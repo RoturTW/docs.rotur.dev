@@ -1,4 +1,4 @@
-# RTR Structure
+# Structure
 
 RTR is a lightweight scripting language with a simple but powerful structure. This document outlines the core components and structure of RTR code.
 
@@ -20,8 +20,8 @@ event (anotherEvent) {
 
 ### 1. Variable Declarations
 
-```js
-variable = value;
+```go
+variable := value;
 ```
 
 ### 2. Function Definitions
@@ -34,7 +34,7 @@ functionName = (param1, param2)~{
 
 ### 3. Control Structures
 
-```js
+```javascript
 if (condition) {
     /* Code */
 } elif (otherCondition) {
@@ -58,8 +58,8 @@ for (variable, range) {
 
 ### 4. Function Calls
 
-```js
-result = functionName(arg1, arg2);
+```go
+result := functionName(arg1, arg2);
 ```
 
 ### 5. Object Operations
@@ -72,19 +72,53 @@ obj.property = obj.method(arg1, arg2);
 
 ### 1. Literals
 
-- Numbers: `42`, `3.14`
-- Strings: `"Hello"`, `'World'`
-- Booleans: `true`, `false`
-- Null: `null`
-- Arrays: `[1, 2, 3]`
-- Objects: `{key: value}`
+* Numbers: `42`, `3.14`
+* Strings: `"Hello"`, `'World'`
+* Booleans: `true`, `false`
+* Null: `null`
+* Arrays: `[1, 2, 3]`
+* Objects: `{key: value}`
 
 ### 2. Operators
 
-- Arithmetic: `+`, `-`, `*`, `/`, `%`, `^`
-- Comparison: `==`, `!=`, `>=`, `<=`, `>`, `<`
-- Logical: `!`, `?`
-- Assignment: `=`, `+=`, `-=`, `*=`, `/=`, `^=`, `%=`
+#### Arithmetic: `+`, `-`, `*`, `/`, `%`, `^`
+
+#### Comparison: `==`, `!=`, `>=`, `<=`, `>`, `<`
+
+#### Logical: `!`, `?`
+
+#### Assignment: `=`, `+=`, `-=`, `*=`, `/=`, `^=`, `%=` , `??=`&#x20;
+
+* #### =
+
+Assigns the left hand side to the right hand side, assigning the variable's type to the value's type
+
+```java
+myVariable := "hi";
+obj.prop = "im a property";
+```
+
+* #### :=
+
+Declares a variable with an immutable type (cannot be changed)
+
+```go
+variable := "hello";
+variable = 5; // errors
+```
+
+```go
+variable := "bleh";
+scope {
+    variable := ":3";
+    log(variable); // :3
+}
+log(variable); // bleh
+```
+
+* #### +=, -=, \*=, /=, %=, ^=
+
+
 
 ### 3. Function Calls
 
@@ -114,16 +148,16 @@ globalVar = 42;
 
 event (onload) {
     /* Event scope */
-    eventVar = "Hello";
+    eventVar := "Hello";
     
     function = ()~{
         /* Function scope */
-        funcVar = true;
-    }
+        funcVar := true;
+    };
     
     scope {
         /* Block scope */
-        blockVar = 123;
+        blockVar := 123;
     }
 }
 ```
@@ -143,10 +177,10 @@ event (eventName) {
 
 Common events include:
 
-- `onload`: Triggered when the program starts
-- `onclick`: Triggered on mouse click
-- `onkey`: Triggered on keyboard input
-- `ontick`: Triggered on each frame/tick
+* `onload`: Triggered when the program starts
+* `onclick`: Triggered on mouse click
+* `onkey`: Triggered on keyboard input
+* `ontick`: Triggered on each frame/tick
 
 ## Function Structure
 
@@ -166,7 +200,7 @@ functionName = (param1, param2)~{
 ```js
 obj.method = (param)~{
     /* Function body */
-}
+};
 ```
 
 ## Error Handling
@@ -188,4 +222,4 @@ event (onerror) {
 4. Use multiline comments for documentation
 5. Use built-in functions when available
 6. Handle errors appropriately
-7. Use proper indentation for readability (though not required) 
+7. Use proper indentation for readability (though not required)

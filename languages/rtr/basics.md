@@ -1,4 +1,4 @@
-# RTR Basics
+# Basics
 
 This guide covers the fundamental concepts and syntax of the RTR language.
 
@@ -6,13 +6,13 @@ This guide covers the fundamental concepts and syntax of the RTR language.
 
 RTR is a simple but powerful scripting language. Here's a basic example:
 
-```js
+```c
 event (onload) {
     /* Print a message */
     log("Hello, World!");
     
     /* Create a variable */
-    name = "John";
+    name := "John";
     
     /* Use the variable */
     log(join("Hello, ", name));
@@ -23,86 +23,86 @@ event (onload) {
 
 Variables in RTR are dynamically typed and can hold any type of value.
 
-```js
+```go
 /* Numbers */
-age = 25;
-pi = 3.14159;
+age := 25;
+pi := 3.14159;
 
 /* Strings */
-name = "Alice";
-greeting = 'Hello';
+name := "Alice";
+greeting := 'Hello';
 
 /* Booleans */
-isActive = true;
-isDone = false;
+isActive := true;
+isDone := false;
 
 /* Arrays */
-numbers = [1, 2, 3, 4, 5];
-names = ["John", "Jane", "Bob"];
+numbers := [1, 2, 3, 4, 5];
+names := ["John", "Jane", "Bob"];
 
 /* Objects */
-person = {name: "John", age: 30, isActive: true};
+person := {name: "John", age: 30, isActive: true};
 ```
 
 ## Basic Operations
 
 ### Arithmetic Operations
 
-```js
-a = 10; b = 3;
+```go
+a := 10; b := 3;
 
-sum = a + b;        /* 13 */
-difference = a - b; /* 7 */
-product = a * b;    /* 30 */
-quotient = a / b;   /* 3.333... */
-remainder = a % b;  /* 1 */
-power = a ^ b;      /* 1000 */
+sum := a + b;        /* 13 */
+difference := a - b; /* 7 */
+product := a * b;    /* 30 */
+quotient := a / b;   /* 3.333... */
+remainder := a % b;  /* 1 */
+power := a ^ b;      /* 1000 */
 ```
 
 ### String Operations
 
-```js
-firstName = "John"; lastName = "Doe";
+```go
+firstName := "John"; lastName := "Doe";
 
 /* String concatenation */
-fullName = join(firstName, " ", lastName);
+fullName := join(firstName, " ", lastName);
 
 /* String length */
-nameLength = length(fullName);
+nameLength := length(fullName);
 
 /* String splitting */
-parts = split(fullName, " ");
+parts := split(fullName, " ");
 ```
 
 ### Comparison Operations
 
-```js
-a = 5; b = 10;
+```go
+a := 5; b := 10;
 
-isEqual = a == b;      /* false */
-isNotEqual = a != b;   /* true */
-isGreater = a > b;     /* false */
-isLess = a < b;        /* true */
-isGreaterOrEqual = a >= b; /* false */
-isLessOrEqual = a <= b;    /* true */
+isEqual := a == b;      /* false */
+isNotEqual := a != b;   /* true */
+isGreater := a > b;     /* false */
+isLess := a < b;        /* true */
+isGreaterOrEqual := a >= b; /* false */
+isLessOrEqual := a <= b;    /* true */
 ```
 
 ### Logical Operations
 
-```js
-isTrue = true; isFalse = false;
+```go
+isTrue := true; isFalse := false;
 
-andResult = all(isTrue, isFalse);  /* false */
-orResult = any(isTrue, isFalse);   /* true */
-notResult = not(isTrue);           /* false */
+andResult := all(isTrue, isFalse);  /* false */
+orResult := any(isTrue, isFalse);   /* true */
+notResult := not(isTrue);           /* false */
 ```
 
 ## Control Flow
 
 ### If Statements
 
-```js
-age = 18;
+```c
+age := 18;
 
 if (age >= 18) {
     log("Adult");
@@ -117,8 +117,8 @@ if (age >= 18) {
 
 #### While Loop
 
-```js
-count = 0;
+```c
+count := 0;
 while (count < 5) {
     log(count);
     count += 1;
@@ -127,7 +127,7 @@ while (count < 5) {
 
 #### Repeat Loop
 
-```js
+```lua
 repeat (5) {
     log("Hello");
 }
@@ -153,8 +153,8 @@ greet = (name)~{
 
 ### Function Call
 
-```js
-message = greet("John");
+```go
+message := greet("John");
 log(message);  /* Outputs: Hello, John */
 ```
 
@@ -178,8 +178,12 @@ calculate = (a, b, operation)~{
 
 ### Object Creation
 
-```js
-person = obj(); person.name = "John"; person.age = 30;
+```go
+person := obj(); person.name = "John"; person.age = 30;
+```
+
+```go
+person := { name: "John", age: 30 };
 ```
 
 ### Method Definition
@@ -192,8 +196,8 @@ person.greet = (name)~{
 
 ### Method Call
 
-```js
-message = person.greet("Alice");
+```go
+message := person.greet("Alice");
 log(message);  /* Outputs: Hello, Alice! I am John */
 ```
 
@@ -232,7 +236,7 @@ range(1, 5);                  /* Returns [1, 2, 3, 4, 5] */
 ### Object Functions
 
 ```js
-person = {name: "John", age: 30};
+person := { name: "John", age: 30 };
 keys(person);                 /* Returns ["name", "age"] */
 values(person);               /* Returns ["John", 30] */
 has(person, "name");          /* Returns true */
@@ -257,4 +261,4 @@ event (onerror) {
 5. Handle errors appropriately
 6. Use built-in functions when available
 7. Keep functions small and focused
-8. Use proper scoping 
+8. Use proper scoping
