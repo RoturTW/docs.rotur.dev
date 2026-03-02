@@ -34,7 +34,7 @@
 * [rMail](assorted-apis/rmail.md)
 * [avatars.rotur.dev](assorted-apis/avatars.rotur.dev/README.md)
   * [.banners](assorted-apis/avatars.rotur.dev/.banners.md)
-* [share.rotur.dev](assorted-apis/share.rotur.dev/README.md)
+* [share.rotur.dev](assorted-apis/share.rotur.dev.md)
 * [rotur.dev/auth](assorted-apis/rotur.dev-auth.md)
 * [Keys](assorted-apis/keys.md)
 * [Linking](assorted-apis/linking.md)
