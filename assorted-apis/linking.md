@@ -17,7 +17,7 @@ Then simply display the code to the user and direct them to open https://rotur.d
 
 Once the user has completed authenticating, you must have a button or an action that allows them to click to signal "i have finished authenticating". Once this button is clicked, simply request to
 
-GET [https://api.rotur.dev/link/username?code=](https://api.rotur.dev/link/user?code=)
+GET [https://api.rotur.dev/link/user?code=](https://api.rotur.dev/link/user?code=)
 
 <pre class="language-javascript"><code class="lang-javascript"><strong>// STATUS 404
 </strong><strong>{
