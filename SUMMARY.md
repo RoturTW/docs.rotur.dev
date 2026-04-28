@@ -38,6 +38,15 @@
 * [rotur.dev/auth](assorted-apis/rotur.dev-auth.md)
 * [Keys](assorted-apis/keys.md)
 * [Linking](assorted-apis/linking.md)
+* [Notifications](assorted-apis/notifications/README.md)
+  * [Register an Endpoint](assorted-apis/notifications/register-endpoint.md)
+  * [Check Registration](assorted-apis/notifications/check-registration.md)
+  * [List Endpoints](assorted-apis/notifications/list-endpoints.md)
+  * [Delete a Device](assorted-apis/notifications/delete-device.md)
+  * [Allowed Senders](assorted-apis/notifications/allowed-senders.md)
+  * [Notification Log](assorted-apis/notifications/notification-log.md)
+  * [Send a Notification](assorted-apis/notifications/send-notification.md)
+* [Status WebSocket](assorted-apis/status-websocket/README.md)
 
 ## languages
 
@@ -81,6 +90,18 @@
   * [/repost](claw/api-endpoints/repost.md)
   * [/top\_posts](claw/api-endpoints/top_posts.md)
   * [/search\_posts](claw/api-endpoints/search_posts.md)
+  * [/notifications](claw/api-endpoints/notifications.md)
+  * [/me](claw/api-endpoints/me.md)
+  * [/exists](claw/api-endpoints/exists.md)
+  * [/pin\_post](claw/api-endpoints/pin_post.md)
+  * [/unpin\_post](claw/api-endpoints/unpin_post.md)
+  * [/claim\_daily](claw/api-endpoints/claim_daily.md)
+  * [/claim\_time](claw/api-endpoints/claim_time.md)
+  * [/badges](claw/api-endpoints/badges.md)
+  * [Friends](claw/api-endpoints/friends.md)
+  * [Files](claw/api-endpoints/files.md)
+  * [Items](claw/api-endpoints/items.md)
+  * [Gifts](claw/api-endpoints/gifts.md)
 
 ## Web Standard
 
