@@ -48,7 +48,7 @@ Authenticate the connection using your Rotur user token.
 
 ## Rooms
 
-Rooms are the core organisational unit. You only see status updates from users who are in the same rooms as you. Room names must match `^[a-zA-Z0-9_\-:]+$` and be at most 64 characters. Each connection can join up to 10 rooms.
+Rooms are the core organisational unit. You only see status updates from users who are in the same rooms as you. Room names must match `^[a-zA-Z0-9_\-:]+$` and be at most 64 characters. Each connection can join up to 200 rooms.
 
 ### `join`
 
