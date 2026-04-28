@@ -9,10 +9,10 @@ The handshake is unmodified from cl4, using the same format and same inputs. Thi
     "language": "Javascript", // the language that you are connecting using
     "version": {
       "editorType": "Scratch", // the type of your environment
-      "versionNumber": 3,
-    },
+      "versionNumber": 3
+    }
   },
-  "listener": "handshake_cfg",
+  "listener": "handshake_cfg"
 }
 
 
