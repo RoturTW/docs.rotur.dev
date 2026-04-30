@@ -45,4 +45,4 @@ Allowed senders and the notification log are stored on the user account object u
 
 All endpoints (except `/notify/vapid`) require a valid `auth` query parameter (your Rotur user token).
 
-**Base URL:** `https://social.rotur.dev`
+**Base URL:** `https://api.rotur.dev`
