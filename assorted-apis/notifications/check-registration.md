@@ -24,6 +24,8 @@ GET /notify/check?source=originChats&fingerprint=a1b2c3d4e5f6
   "registered": true,
   "device_id": "a4f8b2c1d3e5f7a9b0c2d4e6",
   "endpoint": "https://push.example.com/deliver/abc123",
+  "p256dh": "BASE64URL_P256DH_KEY",
+  "auth": "BASE64URL_AUTH_SECRET",
   "source": "originChats",
   "created_at": 1715054321000
 }

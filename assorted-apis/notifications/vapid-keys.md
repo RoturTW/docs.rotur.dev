@@ -11,7 +11,6 @@ This endpoint does **not** require authentication.
 ```json
 {
   "public_key": "BEs9Xb2...",
-  "public_key_hex": "0412f35daf6f...",
   "subject": "mailto:admin@rotur.dev"
 }
 ```
@@ -19,7 +18,6 @@ This endpoint does **not** require authentication.
 | Field | Type | Description |
 | --- | --- | --- |
 | `public_key` | string | Uncompressed P-256 public key encoded as standard Base64 |
-| `public_key_hex` | string | Same key encoded as hex |
 | `subject` | string | The VAPID subject (typically a `mailto:` URI) |
 
 ## Usage with Web Push
