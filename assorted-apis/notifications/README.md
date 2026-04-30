@@ -26,8 +26,23 @@ origin/(c) users/<username>/application data/notify@rotur/endpoints.json
 
 Allowed senders and the notification log are stored on the user account object under `sys.notify_allowed` and `sys.notify_log`.
 
+## Endpoints
+
+| Endpoint | Auth | Description |
+| --- | --- | --- |
+| [GET `/notify/vapid`](vapid-keys.md) | No | Retrieve the server's VAPID public key for web push |
+| [POST `/notify/register`](register-endpoint.md) | Yes | Register a push endpoint |
+| [GET `/notify/check`](check-registration.md) | Yes | Check if a device is registered |
+| [GET `/notify/endpoints`](list-endpoints.md) | Yes | List all registered endpoints |
+| [DELETE `/notify/device/:device_id`](delete-device.md) | Yes | Remove a registered device |
+| [GET `/notify/allowed`](allowed-senders.md) | Yes | List allowed senders |
+| [POST `/notify/allowed/:username`](allowed-senders.md) | Yes | Allow a sender |
+| [DELETE `/notify/allowed/:username`](allowed-senders.md) | Yes | Remove an allowed sender |
+| [GET `/notify/log`](notification-log.md) | Yes | View notification history |
+| [POST `/notify/:username`](send-notification.md) | Yes | Send a notification |
+
 ## Authentication
 
-All endpoints require a valid `auth` query parameter (your Rotur user token).
+All endpoints (except `/notify/vapid`) require a valid `auth` query parameter (your Rotur user token).
 
 **Base URL:** `https://social.rotur.dev`

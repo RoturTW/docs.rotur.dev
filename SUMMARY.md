@@ -45,6 +45,7 @@
   * [Delete a Device](assorted-apis/notifications/delete-device.md)
   * [Allowed Senders](assorted-apis/notifications/allowed-senders.md)
   * [Notification Log](assorted-apis/notifications/notification-log.md)
+  * [VAPID Keys](assorted-apis/notifications/vapid-keys.md)
   * [Send a Notification](assorted-apis/notifications/send-notification.md)
 * [Status WebSocket](assorted-apis/status-websocket/README.md)
 
