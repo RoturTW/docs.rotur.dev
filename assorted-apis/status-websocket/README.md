@@ -31,7 +31,8 @@ Authenticate the connection using your Rotur user token.
 
 ```json
 {
-  "cmd": "auth_ok",
+  "cmd": "ready",
+  "user": {rotur user object}
   "user_id": "abc123",
   "username": "mist"
 }
