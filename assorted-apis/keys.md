@@ -7,7 +7,7 @@
 >
 >
 > **The base url for this api is:**\
-> https://social.rotur.dev/\
+> https://api.rotur.dev/\
 > \
 > \
 > **Manage your keys with the GUI:**\

@@ -12,4 +12,4 @@ Retrieves recent posts from users that the authenticated user is following on Cl
 
 ## Endpoint
 
-{% embed url="https://social.rotur.dev/following_feed?auth=YOUR_AUTH_KEY" %}
+{% embed url="https://api.rotur.dev/following_feed?auth=YOUR_AUTH_KEY" %}

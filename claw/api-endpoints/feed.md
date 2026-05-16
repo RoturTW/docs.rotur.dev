@@ -13,4 +13,4 @@ The feed is the main display of Claw, allowing you to view an array of posts.
 
 ## Endpoint
 
-{% embed url="https://social.rotur.dev/feed?limit=10&offset=0" %}
+{% embed url="https://api.rotur.dev/feed?limit=10&offset=0" %}

@@ -13,4 +13,4 @@ Returns recent posts sorted by the most number of likes
 
 ## Endpoint
 
-{% embed url="https://social.rotur.dev/top_posts" %}
+{% embed url="https://api.rotur.dev/top_posts" %}

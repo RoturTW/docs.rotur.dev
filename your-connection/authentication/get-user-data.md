@@ -15,7 +15,7 @@ const password = "md5_hashed_password"; // hash it before sending
 // you can also use ?auth=token with a rotur token
 // if you dont have the username and password
 
-fetch(`https://social.rotur.dev/get_user?username=${username}&password=${password}`)
+fetch(`https://api.rotur.dev/get_user?username=${username}&password=${password}`)
   .then(res => res.json())
   .then(data => {
     if (data.error) {

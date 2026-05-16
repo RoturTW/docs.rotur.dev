@@ -4,7 +4,7 @@ The gifts API allows users to create, claim, and cancel credit gifts that are re
 
 All endpoints requiring authentication use the `auth` query parameter.
 
-**Base URL:** `https://social.rotur.dev`
+**Base URL:** `https://api.rotur.dev`
 
 ## Create Gift
 

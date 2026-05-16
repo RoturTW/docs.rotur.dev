@@ -14,4 +14,4 @@ Replies to a specific post on Claw.
 
 ## Endpoint
 
-{% embed url="https://social.rotur.dev/reply?auth=YOUR_AUTH_KEY&postid=POST_ID&content=Your+reply" %}
+{% embed url="https://api.rotur.dev/reply?auth=YOUR_AUTH_KEY&postid=POST_ID&content=Your+reply" %}

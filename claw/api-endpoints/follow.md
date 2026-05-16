@@ -13,4 +13,4 @@ Follows a specified user on Claw.
 
 ## Endpoint
 
-{% embed url="https://social.rotur.dev/follow?auth=YOUR_AUTH_KEY&name=TargetUser" %}
+{% embed url="https://api.rotur.dev/follow?auth=YOUR_AUTH_KEY&name=TargetUser" %}

@@ -15,4 +15,4 @@ Creates a new post for the authenticated user.
 
 ## Endpoint
 
-{% embed url="https://social.rotur.dev/post?auth=YOUR_AUTH_KEY&content=Hello&attachment=https://example.com/image.jpg" %}
+{% embed url="https://api.rotur.dev/post?auth=YOUR_AUTH_KEY&content=Hello&attachment=https://example.com/image.jpg" %}

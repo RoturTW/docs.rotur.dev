@@ -13,4 +13,4 @@ Reposts a post on claw to your profile.
 
 ## Endpoint
 
-{% embed url="https://social.rotur.dev/repost?auth=YOUR_AUTH_KEY&id=post_id" %}
+{% embed url="https://api.rotur.dev/repost?auth=YOUR_AUTH_KEY&id=post_id" %}

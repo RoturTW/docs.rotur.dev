@@ -12,4 +12,4 @@ Retrieves a list of followers for a specific user on Claw.
 
 ## Endpoint
 
-{% embed url="https://social.rotur.dev/followers?name=TargetUser" %}
+{% embed url="https://api.rotur.dev/followers?name=TargetUser" %}

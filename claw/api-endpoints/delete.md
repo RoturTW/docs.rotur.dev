@@ -13,4 +13,4 @@ Deletes a post on Claw if the authenticated user is the creator.
 
 ## Endpoint
 
-{% embed url="https://social.rotur.dev/delete?auth=YOUR_AUTH_KEY&id=POST_ID" %}
+{% embed url="https://api.rotur.dev/delete?auth=YOUR_AUTH_KEY&id=POST_ID" %}

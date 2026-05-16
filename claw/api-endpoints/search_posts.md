@@ -13,4 +13,4 @@ Returns the an array of posts that have your query in their content
 
 ## Endpoint
 
-{% embed url="https://social.rotur.dev/search_posts?limit=20&q=mist" %}
+{% embed url="https://api.rotur.dev/search_posts?limit=20&q=mist" %}

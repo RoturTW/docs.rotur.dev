@@ -13,4 +13,4 @@ Retrieves the profile information and posts of a specific user on Claw.
 
 ## Endpoint
 
-{% embed url="https://social.rotur.dev/profile?name=TargetUser" %}
+{% embed url="https://api.rotur.dev/profile?name=TargetUser" %}

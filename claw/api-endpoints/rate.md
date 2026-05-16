@@ -14,4 +14,4 @@ Allows a user to like or unlike a post on Claw.
 
 ## Endpoint
 
-{% embed url="https://social.rotur.dev/rate?auth=YOUR_AUTH_KEY&id=POST_ID&rating=1" %}
+{% embed url="https://api.rotur.dev/rate?auth=YOUR_AUTH_KEY&id=POST_ID&rating=1" %}

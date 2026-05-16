@@ -2,7 +2,7 @@
 
 The files API manages user file storage via the OFSF (Origin File System Format). All endpoints require authentication.
 
-**Base URL:** `https://social.rotur.dev`
+**Base URL:** `https://api.rotur.dev`
 
 ## Update Files
 

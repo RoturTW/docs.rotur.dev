@@ -4,7 +4,7 @@ The friends API provides full friend management — sending, accepting, rejectin
 
 All endpoints require authentication.
 
-**Base URL:** `https://social.rotur.dev`
+**Base URL:** `https://api.rotur.dev`
 
 ## List Friends
 
