@@ -32,18 +32,4 @@ Using the rotur websocket you can tell the rotur server to transfer credits to a
 
 ## Rotur Taxes
 
-### transfers made on discord
-
-0.5 credits to the owner of the os that your linked account was made with
-
-* your account was made on originOS so i get 0.5 credits every time you make a transfer
-
-### transfers made on any roturOS
-
-0.5 credits go to the owner of the os that you are currently using
-
-* you are logged into originOS and you use the wallet app to make the transfer, i get 0.5 credits
-
-### all transfers
-
-0.5 credits get deleted for any transfer in order to keep the economy stable
+Transfers are completely free and have no tax or fees
