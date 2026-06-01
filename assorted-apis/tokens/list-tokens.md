@@ -28,6 +28,7 @@ GET /tokens?auth=YOUR_TOKEN
       "created_at": 1715512345678,
       "last_used_at": 1715599999999,
       "expires_at": null,
+      "token": "the token value",
       "revoked": false,
       "revoked_at": null,
       "origin": "https://myapp.example.com",
@@ -38,5 +39,3 @@ GET /tokens?auth=YOUR_TOKEN
   "total": 1
 }
 ```
-
-> **Note:** The `token` field (the secret value) is **never** included in list responses. Only the public fields are returned.
