@@ -44,8 +44,6 @@ Sub-tokens are stored per-user at:
 <USERDATA_PATH>/<username>/tokens.json
 ```
 
-The token value itself is only returned once — at creation time. It is never exposed again in any API response.
-
 ***
 
 ## Endpoints
