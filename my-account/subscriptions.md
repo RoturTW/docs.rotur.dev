@@ -117,7 +117,7 @@ All users can claim daily credits via the `/claim_daily` endpoint. The amount re
 
 Subscriptions can be obtained through:
 
-- **Ko-fi purchases** - Buying a subscription via the Rotur Ko-fi shop automatically applies the tier to your account
+- **Ko-fi purchases** - Buying a subscription via [Ko-fi](https://ko-fi.com/mistium)
 - **Admin assignment** - Rotur administrators can manually assign subscription tiers
 - **Key-based subscriptions** - Some access keys grant subscription access as a benefit
 
