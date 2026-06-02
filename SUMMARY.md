@@ -26,6 +26,7 @@
 * [Rotur Badges](my-account/rotur-badges.md)
 * [Transactions and Taxes](my-account/transactions-and-taxes.md)
 * [Bio Template Strings](my-account/bio-templates.md)
+* [Subscriptions](my-account/subscriptions.md)
 * [Friend Notes](my-account/friend-notes.md)
 * [Earn Credits](my-account/earn-credits.md)
 

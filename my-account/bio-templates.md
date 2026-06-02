@@ -28,6 +28,16 @@ might render as:
 Hi, I'm Sophie and I currently have 1234 credits!
 ```
 
+### Different tiers
+
+Available from **Lite** and above. Bio templating lets you use dynamic template expressions in your bio text. Templates use the `{{ ... }}` syntax.
+
+| Template | Minimum Tier | Description |
+|---|---|---|
+| `{{ user key }}` | Lite | Display a field from your profile (e.g. `{{ user username }}`) |
+| `{{ time format }}` | Plus | Display your current local time (e.g. `{{ time 15:04 }}`) |
+| `{{ url address }}` | Pro | Fetch and render content from an external URL |
+
 ### Key points:
 
 * Only safe keys are processed; unknown keys are replaced with an empty string.
