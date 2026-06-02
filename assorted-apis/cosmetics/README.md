@@ -37,12 +37,6 @@ For example, if an overlay costs 100 credits and the creator has `creator_pct` s
 
 ### User Cosmetics Storage
 
-Per-user cosmetics data is stored at:
-
-```
-~/Documents/rotur/userdata/<username>/cosmetics.json
-```
-
 Structure:
 
 ```json
@@ -53,32 +47,6 @@ Structure:
   "owned_cosmetics": ["cat_ears", "huopa", "maga"]
 }
 ```
-
-### Overlay Assets
-
-Overlay GIF files are stored at:
-
-```
-~/Documents/cosmetics/overlays/<id>.gif
-```
-
-The existing overlay manifest is at:
-
-```
-~/Documents/cosmetics/overlays/-manifest.json
-```
-
-### Catalog Storage
-
-The cosmetics catalog (all available items) is stored at:
-
-```
-./cosmetics_catalog.json
-```
-
-This file is managed by admins only — there is no user-facing API to add cosmetics to the catalog.
-
-***
 
 ## Endpoints
 
