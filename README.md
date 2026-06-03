@@ -1,33 +1,30 @@
+![](https://github.com/user-attachments/assets/59384c74-a8c4-4707-9931-f6a3364395dc)
+
 # Getting Started
 
-### What is Rotur?
-
-Rotur is a cloudlink based, networking packet standard and accounts system packaged into an easy to use extension. Made to make turbowarp operating systems more interconnected and easier to develop.
+Rotur is an ecosystem as a service, you can hook into the existing system and accounts from rotur, it was made to make it simple to build connected and networked online experiences.
 
 ### When is Rotur? :3
 
 Rotur is a project started on the 29th of June, 2024.
 
-### Devs
-
-Rotur's current developers are:
-
-|            ![](https://avatars.rotur.dev/mist)            |           ![](https://avatars.rotur.dev/flufi)            |               ![](https://avatars.rotur.dev/b1j2754)              |
-| :-------------------------------------------------------: | :-------------------------------------------------------: | :---------------------------------------------------------------: |
-|               [Mistium](https://mistium.com)              |         [Flufi](https://github.com/ThePandaDever)         |                [B1j2754](https://github.com/B1j2754)              |
-
-***
-
 ### Who is Rotur for?
 
-Rotur is aimed at Turbowarp-based operating systems but can be used in other environments as long as websockets are available.
-
-The standard should allow for things like cross-play of games between operating systems, or collaborative editing on text editors, running on completely different projects!
-
-We think this could be really really cool if its implemented thoroughly at a wide scale, and it is currently Present in 5 Systems (2 Released)
-
-***
+Rotur was originally made for TurboWarp/MistWarp based operating systems to allow them to become more interconnected, but has since grown out of that and into a more general use case by powering services like originChats and the rotur suite
 
 ### Why use Rotur?
 
-Rotur enables a whole range of new possibilities, simulated ports, client info, timestamps and more.
+Rotur provides everything you could need for authentication and user to user interactions out of the box and simply, you dont have to reimplement everything and you automatically inherit the whole userbase of rotur as people who can just login to your app and use it!
+
+### What does Rotur offer?
+
+Rotur offers authentication primarily, an inbuilt ecosystem, centralised and simple user avatars, banners, friends, real time streaming for account data, authentication levels and token permissions, cosmetics, groups plus a super simple way to do discord-like rpc and activities from the web.
+
+# More here
+
+https://rotur.dev
+https://docs.rotur.dev
+
+# Chat with us in our official originChats server
+
+https://originchats.mistium.com?server=chats.mistium.com
