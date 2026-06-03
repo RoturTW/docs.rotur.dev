@@ -81,7 +81,7 @@ Users can **represent** a group, which sets `sys.group` on their account. This a
 Each group is stored in its own directory:
 
 ```
-~/Documents/rotur/groups/{groupId}/
+groups/{groupId}/
 ├── group.json       # Group metadata, members, roles, announcements, events
 └── tips.json        # Tips (separate file)
 ```
@@ -89,7 +89,7 @@ Each group is stored in its own directory:
 If an icon is uploaded:
 
 ```
-~/Documents/rotur/groups/{groupId}/
+groups/{groupId}/
 ├── group.json
 ├── tips.json
 └── icon.jpg
