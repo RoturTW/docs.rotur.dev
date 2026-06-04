@@ -189,26 +189,44 @@
 ## Rotur SDK
 
 * [Getting Started](rotur-sdk/README.md)
-* [Authentication](rotur-sdk/authentication.md)
-* [Me — Your Account](rotur-sdk/me.md)
-* [Profiles](rotur-sdk/profiles.md)
-* [Posts](rotur-sdk/posts.md)
-* [Friends](rotur-sdk/friends.md)
-* [Following](rotur-sdk/following.md)
-* [Notifications](rotur-sdk/notifications.md)
-* [Keys](rotur-sdk/keys.md)
-* [Items](rotur-sdk/items.md)
-* [Gifts](rotur-sdk/gifts.md)
-* [Tokens](rotur-sdk/tokens.md)
-* [Groups](rotur-sdk/groups.md)
-* [Systems](rotur-sdk/systems.md)
-* [Stats](rotur-sdk/stats.md)
-* [Status & WebSocket](rotur-sdk/status.md)
-* [Validators](rotur-sdk/validators.md)
-* [Linking](rotur-sdk/linking.md)
-* [Cosmetics](rotur-sdk/cosmetics.md)
-* [Push Notifications](rotur-sdk/push.md)
-* [Files](rotur-sdk/files.md)
-* [Standing](rotur-sdk/standing.md)
-* [DevFund](rotur-sdk/devfund.md)
-* [Check](rotur-sdk/check.md)
+
+### Account
+
+* [Authentication](rotur-sdk/account/authentication.md)
+* [Me — Your Account](rotur-sdk/account/me.md)
+* [Profiles](rotur-sdk/account/profiles.md)
+
+### Social
+
+* [Posts](rotur-sdk/social/posts.md)
+* [Friends](rotur-sdk/social/friends.md)
+* [Following](rotur-sdk/social/following.md)
+* [Notifications](rotur-sdk/social/notifications.md)
+
+### Marketplace
+
+* [Keys](rotur-sdk/marketplace/keys.md)
+* [Items](rotur-sdk/marketplace/items.md)
+* [Gifts](rotur-sdk/marketplace/gifts.md)
+* [Tokens](rotur-sdk/marketplace/tokens.md)
+* [Cosmetics](rotur-sdk/marketplace/cosmetics.md)
+
+### Platform
+
+* [Groups](rotur-sdk/platform/groups.md)
+* [Systems](rotur-sdk/platform/systems.md)
+* [Stats](rotur-sdk/platform/stats.md)
+* [Standing](rotur-sdk/platform/standing.md)
+* [DevFund](rotur-sdk/platform/devfund.md)
+* [Check](rotur-sdk/platform/check.md)
+
+### Realtime
+
+* [Status & WebSocket](rotur-sdk/realtime/status.md)
+* [Push Notifications](rotur-sdk/realtime/push.md)
+
+### Utilities
+
+* [Validators](rotur-sdk/utilities/validators.md)
+* [Linking](rotur-sdk/utilities/linking.md)
+* [Files](rotur-sdk/utilities/files.md)
