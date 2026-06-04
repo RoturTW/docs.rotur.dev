@@ -189,44 +189,32 @@
 ## Rotur SDK
 
 * [Getting Started](rotur-sdk/README.md)
-
-### Account
-
-* [Authentication](rotur-sdk/account/authentication.md)
-* [Me — Your Account](rotur-sdk/account/me.md)
-* [Profiles](rotur-sdk/account/profiles.md)
-
-### Social
-
-* [Posts](rotur-sdk/social/posts.md)
-* [Friends](rotur-sdk/social/friends.md)
-* [Following](rotur-sdk/social/following.md)
-* [Notifications](rotur-sdk/social/notifications.md)
-
-### Marketplace
-
-* [Keys](rotur-sdk/marketplace/keys.md)
-* [Items](rotur-sdk/marketplace/items.md)
-* [Gifts](rotur-sdk/marketplace/gifts.md)
-* [Tokens](rotur-sdk/marketplace/tokens.md)
-* [Cosmetics](rotur-sdk/marketplace/cosmetics.md)
-
-### Platform
-
-* [Groups](rotur-sdk/platform/groups.md)
-* [Systems](rotur-sdk/platform/systems.md)
-* [Stats](rotur-sdk/platform/stats.md)
-* [Standing](rotur-sdk/platform/standing.md)
-* [DevFund](rotur-sdk/platform/devfund.md)
-* [Check](rotur-sdk/platform/check.md)
-
-### Realtime
-
-* [Status & WebSocket](rotur-sdk/realtime/status.md)
-* [Push Notifications](rotur-sdk/realtime/push.md)
-
-### Utilities
-
-* [Validators](rotur-sdk/utilities/validators.md)
-* [Linking](rotur-sdk/utilities/linking.md)
-* [Files](rotur-sdk/utilities/files.md)
+* [Account](rotur-sdk/account/README.md)
+  * [Authentication](rotur-sdk/account/authentication.md)
+  * [Me — Your Account](rotur-sdk/account/me.md)
+  * [Profiles](rotur-sdk/account/profiles.md)
+* [Social](rotur-sdk/social/README.md)
+  * [Posts](rotur-sdk/social/posts.md)
+  * [Friends](rotur-sdk/social/friends.md)
+  * [Following](rotur-sdk/social/following.md)
+  * [Notifications](rotur-sdk/social/notifications.md)
+* [Marketplace](rotur-sdk/marketplace/README.md)
+  * [Keys](rotur-sdk/marketplace/keys.md)
+  * [Items](rotur-sdk/marketplace/items.md)
+  * [Gifts](rotur-sdk/marketplace/gifts.md)
+  * [Tokens](rotur-sdk/marketplace/tokens.md)
+  * [Cosmetics](rotur-sdk/marketplace/cosmetics.md)
+* [Platform](rotur-sdk/platform/README.md)
+  * [Groups](rotur-sdk/platform/groups.md)
+  * [Systems](rotur-sdk/platform/systems.md)
+  * [Stats](rotur-sdk/platform/stats.md)
+  * [Standing](rotur-sdk/platform/standing.md)
+  * [DevFund](rotur-sdk/platform/devfund.md)
+  * [Check](rotur-sdk/platform/check.md)
+* [Realtime](rotur-sdk/realtime/README.md)
+  * [Status & WebSocket](rotur-sdk/realtime/status.md)
+  * [Push Notifications](rotur-sdk/realtime/push.md)
+* [Utilities](rotur-sdk/utilities/README.md)
+  * [Validators](rotur-sdk/utilities/validators.md)
+  * [Linking](rotur-sdk/utilities/linking.md)
+  * [Files](rotur-sdk/utilities/files.md)
