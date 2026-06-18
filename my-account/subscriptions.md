@@ -44,6 +44,7 @@ Each tier inherits all benefits from the tier below it and adds new ones.
 
 The default tier for all Rotur accounts. No subscription required.
 
+> on rotur
 - **5 Currency Keys** - Create up to 5 keys for access control and API integrations
 - **10 Login History Entries** - View up to 10 recent login records
 - **20 Transaction History Entries** - View up to 20 recent credit transactions
@@ -52,12 +53,16 @@ The default tier for all Rotur accounts. No subscription required.
 - **200 Character Bio** - Write a bio up to 200 characters
 - **1× Daily Credit Multiplier** - Earn 1 credit per daily claim
 
+> on roturGate
+- **20 free roturGate urls** - Shorten 20 urls
+
 ---
 
 ### Lite
 
 A lightweight upgrade that introduces profile customization.
 
+> on rotur
 - **Everything in Free**, plus:
 - **10 MB File System** - Double the storage capacity (up from 5 MB)
 - **Bio Templating** - Use template expressions like `{{ user username }}` in your bio to dynamically display profile data
@@ -68,6 +73,7 @@ A lightweight upgrade that introduces profile customization.
 
 The sweet spot for active users who want animated avatars and more capacity.
 
+> on rotur
 - **Everything in Lite**, plus:
 - **20 Currency Keys** - Create up to 20 keys (up from 5)
 - **100 Login History Entries** - View up to 100 recent login records (up from 10)
@@ -80,12 +86,17 @@ The sweet spot for active users who want animated avatars and more capacity.
 - **Profile Notes** - Add personal notes to other users' profiles via the `/me/note/:username` endpoint
 - **`{{ time }}` Bio Template** - Display your local time in your bio using `{{ time HH:MM }}`
 
+> on roturGate
+- **100 roturGate urls** - Have up to 100 shortened urls using rotur gate
+- **Rename roturGate urls** - Create custom https://gate.rotur.dev/:name urls for your redirects
+
 ---
 
 ### Pro
 
 The premium tier for power users and developers.
 
+> on rotur
 - **Everything in Plus**, plus:
 - **50 Currency Keys** - Create up to 50 keys (up from 20)
 - **100,000 Rmails** - Store up to 100,000 rmail messages (up from 1,000)
@@ -97,6 +108,9 @@ The premium tier for power users and developers.
 - **3× Daily Credit Multiplier** - Earn 3 credits per daily claim (up from 2×)
 - **Pro Subscriber Badge** - A special badge displayed on your profile
 - **`{{ url }}` Bio Template** - Fetch and display external URL content in your bio using `{{ url https://... }}`. Can also be used to track number of profile visits.
+
+> on roturGate
+- **1000 roturGate urls** - Have up to 1000 shortened urls using rotur gate
 
 ---
 
