@@ -110,6 +110,9 @@ GET /tokens/permissions
 | `PermManageGroups` | `groups:manage` | Manage groups |
 | `PermJoinGroup` | `groups:join` | Join groups |
 | `PermLeaveGroup` | `groups:leave` | Leave groups |
+| `PermViewGroupMembers` | `groups:members.view` | View group member lists |
+| `PermInviteGroup` | `groups:invite` | Send and manage group invites |
+| `PermBanGroup` | `groups:ban` | Ban and unban group members |
 
 ### Notifications
 
@@ -165,6 +168,7 @@ Permission groups are pre-defined bundles of permissions for common use cases.
 | `files:view` |
 | `keys:view` |
 | `groups:view` |
+| `groups:members.view` |
 | `notifications:view` |
 | `gifts:view` |
 | `items:view` |

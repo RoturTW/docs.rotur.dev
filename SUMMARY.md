@@ -37,6 +37,7 @@
   * [.banners](assorted-apis/avatars.rotur.dev/.banners.md)
 * [share.rotur.dev](assorted-apis/share.rotur.dev.md)
 * [rotur.dev/auth](assorted-apis/rotur.dev-auth.md)
+* [Gate](assorted-apis/gate.md)
 * [Keys](assorted-apis/keys.md)
 * [Linking](assorted-apis/linking.md)
 * [Validators](assorted-apis/validators/README.md)
@@ -85,6 +86,7 @@
   * [Events](assorted-apis/groups/events.md)
   * [Tips](assorted-apis/groups/tips.md)
   * [Roles](assorted-apis/groups/roles.md)
+  * [Members](assorted-apis/groups/members.md)
   * [Member Roles & Permissions](assorted-apis/groups/member-roles.md)
 * [Status WebSocket](assorted-apis/status-websocket/README.md)
 

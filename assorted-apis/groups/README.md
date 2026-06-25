@@ -30,6 +30,8 @@ Groups can be **public** or **private**. Only public groups appear in search res
 
 Each group has an **Owner** role (created automatically) and a default **Member** role. The Owner can create additional custom roles with specific permissions and benefits.
 
+> **Note:** The Owner role always has **all** group permissions dynamically — it doesn't rely on a stored permission list. This means any new permissions added in future updates are automatically available to the owner without needing to update the group's role data.
+
 **Available permissions:**
 
 | Permission | Description |
@@ -37,12 +39,16 @@ Each group has an **Owner** role (created automatically) and a default **Member*
 | `groups.manage` | Full group management |
 | `groups.members.invite` | Invite new members |
 | `groups.members.remove` | Remove members |
+| `groups.members.ban` | Ban/unban members |
+| `groups.members.view` | View the group member list |
 | `groups.roles.manage` | Create, update, delete roles |
 | `groups.roles.assign` | Assign/remove roles from members |
 | `groups.announcements.send` | Create and delete announcements |
 | `groups.events.manage` | Create events |
 | `groups.events.publish` | Publish events |
 | `groups.tips.manage` | Manage tips |
+| `groups.tips.withdraw` | Withdraw credits from the group tip jar |
+| `groups.tips.deposit` | Deposit credits into the group tip jar |
 | `groups.group.edit` | Edit group settings |
 
 ### Readme & Rules
@@ -61,12 +67,16 @@ If the user doesn't have enough credits, the join request is rejected.
 ### Credits
 
 - **Creating a group** costs **50 credits**.
-- **Setting a banner** costs **10 credits**.
-- Tips sent to a group are added to the group's `credits_balance`. Tips are stored in a separate `tips.json` file per group.
+- Banners are uploaded directly (no credit charge).
+- Tips sent to a group are added to the group's `credits_balance`. Tips are stored in a separate `tips.json` file per group. Users with the `groups.tips.withdraw` permission can withdraw credits from the tip jar to their own balance. Withdrawals are stored in a separate `withdrawals.json` file per group.
 
 ### Icons
 
 Group icons can be uploaded as images and are automatically resized to **256×256 JPEG** (max 5MB upload). Icons are served at `GET /groups/{tag}/icon.jpg`.
+
+### Banners
+
+Group banners can be uploaded as images and are automatically resized to **900×300** (max 5MB upload). GIF, PNG, and JPEG formats are supported. Banners are served at `GET /groups/{tag}/banner`.
 
 ### Announcements & Notifications
 
@@ -86,13 +96,15 @@ groups/{groupId}/
 └── tips.json        # Tips (separate file)
 ```
 
-If an icon is uploaded:
+If an icon and/or banner is uploaded:
 
 ```
 groups/{groupId}/
 ├── group.json
 ├── tips.json
-└── icon.jpg
+├── withdrawals.json
+├── icon.jpg
+└── banner.jpg (or .png / .gif)
 ```
 
 ***
@@ -115,7 +127,8 @@ groups/{groupId}/
 | [`/groups/{tag}/report`](report.md) | POST | Yes | Report a group |
 | [`/groups/{tag}/icon`](icon.md) | POST | Yes | Upload a group icon (owner only) |
 | [`/groups/{tag}/icon.jpg`](icon.md) | GET | No | Get a group's icon image |
-| [`/groups/{tag}/banner`](banner.md) | POST | Yes | Set a group banner URL (10 credits, owner only) |
+| [`/groups/{tag}/banner`](banner.md) | POST | Yes | Upload a group banner image (owner only) |
+| [`/groups/{tag}/banner`](banner.md) | GET | No | Get a group's banner image |
 | [`/groups/{tag}/announcements`](announcements.md) | GET | No | List announcements |
 | [`/groups/{tag}/announcements`](announcements.md) | POST | Yes | Create an announcement |
 | [`/groups/{tag}/announcements/{id}`](announcements.md) | DELETE | Yes | Delete an announcement |
@@ -124,10 +137,30 @@ groups/{groupId}/
 | [`/groups/{tag}/events`](events.md) | POST | Yes | Create an event |
 | [`/groups/{tag}/tips`](tips.md) | GET | Yes | List tips |
 | [`/groups/{tag}/tips`](tips.md) | POST | Yes | Send a tip |
+| [`/groups/{tag}/tips/withdraw`](tips.md) | POST | Yes | Withdraw from the group tip jar |
+| [`/groups/{tag}/tips/withdrawals`](tips.md) | GET | Yes | List tip jar withdrawals |
 | [`/groups/{tag}/roles`](roles.md) | GET | Yes | List roles |
 | [`/groups/{tag}/roles`](roles.md) | POST | Yes | Create a role |
 | [`/groups/{tag}/roles/{id}`](roles.md) | PATCH | Yes | Update a role |
 | [`/groups/{tag}/roles/{id}`](roles.md) | DELETE | Yes | Delete a role |
+| [`/groups/{tag}/members`](members.md) | GET | Yes | List all members (paginated, owner or `groups.members.view` permission) |
+| [`/groups/{tag}/members/{user}`](members.md) | GET | Yes | Get a member's detailed info |
+| [`/groups/{tag}/members/{user}`](members.md) | DELETE | Yes | Kick a member (`groups.members.remove`) |
+| [`/groups/{tag}/members/{user}/ban`](members.md) | POST | Yes | Ban a member (`groups.members.ban`) |
+| [`/groups/{tag}/members/{user}/ban`](members.md) | DELETE | Yes | Unban a member (`groups.members.ban`) |
+| [`/groups/{tag}/bans`](members.md) | GET | Yes | List bans (`groups.members.ban`) |
+| [`/groups/{tag}/bans/{user}`](members.md) | GET | Yes | Check if a user is banned |
+| [`/groups/{tag}/invites`](members.md) | GET | Yes | List pending invites |
+| [`/groups/{tag}/invites`](members.md) | POST | Yes | Send an invite (`groups.members.invite`) |
+| [`/groups/{tag}/invites/{id}/accept`](members.md) | POST | Yes | Accept an invite |
+| [`/groups/{tag}/invites/{id}/decline`](members.md) | POST | Yes | Decline an invite |
+| [`/groups/{tag}/invites/{id}`](members.md) | DELETE | Yes | Revoke an invite (`groups.members.invite`) |
+| [`/groups/invites/mine`](members.md) | GET | Yes | List your pending invites |
+| [`/groups/{tag}/join_requests`](members.md) | GET | Yes | List join requests (`groups.members.invite`) |
+| [`/groups/{tag}/join_requests`](members.md) | POST | Yes | Request to join |
+| [`/groups/{tag}/join_requests/{id}/accept`](members.md) | POST | Yes | Accept a join request (`groups.members.invite`) |
+| [`/groups/{tag}/join_requests/{id}/decline`](members.md) | POST | Yes | Decline a join request (`groups.members.invite`) |
+| [`/groups/{tag}/transfer/{user}`](members.md) | POST | Yes | Transfer ownership (owner only) |
 | [`/groups/{tag}/members/{user}/roles`](member-roles.md) | GET | Yes | Get a member's roles |
 | [`/groups/{tag}/members/{user}/permissions`](member-roles.md) | GET | Yes | Get a member's permissions |
 | [`/groups/{tag}/members/{user}/benefits`](member-roles.md) | GET | Yes | Get a member's benefits |
@@ -150,7 +183,7 @@ All group API responses return the **public** version with `owner_user_id` resol
   "readme": "# Welcome\nThis is the group readme...",
   "rules": "1. Be respectful\n2. No spam",
   "icon_url": "https://api.rotur.dev/groups/mygroup/icon.jpg",
-  "banner_url": "https://example.com/banner.png",
+  "banner_url": "https://api.rotur.dev/groups/mygroup/banner",
   "owner_user_id": "alice",
   "public": true,
   "join_policy": "OPEN",
@@ -216,6 +249,18 @@ Member responses use `username` instead of `user_id`:
   "from_username": "bob",
   "amount_credits": 25.0,
   "created_at": 1717000000
+}
+```
+
+### Withdrawal (API response)
+
+```json
+{
+  "id": "withdrawal-1",
+  "group_tag": "mygroup",
+  "to_username": "alice",
+  "amount_credits": 50.0,
+  "created_at": 1717200000
 }
 ```
 

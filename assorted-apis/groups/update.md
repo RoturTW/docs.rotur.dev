@@ -24,7 +24,6 @@ Updates group settings. **Owner only.**
 | `readme` | string | No | New readme content (max 10,000 chars) |
 | `rules` | string | No | New rules content (max 5,000 chars) |
 | `icon` | string | No | Icon URL string (for URL-based icons; use the `/icon` upload endpoint for image uploads) |
-| `banner_url` | string | No | Banner URL (for URL-based banners; use the `/banner` endpoint to set with credit charge) |
 | `public` | bool | No | Whether the group is public |
 | `join_policy` | string | No | `"OPEN"`, `"REQUEST"`, or `"INVITE"` |
 | `entry_fee` | float | No | Credits required to join (set to `0` to remove) |

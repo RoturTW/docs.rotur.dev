@@ -26,7 +26,7 @@ Returns a group's public information.
   "readme": "# About\nWelcome to our group!",
   "rules": "1. Be respectful\n2. No spam",
   "icon_url": "https://api.rotur.dev/groups/mygroup/icon.jpg",
-  "banner_url": "",
+  "banner_url": "https://api.rotur.dev/groups/mygroup/banner",
   "owner_user_id": "alice",
   "public": true,
   "join_policy": "OPEN",

@@ -97,7 +97,7 @@ Returns the aggregated list of permissions a member has across all their roles.
 }
 ```
 
-The **Owner** role automatically grants all permissions, regardless of what's listed in the `permissions` array.
+The **Owner** role automatically grants all permissions dynamically, regardless of what's listed in the role's `permissions` array. When you request a member's permissions and they have the Owner role, the API returns the full list of all group permissions rather than what's stored in the group's JSON data.
 
 **Error Responses:**
 
