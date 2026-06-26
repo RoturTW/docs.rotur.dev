@@ -27,3 +27,4 @@ You can add the following query parameters to customize the avatar:
 
 * `s`: Specify the size of the avatar. Default is 256. Example: `?s=128`
 * `radius`: Specify the border radius of the avatar. Default is 0 (square). Example: `?radius=128` for a circular avatar.
+* `no_animate`: Set to `1` to force an animated (GIF) avatar to be served as a still image. The value must be exactly `1` — any other value is ignored. Example: `?no_animate=1`
