@@ -200,7 +200,7 @@ Request the current state of a room you are in.
 }
 ```
 
-## Presence
+## Presence & Status
 
 Presence determines your visibility to other users in rooms. A user with multiple connections uses the most visible presence across all of them.
 
@@ -211,35 +211,25 @@ Presence determines your visibility to other users in rooms. A user with multipl
 | `dnd` | Visible, indicates do not disturb |
 | `invisible` | Hidden from room member lists entirely |
 
-### `set_presence`
-
-**Send:**
-
-```json
-{
-  "cmd": "set_presence",
-  "presence": "idle"
-}
-```
-
-When switching from visible to invisible, other room members receive a `member_leave`. When switching from invisible to visible, they receive a `member_join`. Otherwise, a `status_update` is broadcast.
-
-## Status
-
-A simple text string (max 128 characters) shown alongside your presence.
+Status is a simple text string (max 128 characters) shown alongside your presence.
 
 ### `set_status`
+
+Set your presence, status text, or both in a single command. At least one field must be provided.
 
 **Send:**
 
 ```json
 {
   "cmd": "set_status",
+  "presence": "idle",
   "status": "working on rotur"
 }
 ```
 
-Other room members receive a `status_update` event:
+Both fields are optional individually — you can send only `presence`, only `status`, or both together.
+
+When switching from visible to invisible, other room members receive a `member_leave`. When switching from invisible to visible, they receive a `member_join`. Otherwise, a `status_update` is broadcast:
 
 ```json
 {
@@ -328,7 +318,7 @@ A single user can have multiple websocket connections simultaneously (e.g. on di
 
 When all connections for a user leave a room, the user is fully removed and a `member_leave` is broadcast.
 
-## HTTP Fallback
+## HTTP API
 
 ### GET `/status/get`
 
@@ -370,6 +360,27 @@ Retrieve the real-time status of a user without a websocket connection.
 
 This only returns data for users with visible presence who are currently connected to the status websocket.
 
-## Keepalive
+### POST `/status/set`
 
-The server sends ping frames every 30 seconds. The client must respond with pong frames. If no pong is received within 120 seconds, the connection is closed.
+Set your presence and/or status text over HTTP. Requires authentication.
+
+**Request body:**
+
+```json
+{
+  "presence": "idle",
+  "status": "working on rotur"
+}
+```
+
+Both fields are optional individually — you can send only `presence`, only `status`, or both. At least one must be present.
+
+**Response (200):**
+
+```json
+{
+  "ok": true
+}
+```
+
+This broadcasts room updates the same way the WebSocket `set_status` command does.
