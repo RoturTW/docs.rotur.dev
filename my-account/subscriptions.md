@@ -78,7 +78,6 @@ The sweet spot for active users who want animated avatars and more capacity.
 - **20 Currency Keys** - Create up to 20 keys (up from 5)
 - **100 Login History Entries** - View up to 100 recent login records (up from 10)
 - **100 Transaction History Entries** - View up to 100 recent credit transactions (up from 20)
-- **1,000 Rmails** - Store up to 1,000 rmail messages (up from 100)
 - **15 MB File System** - Triple the base storage capacity (up from 10 MB)
 - **500 Character Bio** - Write a bio up to 500 characters (up from 200)
 - **Animated Profile Picture** - Upload and display an animated GIF as your avatar
@@ -86,9 +85,16 @@ The sweet spot for active users who want animated avatars and more capacity.
 - **Profile Notes** - Add personal notes to other users' profiles via the `/me/note/:username` endpoint
 - **`{{ time }}` Bio Template** - Display your local time in your bio using `{{ time HH:MM }}`
 
+> on mail
+- **1,000 Rmails** - Store up to 1,000 rmail messages (up from 100)
+
 > on roturGate
 - **100 roturGate urls** - Have up to 100 shortened urls using rotur gate
 - **Rename roturGate urls** - Create custom https://gate.rotur.dev/:name urls for your redirects
+
+> on sable
+- Access to the full model catalogue
+- 25% cheaper tokens compared to free
 
 ---
 
@@ -99,7 +105,6 @@ The premium tier for power users and developers.
 > on rotur
 - **Everything in Plus**, plus:
 - **50 Currency Keys** - Create up to 50 keys (up from 20)
-- **100,000 Rmails** - Store up to 100,000 rmail messages (up from 1,000)
 - **1 GB File System** - 1 GB of file storage (up from 15 MB)
 - **1,000 Character Bio** - Write a bio up to 1,000 characters (up from 500)
 - **Animated Banner** - Upload and display an animated GIF as your profile banner
@@ -109,8 +114,14 @@ The premium tier for power users and developers.
 - **Pro Subscriber Badge** - A special badge displayed on your profile
 - **`{{ url }}` Bio Template** - Fetch and display external URL content in your bio using `{{ url https://... }}`. Can also be used to track number of profile visits.
 
+> on mail
+- **100,000 Rmails** - Store up to 100,000 rmail messages (up from 1,000)
+
 > on roturGate
 - **1000 roturGate urls** - Have up to 1000 shortened urls using rotur gate
+
+> on sable
+- 50% cheaper tokens compared to free
 
 ---
 
