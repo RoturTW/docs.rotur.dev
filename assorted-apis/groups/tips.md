@@ -1,6 +1,6 @@
 # Tips
 
-Tips are credit donations sent to a group. The total of all tips is reflected in the group's `credits_balance`. Tips are stored in a separate `tips.json` file per group.
+Tips are credit donations to a group. They land in the group's `credits_balance`, which members with the right permission can withdraw from.
 
 Users with the `groups.tips.withdraw` permission can withdraw credits from the group's tip jar to their own balance. Withdrawals are stored in a separate `withdrawals.json` file per group.
 
@@ -8,24 +8,25 @@ Users with the `groups.tips.withdraw` permission can withdraw credits from the g
 
 ## List Tips
 
-### GET `/groups/{tag}/tips`
+### GET `/v2/groups/{tag}/tips`
 
-Returns tips for a group, newest first.
+**Auth:** required. Token permission: `groups:view`.
 
-**Path Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
+Returns tips, newest first.
 
 **Query Parameters:**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
 | `limit` | int | No | Max number of results (default: 20) |
 
-**Response (200):**
+**Example request:**
+
+```bash
+curl "https://api.rotur.dev/v2/groups/mygroup/tips?auth=YOUR_TOKEN"
+```
+
+**Example response (200):**
 
 ```json
 [
@@ -34,60 +35,152 @@ Returns tips for a group, newest first.
     "group_tag": "mygroup",
     "from_username": "bob",
     "amount_credits": 25.0,
+    "note": "keep it up!",
     "created_at": 1717000000
   }
 ]
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
-| 400 | `Group tag is required` | No tag provided |
 | 404 | `Group not found` | Group doesn't exist |
 
----
+***
 
 ## Send a Tip
 
-### POST `/groups/{tag}/tips`
+### POST `/v2/groups/{tag}/tips`
 
-Send credits to a group. You must be a member (or the group must be public). The amount is deducted from your balance.
+**Auth:** required. Token permission: `credits:manage`.
 
-**Path Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
+Send credits to a group. You must be a member, unless the group is public. The amount is deducted from your balance and recorded as a `group_tip` transaction.
 
 **Query Parameters:**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
-| `amount` | float | Yes | Amount of credits to tip (must be positive) |
+| `amount` | float | Yes | Credits to tip (must be positive) |
+| `note` | string | No | A note with the tip (max 200 chars) |
 
-**Response (201):**
+**Example request:**
+
+```bash
+curl -X POST "https://api.rotur.dev/v2/groups/mygroup/tips?auth=YOUR_TOKEN&amount=10&note=thanks"
+```
+
+**Example response (201):**
 
 ```json
 {
   "id": "tip-2",
   "group_tag": "mygroup",
-  "from_username": "charlie",
+  "from_user_id": "user-id-here",
   "amount_credits": 10.0,
+  "note": "thanks",
   "created_at": 1717100000
 }
 ```
 
-**Transaction:** A `group_tip` transaction is recorded on your account for the tipped amount.
+{% hint style="info" %}
+The create response contains your raw `from_user_id`. The list endpoint returns `from_username` instead.
+{% endhint %}
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
 | 400 | `Invalid amount` | Amount is not a positive number |
-| 400 | `Insufficient funds` | You don't have enough credits |
-| 403 | `You can only tip groups you're a member of` | Not a member and group is private |
+| 400 | `Note length exceeded (max 200)` | Note too long |
+| 400 | `Insufficient funds` | Not enough credits (response includes `required` and `available`) |
+| 403 | `You can only tip groups you're a member of` | Not a member and the group is private |
+| 404 | `Group not found` | Group doesn't exist |
+
+***
+
+## Withdraw from the Tip Jar
+
+### POST `/v2/groups/{tag}/tips/withdraw`
+
+**Auth:** required. Token permission: `credits:manage`. Requires the `groups.tips.withdraw` group permission.
+
+Moves credits from the group's `credits_balance` to your account. Recorded as a `group_tip_withdrawal` transaction.
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `amount` | float | Yes | Credits to withdraw (must be positive) |
+
+**Example request:**
+
+```bash
+curl -X POST "https://api.rotur.dev/v2/groups/mygroup/tips/withdraw?auth=YOUR_TOKEN&amount=50"
+```
+
+**Example response (201):**
+
+```json
+{
+  "id": "wd-1",
+  "group_tag": "mygroup",
+  "to_username": "alice",
+  "amount_credits": 50.0,
+  "created_at": 1717200000
+}
+```
+
+**Common errors:**
+
+| Status | Error | Cause |
+|--------|-------|-------|
+| 400 | `Invalid amount` | Amount is not a positive number |
+| 400 | `Insufficient funds in group tip jar` | Group balance too low (response includes `required` and `available`) |
+| 403 | `You don't have permission to withdraw from the group tip jar` | Missing `groups.tips.withdraw` |
+| 404 | `Group not found` | Group doesn't exist |
+
+***
+
+## List Withdrawals
+
+### GET `/v2/groups/{tag}/tips/withdrawals`
+
+**Auth:** required. Token permission: `groups:view`. Requires the `groups.tips.withdraw` group permission.
+
+Returns withdrawals, newest first.
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `limit` | int | No | Max number of results (default: 20) |
+
+**Example request:**
+
+```bash
+curl "https://api.rotur.dev/v2/groups/mygroup/tips/withdrawals?auth=YOUR_TOKEN"
+```
+
+**Example response (200):**
+
+```json
+[
+  {
+    "id": "wd-1",
+    "group_tag": "mygroup",
+    "to_username": "alice",
+    "amount_credits": 50.0,
+    "created_at": 1717200000
+  }
+]
+```
+
+**Common errors:**
+
+| Status | Error | Cause |
+|--------|-------|-------|
+| 403 | `You don't have permission to view withdrawals` | Missing `groups.tips.withdraw` |
 | 404 | `Group not found` | Group doesn't exist |
 
 ---

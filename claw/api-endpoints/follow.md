@@ -1,16 +1,36 @@
 # /follow
 
-## About
+Follows another user on Claw.
 
-Follows a specified user on Claw.
+Requires authentication, the `following:follow` permission, and at least `warning` account standing. Rate limited to 20 follows per minute (60 when authenticated).
 
 ## Parameters
 
-| Parameter | Description |
-| --------- | ----------- |
-| auth      | A required user authentication key |
-| name      | The username of the user to follow |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| auth | Yes | Your authentication key |
+| username | Yes | The user to follow. `name` also works |
 
-## Endpoint
+## Example
 
-{% embed url="https://api.rotur.dev/follow?auth=YOUR_AUTH_KEY&name=TargetUser" %}
+```bash
+curl "https://api.rotur.dev/follow?auth=YOUR_AUTH_KEY&username=mist"
+```
+
+## Response
+
+```json
+{
+  "message": "You are now following mist"
+}
+```
+
+## Common errors
+
+| Status | Error | Cause |
+| --- | --- | --- |
+| 400 | `You cannot follow yourself` | Target is your own account |
+| 400 | `You are already following NAME` | Duplicate follow |
+| 400 | `You cant follow this user` | The target has blocked you |
+| 400 | `Unblock this user before following them` | You have blocked the target |
+| 404 | `User not found` | No account with that username |

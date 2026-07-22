@@ -46,4 +46,4 @@ const token = await rotur.link.pollUntilLinked(
 );
 ```
 
-Throws an error on timeout.
+On success the token is set on the client automatically and returned. Throws an error on timeout.

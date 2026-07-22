@@ -1,9 +1,12 @@
-## OUTDATED PLEASE USE&#x20;
-
-[get-user-data.md](./get-user-data.md "mention")
-
 # Login
 
+{% hint style="warning" %}
+This page documents the legacy Rotur websocket, which is deprecated but kept around as a reference. For new projects, we recommend the REST API at [https://api.rotur.dev](https://api.rotur.dev) together with the [Rotur SDK](../../rotur-sdk/README.md).
+{% endhint %}
+
+## Outdated, please use
+
+[get-user-data.md](./get-user-data.md "mention")
 
 Logging into rotur is pretty simple. Ensure you meet the requirements for authentication in [.](./ "mention")
 
@@ -32,7 +35,7 @@ This uses a standard Rotur pmsg (private message) to send an authentication requ
 
 ## Successful auth
 
-Upon successful authentication (your username and password are correct) you will recieve this packet back from the sys-rotur peer.&#x20;
+Upon successful authentication (your username and password are correct) you will receive this packet back from the sys-rotur peer.&#x20;
 
 ```json
 {
@@ -56,7 +59,7 @@ Find out about rotur account objects here: [rotur-account-objects](../../my-acco
 
 ## Incorrect details
 
-If your password or username is wrong you will recieve this message
+If your password or username is wrong you will receive this message
 
 ```javascript
 {

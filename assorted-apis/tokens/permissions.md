@@ -1,11 +1,10 @@
 # Permissions
 
+List every token permission and permission group. Anyone can call this, no auth needed.
+
 > **Authentication:** None (public endpoint)
 
 ### GET `/tokens/permissions`
-
-**Description:**
-List all available token permissions and permission groups. This endpoint is unauthenticated — anyone can view the permission schema.
 
 **Example:**
 
@@ -41,112 +40,129 @@ GET /tokens/permissions
 
 ### Account
 
-| Permission | String | Description |
-|---|---|---|
-| `PermDeleteAccount` | `account:delete` | Delete the user account. **Cannot be granted to sub-tokens.** |
-| `PermManageProfile` | `account:profile` | Edit profile fields |
-| `PermManageSettings` | `account:settings` | Change account settings |
-| `PermViewProfile` | `account:view` | View profile data |
+| Permission | Description |
+|---|---|
+| `account:delete` | Delete the user account |
+| `account:profile` | Edit profile fields |
+| `account:settings` | Change account settings |
+| `account:view` | View profile data |
 
 ### Credits
 
-| Permission | String | Description |
-|---|---|---|
-| `PermViewCredits` | `credits:view` | View credit balance and transactions |
-| `PermManageCredits` | `credits:manage` | Modify credit balance |
-| `PermTransferCredits` | `credits:transfer` | Transfer credits to other users |
-| `PermClaimDaily` | `credits:daily` | Claim daily credits |
+| Permission | Description |
+|---|---|
+| `credits:view` | View credit balance and transactions |
+| `credits:manage` | Modify credit balance |
+| `credits:transfer` | Transfer credits to other users |
+| `credits:daily` | Claim daily credits |
 
 ### Friends
 
-| Permission | String | Description |
-|---|---|---|
-| `PermViewFriends` | `friends:view` | View friends list |
-| `PermManageFriends` | `friends:manage` | Manage friends list |
-| `PermSendFriendReq` | `friends:request` | Send friend requests |
-| `PermAcceptFriend` | `friends:accept` | Accept friend requests |
-| `PermRemoveFriend` | `friends:remove` | Remove friends |
+| Permission | Description |
+|---|---|
+| `friends:view` | View friends list |
+| `friends:manage` | Manage friends list |
+| `friends:request` | Send friend requests |
+| `friends:accept` | Accept friend requests |
+| `friends:remove` | Remove friends |
+| `friends:cancel` | Cancel outgoing friend requests |
 
 ### Posts
 
-| Permission | String | Description |
-|---|---|---|
-| `PermViewPosts` | `posts:view` | View posts |
-| `PermCreatePost` | `posts:create` | Create new posts |
-| `PermDeletePost` | `posts:delete` | Delete posts |
-| `PermManagePosts` | `posts:manage` | Manage posts (pin, etc.) |
-| `PermLikePost` | `posts:like` | Like/unlike posts |
-| `PermReplyPost` | `posts:reply` | Reply to posts |
-| `PermRepost` | `posts:repost` | Repost posts |
+| Permission | Description |
+|---|---|
+| `posts:view` | View posts |
+| `posts:create` | Create new posts |
+| `posts:delete` | Delete posts |
+| `posts:manage` | Manage posts (edit, pin, etc.) |
+| `posts:like` | Like/unlike posts |
+| `posts:reply` | Reply to posts |
+| `posts:repost` | Repost posts |
 
 ### Following
 
-| Permission | String | Description |
-|---|---|---|
-| `PermViewFollowing` | `following:view` | View following list |
-| `PermFollow` | `following:follow` | Follow users |
-| `PermUnfollow` | `following:unfollow` | Unfollow users |
+| Permission | Description |
+|---|---|
+| `following:view` | View following list |
+| `following:follow` | Follow users |
+| `following:unfollow` | Unfollow users |
 
 ### Files
 
-| Permission | String | Description |
-|---|---|---|
-| `PermViewFiles` | `files:view` | View files |
-| `PermManageFiles` | `files:manage` | Upload and manage files |
-| `PermDeleteFiles` | `files:delete` | Delete files |
+| Permission | Description |
+|---|---|
+| `files:view` | View files |
+| `files:manage` | Upload and manage files |
+| `files:delete` | Delete files |
+
+### Storage
+
+| Permission | Description |
+|---|---|
+| `storage:view` | View storage |
+| `storage:manage` | Write to storage |
+| `storage:delete` | Delete storage |
 
 ### Keys
 
-| Permission | String | Description |
-|---|---|---|
-| `PermViewKeys` | `keys:view` | View keys |
-| `PermManageKeys` | `keys:manage` | Create, update, and revoke keys |
+| Permission | Description |
+|---|---|
+| `keys:view` | View keys |
+| `keys:manage` | Create, update, and revoke keys |
 
 ### Groups
 
-| Permission | String | Description |
-|---|---|---|
-| `PermViewGroups` | `groups:view` | View groups |
-| `PermManageGroups` | `groups:manage` | Manage groups |
-| `PermJoinGroup` | `groups:join` | Join groups |
-| `PermLeaveGroup` | `groups:leave` | Leave groups |
-| `PermViewGroupMembers` | `groups:members.view` | View group member lists |
-| `PermInviteGroup` | `groups:invite` | Send and manage group invites |
-| `PermBanGroup` | `groups:ban` | Ban and unban group members |
+| Permission | Description |
+|---|---|
+| `groups:view` | View groups |
+| `groups:manage` | Manage groups |
+| `groups:join` | Join groups |
+| `groups:leave` | Leave groups |
+| `groups:members.view` | View group member lists |
+| `groups:invite` | Send and manage group invites |
 
 ### Notifications
 
-| Permission | String | Description |
-|---|---|---|
-| `PermViewNotifications` | `notifications:view` | View notifications |
-| `PermSendNotifications` | `notifications:send` | Send notifications |
+| Permission | Description |
+|---|---|
+| `notifications:view` | View notifications |
+| `notifications:send` | Send notifications |
 
 ### Gifts
 
-| Permission | String | Description |
-|---|---|---|
-| `PermViewGifts` | `gifts:view` | View gifts |
-| `PermCreateGift` | `gifts:create` | Create gifts |
-| `PermClaimGift` | `gifts:claim` | Claim gifts |
-| `PermCancelGift` | `gifts:cancel` | Cancel gifts |
+| Permission | Description |
+|---|---|
+| `gifts:view` | View gifts |
+| `gifts:create` | Create gifts |
+| `gifts:claim` | Claim gifts |
+| `gifts:cancel` | Cancel gifts |
 
 ### Items
 
-| Permission | String | Description |
-|---|---|---|
-| `PermViewItems` | `items:view` | View marketplace items |
-| `PermBuyItems` | `items:buy` | Buy items |
-| `PermSellItems` | `items:sell` | Sell items |
-| `PermManageItems` | `items:manage` | Manage items |
+| Permission | Description |
+|---|---|
+| `items:view` | View marketplace items |
+| `items:buy` | Buy items |
+| `items:sell` | Sell items |
+| `items:manage` | Manage items |
+
+### Cosmetics
+
+| Permission | Description |
+|---|---|
+| `cosmetics:view` | View cosmetics |
+| `cosmetics:buy` | Buy cosmetics |
+| `cosmetics:equip` | Equip and unequip cosmetics |
+| `cosmetics:gift` | Gift cosmetics |
 
 ### Other
 
-| Permission | String | Description |
-|---|---|---|
-| `PermGenerateValidator` | `validators:generate` | Generate validators |
-| `PermViewBlocked` | `blocked:view` | View blocked users list |
-| `PermManageBlocked` | `blocked:manage` | Block and unblock users |
-| `PermManageTokens` | `tokens:manage` | Manage sub-tokens. **Cannot be granted to sub-tokens.** |
+| Permission | Description |
+|---|---|
+| `validators:generate` | Generate validators |
+| `blocked:view` | View blocked users list |
+| `blocked:manage` | Block and unblock users |
+| `tokens:manage` | Manage sub-tokens. **Cannot be granted to sub-tokens.** |
 
 ***
 
@@ -158,77 +174,25 @@ Permission groups are pre-defined bundles of permissions for common use cases.
 
 **Read-only access to your profile, posts, friends, and followers.**
 
-| Permission |
-|---|
-| `account:view` |
-| `credits:view` |
-| `friends:view` |
-| `posts:view` |
-| `following:view` |
-| `files:view` |
-| `keys:view` |
-| `groups:view` |
-| `groups:members.view` |
-| `notifications:view` |
-| `gifts:view` |
-| `items:view` |
-| `blocked:view` |
+`account:view`, `credits:view`, `friends:view`, `posts:view`, `following:view`, `files:view`, `storage:view`, `keys:view`, `groups:view`, `groups:members.view`, `notifications:view`, `gifts:view`, `items:view`, `cosmetics:view`, `blocked:view`
 
 ### `social`
 
 **Read and interact with posts, friends, and following.**
 
-| Permission |
-|---|
-| `account:view` |
-| `credits:view` |
-| `friends:view` |
-| `posts:view` |
-| `posts:create` |
-| `posts:delete` |
-| `posts:manage` |
-| `posts:like` |
-| `posts:reply` |
-| `posts:repost` |
-| `following:view` |
-| `following:follow` |
-| `following:unfollow` |
-| `friends:manage` |
-| `friends:request` |
-| `friends:accept` |
-| `friends:remove` |
-| `notifications:view` |
+`account:view`, `credits:view`, `friends:view`, `posts:view`, `posts:create`, `posts:delete`, `posts:manage`, `posts:like`, `posts:reply`, `posts:repost`, `following:view`, `following:follow`, `following:unfollow`, `friends:manage`, `friends:request`, `friends:accept`, `friends:remove`, `friends:cancel`, `notifications:view`
 
 ### `economy`
 
 **Manage credits, gifts, and marketplace items.**
 
-| Permission |
-|---|
-| `account:view` |
-| `credits:view` |
-| `credits:manage` |
-| `credits:transfer` |
-| `credits:daily` |
-| `gifts:view` |
-| `gifts:create` |
-| `gifts:claim` |
-| `gifts:cancel` |
-| `items:view` |
-| `items:buy` |
-| `items:sell` |
-| `items:manage` |
+`account:view`, `credits:view`, `credits:manage`, `credits:transfer`, `credits:daily`, `gifts:view`, `gifts:create`, `gifts:claim`, `gifts:cancel`, `items:view`, `items:buy`, `items:sell`, `items:manage`, `cosmetics:view`, `cosmetics:buy`, `cosmetics:equip`, `cosmetics:gift`
 
 ### `storage`
 
 **Manage files and storage.**
 
-| Permission |
-|---|
-| `account:view` |
-| `files:view` |
-| `files:manage` |
-| `files:delete` |
+`account:view`, `files:view`, `files:manage`, `files:delete`, `storage:view`, `storage:manage`, `storage:delete`
 
 ### `full`
 

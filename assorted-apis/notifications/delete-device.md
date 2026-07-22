@@ -2,7 +2,11 @@
 
 ### DELETE `/notify/device/:device_id`
 
-Removes a specific device from the authenticated user's registered endpoints.
+Removes a device from your registered endpoints.
+
+{% hint style="info" %}
+On v2 this is `DELETE /v2/notify/devices/:device_id`.
+{% endhint %}
 
 **Path Parameters:**
 
@@ -13,7 +17,7 @@ Removes a specific device from the authenticated user's registered endpoints.
 **Example:**
 
 ```
-DELETE /notify/device/a4f8b2c1d3e5f7a9b0c2d4e6
+DELETE /notify/device/a4f8b2c1d3e5f7a9b0c2d4e6?auth=your_auth_key
 ```
 
 **Response (200):**
@@ -25,10 +29,8 @@ DELETE /notify/device/a4f8b2c1d3e5f7a9b0c2d4e6
 }
 ```
 
-**Response (404):**
+**Common Errors:**
 
-```json
-{
-  "error": "device not found"
-}
-```
+| Status | Body | Condition |
+| --- | --- | --- |
+| 404 | `{"error": "device not found"}` | No endpoint with that device ID |

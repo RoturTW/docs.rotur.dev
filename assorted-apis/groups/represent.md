@@ -1,12 +1,12 @@
-# Represent / Stop Representing a Group
+# Represent a Group
+
+Show a group on your Rotur profile. Representing sets `sys.group` on your account, and the group's tag appears as `group_tag` in your profile response.
 
 ## Represent a Group
 
-### POST `/groups/{tag}/rep`
+### PUT `/v2/groups/{tag}/represent`
 
-Set this group as your represented group on your Rotur profile. This sets `sys.group` on your account and causes `group_tag` to appear in your profile response.
-
-You must be a member of the group.
+**Auth:** required. Token permission: `account:settings`. You must be a member of the group.
 
 **Path Parameters:**
 
@@ -14,13 +14,13 @@ You must be a member of the group.
 |-----------|------|----------|-------------|
 | `tag` | string | Yes | The group tag |
 
-**Query Parameters:**
+**Example request:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
+```bash
+curl -X PUT "https://api.rotur.dev/v2/groups/mygroup/represent?auth=YOUR_TOKEN"
+```
 
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
@@ -28,34 +28,30 @@ You must be a member of the group.
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
 | 400 | `You are not a member of this group` | Not a member |
 | 404 | `Group not found` | Group doesn't exist |
 
----
+***
 
-## Stop Representing a Group
+## Stop Representing
 
-### POST `/groups/{tag}/disrep`
+### DELETE `/v2/groups/{tag}/represent`
 
-Removes your represented group from your profile.
+**Auth:** required. Token permission: `account:settings`.
 
-**Path Parameters:**
+Removes your represented group, whichever group it was. The `tag` in the path is required by the route but not checked.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
+**Example request:**
 
-**Query Parameters:**
+```bash
+curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/represent?auth=YOUR_TOKEN"
+```
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
-
-**Response (200):**
+**Example response (200):**
 
 ```json
 {

@@ -1,29 +1,39 @@
 # /claim\_daily
 
-## About
+Claims your daily credit reward. You can claim once every 24 hours.
 
-Claims the daily credit reward for the authenticated user. Returns an error if the cooldown has not elapsed.
+Requires authentication, the `credits:daily` permission, and `good` account standing. The amount you receive depends on your subscription tier's daily credit multiplier.
 
 ## Parameters
 
-| Parameter | Description |
-| --- | --- |
-| auth | A required user authentication key |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| auth | Yes | Your authentication key |
 
-## Endpoint
+## Example
 
-```
-GET /claim_daily?auth=YOUR_AUTH_KEY
+```bash
+curl "https://api.rotur.dev/claim_daily?auth=YOUR_AUTH_KEY"
 ```
 
 ## Response
 
 ```json
 {
-  "message": "Daily claimed!",
-  "amount": 1.5,
-  "new_total": 42.85
+  "message": "Daily claim successful"
 }
 ```
 
-The amount varies based on subscription tier. Requires `good` account standing.
+## Common errors
+
+If you have already claimed within the last 24 hours you get a `429`:
+
+```json
+{
+  "error": "Daily claim already made",
+  "wait_time": 43200,
+  "wait_hours": "12"
+}
+```
+
+`wait_time` is in seconds.

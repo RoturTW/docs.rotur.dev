@@ -2,15 +2,15 @@
 
 View your owned and active cosmetics. Returns full details for each cosmetic you own and your currently equipped cosmetics per type.
 
-**Authentication:** Required (`auth` query parameter or `Authorization` header).
+**Authentication:** Required (`auth` query parameter or `Authorization` header). **Permission:** `cosmetics:view`.
 
-**Example:**
+**Example request:**
 
 ```http
 GET /cosmetics/mine?auth=YOUR_TOKEN
 ```
 
-**Response (200):**
+**Example response (200):**
 
 ```json
 {

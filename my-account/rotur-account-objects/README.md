@@ -1,40 +1,40 @@
 # Rotur Account Objects
 
-A Rotur account object is a simple json object of keys and values.
+Your Rotur account is a simple JSON object of keys and values. Some keys are managed by the server, and some you can change yourself.
 
 ## Key Limits
 
-* Key names must be less than or equal 20 characters long
-* Key values must be less than or equal to 1000 characters long
-* The full account object is limited to 25,000 characters of text
+* Key names must be 20 characters or fewer
+* Key values must be 1,000 characters or fewer
+* The whole account object is limited to 25,000 characters of text
 
-## Rotur Keys
+{% hint style="info" %}
+Keys starting with `sys.` are managed by the server. You cannot write to them directly. The keys `last_login`, `max_size`, `key`, `created`, `discord_id`, `sys.id` and `password` are locked and can never be updated by you.
+{% endhint %}
 
-### Read Only
+## Read Only Keys
 
 ```
-username
-- your account's username (case insensitive)
-  eg. mist
-
-max_size
-- the maximum size of your account ofsf stored in characters of text
-  eg. "1000000000" (1,000,000,000)
+key
+- your account token. Keep it secret, it is your login.
 
 created
-- the timestamp of when your account was created stored in ms
+- the timestamp of when your account was created, in ms
   eg. 1712792411288
 
-key
-- your account token
+max_size
+- the maximum size of your cloud file storage in characters of text.
+  Set automatically from your subscription tier.
+  eg. "5000000" (5 MB on the Free tier)
 
-system
-- the operating system your account was made with
-  eg. originOS
-  
+discord_id
+- the id of the discord account linked to this rotur account.
+  Set through roturBOT linking, you cannot edit it directly.
+  eg. "603952506330021898"
+
 sys.currency
 - the number of rotur credits you have
-> your credits cannot go into negatives and you cannot have below 0.01 of a credit
+> your credits cannot go negative and amounts are rounded to 2 decimal places
   eg. 14.35
 
 sys.friends
@@ -42,44 +42,78 @@ sys.friends
   eg. ["throwaway", "rm"]
 
 sys.requests
-- Array of rotur usernames that have asked you to be friends with them
+- Array of rotur usernames that have asked to be your friend
   eg. ["temp"]
 
 sys.badges
-- Array of badge names
-  eg. ["originOS", "rotur", "creator", "discord", "friendly"]
+- Array of your badges, recalculated every time you log in.
+  Each badge has a name, an icon and a description.
 
 sys.purchases
 - Array of item ids that you own
-  eg. ["c4068074d5ed5bfcae9a91874383dab9","9a5d1aeafd96a7570f6f39742f1cd1d4"]
+  eg. ["c4068074d5ed5bfcae9a91874383dab9"]
 
 sys.total_logins
 - the number of times you have logged into rotur
   eg. 106
 
 sys.transactions
-- Array of previous transaction information with Rotur Credits
-  eg. ["+1.64 from rotur", "-2 to temp"]
+- Array of your recent credit transactions. Each entry is an object with
+  a type, amount, note, the other user, a timestamp and your new total.
+  How many are kept depends on your subscription tier.
 
-sys.used_systems
-- Array of all rotur systems you have logged into (broken currently)
-  eg. ["originOS", "constellinux"]
+sys.notes
+- your private notes about other users (Plus tier and above).
+  See the Friend Notes page.
+
+sys.subscription
+- your subscription state: tier, active flag and next billing timestamp
+
+sys.social_links
+- up to 3 social links shown on your profile
 ```
 
-### Writable
+## Writable Keys
 
 ```
+username
+- your account's username (case insensitive). You can change it as long
+  as the new name is valid and not already taken.
+  eg. mist
+
+email
+- your account email. Changing it marks your email as unverified and
+  sends you a new verification email.
+
 private
-- whether to hide your account publically (boolean)
+- whether to hide your account publicly (boolean)
   eg. true
-  
+
+bio
+- your profile bio. Maximum length depends on your subscription tier
+  (200 characters on Free, up to 1,000 on Pro).
+
+pronouns
+- shown on your profile
+  eg. "she/her"
+
 pfp
-- special key allows you to set it but is always a fixed value of "https://avatars.rotur.dev/your_username"
-> what? well when you set pfp it uploads the value to our profile picture provider meaning you can always just use the username to get the profile picture
-  eg. https://avatars.rotur.dev/mist or https://avatars.rotur.dev/MiSt
+- special key. Set it to a data URI of an image and the server uploads it
+  to our avatar host. Your avatar is then always available at
+  https://avatars.rotur.dev/your_username
+> animated GIF avatars need a Plus subscription or higher
+
+banner
+- special key. Set it to a data URI to upload a profile banner.
+> each upload costs 10 credits unless you have a Pro subscription,
+  and animated banners need Pro
+
+system
+- special key. Setting it switches your account to another registered
+  rotur system. The value must match an existing system's name.
 
 theme
-- an object of colours useful for conforming your ui to the user's preference
+- an object of colours, useful for matching your ui to the user's preference
   eg. {
     "primary": "#111111",
     "secondary": "#333333",
@@ -88,13 +122,9 @@ theme
     "background": "#000000",
     "accent": "#57cdac"
   }
-  
+
 wallpaper
-- A url that should be used as the user's wallpaper on the desktop
-> ive found that pexels is a pretty good website for this since they dont enforce cors
+- a url that should be used as the user's desktop wallpaper
+> pexels is a good source for these since they don't enforce cors
   eg. https://images.pexels.com/photos/1612351/pexels-photo-1612351.jpeg
-  
-discord_id
-- the id of the discord account linked to this rotur account. Allows account management through roturBOT.
-  eg. "603952506330021898"
 ```

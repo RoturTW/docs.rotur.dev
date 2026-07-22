@@ -2,7 +2,13 @@
 
 ### GET `/notify/endpoints`
 
-Returns all registered notification endpoints for the authenticated user.
+Returns all of your registered notification endpoints.
+
+**Example:**
+
+```
+GET /notify/endpoints?auth=your_auth_key
+```
 
 **Response (200):**
 
@@ -29,3 +35,5 @@ Returns all registered notification endpoints for the authenticated user.
   "count": 2
 }
 ```
+
+`created_at` is a Unix timestamp in milliseconds.

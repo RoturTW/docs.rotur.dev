@@ -1,5 +1,10 @@
 # Rotur Designations
 
+{% hint style="warning" %}
+This page documents the legacy Rotur websocket, which is deprecated but kept around as a reference. For new projects, we recommend the REST API at [https://api.rotur.dev](https://api.rotur.dev) together with the [Rotur SDK](../rotur-sdk/README.md).
+{% endhint %}
+
+
 ## What?
 
 Rotur designations are a small 3 letter string at the start of a username that is required for any Rotur client to communicate with you. These designations help in categorising and distinguishing among various services within the Rotur ecosystem.

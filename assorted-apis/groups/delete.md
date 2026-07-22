@@ -1,8 +1,10 @@
 # Delete a Group
 
-### DELETE `/groups/{tag}`
+Permanently delete a group and all its data. Only the group owner can do this.
 
-Permanently deletes a group and all its data. **Owner only.**
+### DELETE `/v2/groups/{tag}`
+
+**Auth:** required. Token permission: `groups:manage`.
 
 **Path Parameters:**
 
@@ -10,13 +12,13 @@ Permanently deletes a group and all its data. **Owner only.**
 |-----------|------|----------|-------------|
 | `tag` | string | Yes | The group tag |
 
-**Query Parameters:**
+**Example request:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
+```bash
+curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup?auth=YOUR_TOKEN"
+```
 
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
@@ -24,10 +26,13 @@ Permanently deletes a group and all its data. **Owner only.**
 }
 ```
 
-**Error Responses:**
+{% hint style="danger" %}
+Deletion is permanent. Members, roles, announcements, events, tips, and the group's credits balance are all removed.
+{% endhint %}
+
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
-| 400 | `Group tag is required` | No tag provided |
-| 403 | `You are not authorized to delete this group` | Not the group owner |
+| 403 | `You are not authorized to delete this group` | You are not the owner |
 | 404 | `Group not found` | Group doesn't exist |

@@ -12,9 +12,9 @@ const result = await rotur.devfund.escrowTransfer(100, "petition-123", "Funding 
 ```
 
 Parameters:
-- `amount` — credits to transfer (minimum 0.01)
-- `petitionId` — the petition to fund
-- `note` — optional description (max 50 chars)
+- `amount`: credits to transfer (minimum 0.01)
+- `petitionId`: the petition to fund
+- `note`: optional description (max 50 chars)
 
 ## Escrow Release (Admin Only)
 
@@ -26,7 +26,7 @@ const result = await rotur.devfund.escrowRelease(100, "developer_name", "petitio
 ```
 
 Parameters:
-- `amount` — credits to release
-- `toUsername` — the developer to pay
-- `petitionId` — the petition being fulfilled
-- `note` — optional description
+- `amount`: credits to release
+- `toUsername`: the developer to pay
+- `petitionId`: the petition being fulfilled
+- `note`: optional description

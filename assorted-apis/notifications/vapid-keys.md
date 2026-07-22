@@ -2,9 +2,15 @@
 
 ### GET `/notify/vapid`
 
-Returns the server's VAPID public key used for web push authentication. Clients need this key to subscribe to push notifications via the Web Push API.
+Returns the server's VAPID public key used for web push authentication. You need this key to subscribe to push notifications via the Web Push API.
 
 This endpoint does **not** require authentication.
+
+**Example:**
+
+```
+GET /notify/vapid
+```
 
 **Response (200):**
 
@@ -17,7 +23,7 @@ This endpoint does **not** require authentication.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `public_key` | string | Uncompressed P-256 public key encoded as standard Base64 |
+| `public_key` | string | Uncompressed P-256 public key, base64url-encoded |
 | `subject` | string | The VAPID subject (typically a `mailto:` URI) |
 
 ## Usage with Web Push

@@ -1,48 +1,23 @@
 # Rotur Badges
 
-Rotur badges are a simple and easy way to show some cool icons on your profile for other people to see.
+Badges are small icons shown on your profile for other people to see.
 
-They are stored in the sys.badges array on your rotur account.
+The server calculates your badges automatically. They are stored in the `sys.badges` array on your account and refreshed every time you log in. They also appear on your public profile. Each badge is an object with a `name`, an `icon` and a `description`.
 
+## Automatic Badges
 
+These are earned automatically based on your account:
 
-## General Badges
+| Badge | How to earn it |
+|---|---|
+| System badge | Shows the system your account was created on (for example originOS) |
+| `rich` | Have 1,000 or more Rotur Credits |
+| `friendly` | Have 10 or more friends on Rotur |
+| `discord` | Link your Discord account to Rotur |
+| `pro` | Have a Pro subscription or higher |
 
-```
-rotur
-- this user is part of the rotur dev team
+## Manually Granted Badges
 
-developer
-- this user has uploaded an app to the app store
-
-rich
-- this user has over 1k rotur credits
-
-collector
-- this user has logged in on every rotur operating system
-
-discord
-- this user has linked their discord account to rotur
-
-friendly
-- this user has over 10 friends on rotur
-
-creator
-- this user is the developer of a rotur operating system
-```
-
-## **Operating System Badges**
-
-```
-originOS
-- this account was created on originOS
-
-Constellinux
-- this account was created on Constellinxu / with the Constellinux Project
-```
-
-## The Badges JSON
-
-This json file contains all the badges along with their icn images. This makes it easy to parse and display the badges that your user has.
+Some badges are granted by hand, for example for members of the Rotur dev team, app developers, and creators of Rotur operating systems. These live in the badges JSON file below, along with their icon images. This makes it easy to parse and display the badges your user has.
 
 {% @github-files/github-code-block url="https://github.com/RoturTW/Badges/blob/main/badges.json" %}

@@ -1,5 +1,10 @@
 # Global Message (gmsg)
 
+{% hint style="warning" %}
+This page documents the legacy Rotur websocket, which is deprecated but kept around as a reference. For new projects, we recommend the REST API at [https://api.rotur.dev](https://api.rotur.dev) together with the [Rotur SDK](../../rotur-sdk/README.md).
+{% endhint %}
+
+
 ## Global Messaging (`gmsg`)
 
 The `gmsg` command allows a client to send a broadcast message to all users in every room that the client is currently a member of.

@@ -1,8 +1,10 @@
 # Report a Group
 
-### POST `/groups/{tag}/report`
+Report a group to the Rotur moderation team. Reports go to a moderation channel for review.
 
-Report a group to the Rotur moderation team. Reports are sent to a Discord channel for review.
+### POST `/v2/groups/{tag}/report`
+
+**Auth:** required. Token permission: `groups:view`.
 
 **Path Parameters:**
 
@@ -10,13 +12,13 @@ Report a group to the Rotur moderation team. Reports are sent to a Discord chann
 |-----------|------|----------|-------------|
 | `tag` | string | Yes | The group tag |
 
-**Query Parameters:**
+**Example request:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
+```bash
+curl -X POST "https://api.rotur.dev/v2/groups/mygroup/report?auth=YOUR_TOKEN"
+```
 
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
@@ -24,9 +26,8 @@ Report a group to the Rotur moderation team. Reports are sent to a Discord chann
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
-| 400 | `Group tag is required` | No tag provided |
 | 404 | `Group not found` | Group doesn't exist |

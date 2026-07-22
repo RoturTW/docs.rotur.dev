@@ -1,26 +1,22 @@
 # Roles
 
-Roles control member permissions and benefits within a group. Every group starts with an **Owner** role (all permissions, cannot be deleted) and a **Member** role (auto-assigned on join).
+Roles control member permissions and benefits inside a group. Every group starts with an **Owner** role (always all permissions, cannot be deleted) and a **Member** role (assigned on join).
 
 ## List Roles
 
-### GET `/groups/{tag}/roles`
+### GET `/v2/groups/{tag}/roles`
 
-Returns all roles for a group.
+**Auth:** required. Token permission: `groups:view`.
 
-**Path Parameters:**
+The Owner role always returns the full permission list, whatever is stored.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
+**Example request:**
 
-**Query Parameters:**
+```bash
+curl "https://api.rotur.dev/v2/groups/mygroup/roles?auth=YOUR_TOKEN"
+```
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
-
-**Response (200):**
+**Example response (200):**
 
 ```json
 [
@@ -36,12 +32,16 @@ Returns all roles for a group.
       "groups.manage",
       "groups.members.invite",
       "groups.members.remove",
+      "groups.members.ban",
+      "groups.members.view",
       "groups.roles.manage",
       "groups.roles.assign",
       "groups.announcements.send",
       "groups.events.manage",
       "groups.events.publish",
       "groups.tips.manage",
+      "groups.tips.withdraw",
+      "groups.tips.deposit",
       "groups.group.edit"
     ]
   },
@@ -58,54 +58,53 @@ Returns all roles for a group.
 ]
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
 | 404 | `Group not found` | Group doesn't exist |
 
----
+***
 
 ## Create a Role
 
-### POST `/groups/{tag}/roles`
+### POST `/v2/groups/{tag}/roles`
 
-Create a new custom role. Requires `groups.roles.manage` permission.
+**Auth:** required. Token permission: `groups:manage`. Requires the `groups.roles.manage` group permission.
 
-**Path Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
+New roles start with empty `benefits` and `permissions`. Use the update endpoint to set them.
 
 **Query Parameters:**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
 | `name` | string | Yes | Role name (max 50 chars) |
 | `description` | string | No | Role description (max 200 chars) |
 | `assign_on_join` | string | No | `"true"` to auto-assign to new members (default: `"false"`) |
-| `self_assignable` | string | No | `"true"` to let members assign to themselves (default: `"false"`) |
+| `self_assignable` | string | No | `"true"` to let members assign it to themselves (default: `"false"`) |
 
-New roles start with empty `benefits` and `permissions`. Use the update endpoint to add them.
+**Example request:**
 
-**Response (201):**
+```bash
+curl -X POST "https://api.rotur.dev/v2/groups/mygroup/roles?auth=YOUR_TOKEN&name=Moderator"
+```
+
+**Example response (201):**
 
 ```json
 {
   "id": "role-3",
   "group_tag": "mygroup",
   "name": "Moderator",
-  "description": "Can manage announcements",
+  "description": "",
   "assign_on_join": false,
-  "self_assignable": true,
+  "self_assignable": false,
   "benefits": [],
   "permissions": []
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
@@ -115,26 +114,13 @@ New roles start with empty `benefits` and `permissions`. Use the update endpoint
 | 403 | `You don't have permission to manage roles` | Missing `groups.roles.manage` |
 | 404 | `Group not found` | Group doesn't exist |
 
----
+***
 
 ## Update a Role
 
-### PATCH `/groups/{tag}/roles/{roleid}`
+### PATCH `/v2/groups/{tag}/roles/{roleid}`
 
-Update a role's properties. Requires `groups.roles.manage` permission.
-
-**Path Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-| `roleid` | string | Yes | The role ID |
-
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
+**Auth:** required. Token permission: `groups:manage`. Requires the `groups.roles.manage` group permission.
 
 **Body (JSON):**
 
@@ -144,10 +130,18 @@ Update a role's properties. Requires `groups.roles.manage` permission.
 | `description` | string | No | New description |
 | `assign_on_join` | bool | No | Auto-assign to new members |
 | `self_assignable` | bool | No | Members can self-assign |
-| `permissions` | string[] | No | New permissions list |
-| `benefits` | string[] | No | New benefits list |
+| `permissions` | string[] | No | New permissions list (replaces the old one) |
+| `benefits` | string[] | No | New benefits list (replaces the old one) |
 
-**Response (200):**
+**Example request:**
+
+```bash
+curl -X PATCH "https://api.rotur.dev/v2/groups/mygroup/roles/role-3?auth=YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"permissions": ["groups.announcements.send"]}'
+```
+
+**Example response (200):**
 
 ```json
 {
@@ -155,37 +149,31 @@ Update a role's properties. Requires `groups.roles.manage` permission.
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
 | 400 | `Invalid request body` | Malformed JSON |
+| 400 | `Invalid permissions` / `Invalid benefits` | Not an array of strings |
 | 403 | `You don't have permission to manage roles` | Missing permission |
 | 404 | `Role not found` | Role ID doesn't exist in this group |
 | 404 | `Group not found` | Group doesn't exist |
 
----
+***
 
 ## Delete a Role
 
-### DELETE `/groups/{tag}/roles/{roleid}`
+### DELETE `/v2/groups/{tag}/roles/{roleid}`
 
-Delete a custom role. Requires `groups.roles.manage` permission. Cannot delete the **Owner** or **Everyone** default roles.
+**Auth:** required. Token permission: `groups:manage`. Requires the `groups.roles.manage` group permission. The **Owner** and **Everyone** roles can't be deleted.
 
-**Path Parameters:**
+**Example request:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-| `roleid` | string | Yes | The role ID |
+```bash
+curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/roles/role-3?auth=YOUR_TOKEN"
+```
 
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
-
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
@@ -193,11 +181,11 @@ Delete a custom role. Requires `groups.roles.manage` permission. Cannot delete t
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
-| 400 | `Cannot delete default roles` | Attempting to delete Owner or Everyone role |
+| 400 | `Cannot delete default roles` | Tried to delete Owner or Everyone |
 | 403 | `You don't have permission to manage roles` | Missing permission |
 | 404 | `Role not found` | Role ID doesn't exist in this group |
 | 404 | `Group not found` | Group doesn't exist |

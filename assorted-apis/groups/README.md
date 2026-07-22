@@ -1,10 +1,17 @@
 # Groups
 
-The Rotur groups system lets users create and manage communities. Groups have their own roles, permissions, announcements, events, and a shared credits balance from tips.
+Groups let Rotur users create and manage communities. Each group has its own roles, permissions, announcements, events, products, invites, and a shared credits balance.
 
-> **Base URL:** `https://api.rotur.dev/groups`
+> **Base URL:** `https://api.rotur.dev/v2/groups`
 >
-> **Authentication:** Endpoints that modify your account require a valid `auth` query parameter (your Rotur user token).
+> **Authentication:** Send your Rotur token as an `auth` query parameter or an `Authorization: Bearer` header. Endpoints below that say "Auth: required" reject requests without a valid token.
+
+{% hint style="info" %}
+Two kinds of permissions apply to groups:
+
+* **Token permissions** (like `groups:view` or `groups:manage`) only matter for scoped sub-tokens. A normal account token passes every token permission check automatically.
+* **Group permissions** (like `groups.roles.manage`) come from the roles you hold inside a group. These are checked for everyone.
+{% endhint %}
 
 ***
 
@@ -12,100 +19,54 @@ The Rotur groups system lets users create and manage communities. Groups have th
 
 ### Group Tags
 
-Every group has a unique **tag** — a short, alphanumeric identifier (max 20 characters). Tags are used in API paths instead of group IDs for readability.
+Every group has a unique **tag**: a short alphanumeric identifier, up to 10 characters. Tags are used in API paths instead of group IDs.
 
 ### Join Policies
 
 | Policy | Description |
 |--------|-------------|
-| `OPEN` | Anyone can join |
-| `REQUEST` | Users must request to join (not yet implemented) |
-| `INVITE` | Invite-only (not yet implemented) |
+| `OPEN` | Anyone can join a public group directly |
+| `REQUEST` | Users must send a [join request](join-requests.md) and be accepted |
+| `INVITE` | Users can only join with a pending [invite](invites.md) |
 
 ### Visibility
 
-Groups can be **public** or **private**. Only public groups appear in search results and the top-groups leaderboard. Private groups require membership to view.
+Groups are **public** or **private**. Only public groups appear in search results and the top-groups list, and only public groups can be joined or tipped by non-members. Anyone can still fetch a group's info by tag.
 
-### Roles & Permissions
+### Roles and Group Permissions
 
-Each group has an **Owner** role (created automatically) and a default **Member** role. The Owner can create additional custom roles with specific permissions and benefits.
-
-> **Note:** The Owner role always has **all** group permissions dynamically — it doesn't rely on a stored permission list. This means any new permissions added in future updates are automatically available to the owner without needing to update the group's role data.
-
-**Available permissions:**
+Each group starts with an **Owner** role and a **Member** role. The Owner role always grants every group permission. You can create custom roles with any mix of permissions and benefits.
 
 | Permission | Description |
 |------------|-------------|
 | `groups.manage` | Full group management |
-| `groups.members.invite` | Invite new members |
-| `groups.members.remove` | Remove members |
-| `groups.members.ban` | Ban/unban members |
-| `groups.members.view` | View the group member list |
-| `groups.roles.manage` | Create, update, delete roles |
-| `groups.roles.assign` | Assign/remove roles from members |
+| `groups.members.invite` | Invite members, handle invites and join requests |
+| `groups.members.remove` | Kick members |
+| `groups.members.ban` | Ban and unban members, view bans |
+| `groups.members.view` | View the member list |
+| `groups.roles.manage` | Create, update, and delete roles and products |
+| `groups.roles.assign` | Assign and remove roles from members |
 | `groups.announcements.send` | Create and delete announcements |
-| `groups.events.manage` | Create events |
+| `groups.events.manage` | Create, update, and delete events |
 | `groups.events.publish` | Publish events |
 | `groups.tips.manage` | Manage tips |
-| `groups.tips.withdraw` | Withdraw credits from the group tip jar |
-| `groups.tips.deposit` | Deposit credits into the group tip jar |
-| `groups.group.edit` | Edit group settings |
+| `groups.tips.withdraw` | Withdraw from the group tip jar, view withdrawals |
+| `groups.tips.deposit` | Deposit into the group tip jar |
+| `groups.group.edit` | Edit group settings, icon, and banner |
 
-### Readme & Rules
+### Readme and Rules
 
-Groups can have a **readme** (long-form description, max 10,000 characters) and **rules** (max 5,000 characters). The readme is typically rendered as markdown and displayed on the group's page. Rules are shown to users before they join — the client is responsible for presenting the rules and requiring agreement before allowing the join request.
+Groups can have a **readme** (long-form description, max 10,000 characters) and **rules** (max 5,000 characters). The readme is typically rendered as markdown on the group page. Clients should show the rules before a user joins.
 
 ### Entry Fee
 
-Groups can charge an **entry fee** in credits. When a user joins a group with an entry fee:
-- The fee is deducted from the user's credits
-- The fee is added to the group's `credits_balance`
-- A `group_entry_fee` transaction is recorded on the user's account
-
-If the user doesn't have enough credits, the join request is rejected.
+Groups can charge an **entry fee** in credits. When you join a group with an entry fee, the fee is deducted from your balance, added to the group's `credits_balance`, and recorded as a `group_entry_fee` transaction. If you can't afford it, the join fails.
 
 ### Credits
 
-- **Creating a group** costs **50 credits**.
-- Banners are uploaded directly (no credit charge).
-- Tips sent to a group are added to the group's `credits_balance`. Tips are stored in a separate `tips.json` file per group. Users with the `groups.tips.withdraw` permission can withdraw credits from the tip jar to their own balance. Withdrawals are stored in a separate `withdrawals.json` file per group.
-
-### Icons
-
-Group icons can be uploaded as images and are automatically resized to **256×256 JPEG** (max 5MB upload). Icons are served at `GET /groups/{tag}/icon.jpg`.
-
-### Banners
-
-Group banners can be uploaded as images and are automatically resized to **900×300** (max 5MB upload). GIF, PNG, and JPEG formats are supported. Banners are served at `GET /groups/{tag}/banner`.
-
-### Announcements & Notifications
-
-When a member with the `groups.announcements.send` permission creates an announcement, the system sends **push notifications** to all group members who haven't muted announcements. The notification source is `group_{tag}`, so members can control notification preferences per group.
-
-### Group Representation
-
-Users can **represent** a group, which sets `sys.group` on their account. This also appears as `group_tag` in their profile response from `GET /profile`.
-
-### Storage
-
-Each group is stored in its own directory:
-
-```
-groups/{groupId}/
-├── group.json       # Group metadata, members, roles, announcements, events
-└── tips.json        # Tips (separate file)
-```
-
-If an icon and/or banner is uploaded:
-
-```
-groups/{groupId}/
-├── group.json
-├── tips.json
-├── withdrawals.json
-├── icon.jpg
-└── banner.jpg (or .png / .gif)
-```
+* Creating a group costs **50 credits**.
+* Tips, entry fees, and product purchases all flow into the group's `credits_balance`.
+* Members with `groups.tips.withdraw` can withdraw from the balance.
 
 ***
 
@@ -113,70 +74,42 @@ groups/{groupId}/
 
 | Endpoint | Method | Auth | Description |
 |----------|--------|------|-------------|
-| [`/groups/mine`](mine.md) | GET | Yes | List groups you're a member of |
-| [`/groups/search`](search.md) | GET | Yes | Search public groups |
-| [`/groups/top`](top.md) | GET | No | Top 10 groups by member count |
-| [`/groups/create`](create.md) | POST | Yes | Create a new group (50 credits) |
-| [`/groups/{tag}`](get.md) | GET | Yes | Get a group's public info |
-| [`/groups/{tag}`](update.md) | PATCH | Yes | Update group settings (owner only) |
-| [`/groups/{tag}`](delete.md) | DELETE | Yes | Delete a group (owner only) |
-| [`/groups/{tag}/join`](join.md) | POST | Yes | Join a public group |
-| [`/groups/{tag}/leave`](leave.md) | POST | Yes | Leave a group |
-| [`/groups/{tag}/rep`](represent.md) | POST | Yes | Represent a group on your profile |
-| [`/groups/{tag}/disrep`](represent.md) | POST | Yes | Stop representing a group |
-| [`/groups/{tag}/report`](report.md) | POST | Yes | Report a group |
-| [`/groups/{tag}/icon`](icon.md) | POST | Yes | Upload a group icon (owner only) |
-| [`/groups/{tag}/icon.jpg`](icon.md) | GET | No | Get a group's icon image |
-| [`/groups/{tag}/banner`](banner.md) | POST | Yes | Upload a group banner image (owner only) |
-| [`/groups/{tag}/banner`](banner.md) | GET | No | Get a group's banner image |
-| [`/groups/{tag}/announcements`](announcements.md) | GET | No | List announcements |
-| [`/groups/{tag}/announcements`](announcements.md) | POST | Yes | Create an announcement |
-| [`/groups/{tag}/announcements/{id}`](announcements.md) | DELETE | Yes | Delete an announcement |
-| [`/groups/{tag}/announcements/mute`](announcements.md) | POST | Yes | Toggle announcement mute |
-| [`/groups/{tag}/events`](events.md) | GET | Yes | List events |
-| [`/groups/{tag}/events`](events.md) | POST | Yes | Create an event |
-| [`/groups/{tag}/tips`](tips.md) | GET | Yes | List tips |
-| [`/groups/{tag}/tips`](tips.md) | POST | Yes | Send a tip |
-| [`/groups/{tag}/tips/withdraw`](tips.md) | POST | Yes | Withdraw from the group tip jar |
-| [`/groups/{tag}/tips/withdrawals`](tips.md) | GET | Yes | List tip jar withdrawals |
-| [`/groups/{tag}/roles`](roles.md) | GET | Yes | List roles |
-| [`/groups/{tag}/roles`](roles.md) | POST | Yes | Create a role |
-| [`/groups/{tag}/roles/{id}`](roles.md) | PATCH | Yes | Update a role |
-| [`/groups/{tag}/roles/{id}`](roles.md) | DELETE | Yes | Delete a role |
-| [`/groups/{tag}/members`](members.md) | GET | Yes | List all members (paginated, owner or `groups.members.view` permission) |
-| [`/groups/{tag}/members/{user}`](members.md) | GET | Yes | Get a member's detailed info |
-| [`/groups/{tag}/members/{user}`](members.md) | DELETE | Yes | Kick a member (`groups.members.remove`) |
-| [`/groups/{tag}/members/{user}/ban`](members.md) | POST | Yes | Ban a member (`groups.members.ban`) |
-| [`/groups/{tag}/members/{user}/ban`](members.md) | DELETE | Yes | Unban a member (`groups.members.ban`) |
-| [`/groups/{tag}/bans`](members.md) | GET | Yes | List bans (`groups.members.ban`) |
-| [`/groups/{tag}/bans/{user}`](members.md) | GET | Yes | Check if a user is banned |
-| [`/groups/{tag}/invites`](members.md) | GET | Yes | List pending invites |
-| [`/groups/{tag}/invites`](members.md) | POST | Yes | Send an invite (`groups.members.invite`) |
-| [`/groups/{tag}/invites/{id}/accept`](members.md) | POST | Yes | Accept an invite |
-| [`/groups/{tag}/invites/{id}/decline`](members.md) | POST | Yes | Decline an invite |
-| [`/groups/{tag}/invites/{id}`](members.md) | DELETE | Yes | Revoke an invite (`groups.members.invite`) |
-| [`/groups/invites/mine`](members.md) | GET | Yes | List your pending invites |
-| [`/groups/{tag}/join_requests`](members.md) | GET | Yes | List join requests (`groups.members.invite`) |
-| [`/groups/{tag}/join_requests`](members.md) | POST | Yes | Request to join |
-| [`/groups/{tag}/join_requests/{id}/accept`](members.md) | POST | Yes | Accept a join request (`groups.members.invite`) |
-| [`/groups/{tag}/join_requests/{id}/decline`](members.md) | POST | Yes | Decline a join request (`groups.members.invite`) |
-| [`/groups/{tag}/transfer/{user}`](members.md) | POST | Yes | Transfer ownership (owner only) |
-| [`/groups/{tag}/members/{user}/roles`](member-roles.md) | GET | Yes | Get a member's roles |
-| [`/groups/{tag}/members/{user}/permissions`](member-roles.md) | GET | Yes | Get a member's permissions |
-| [`/groups/{tag}/members/{user}/benefits`](member-roles.md) | GET | Yes | Get a member's benefits |
-| [`/groups/{tag}/members/{user}/roles/{id}`](member-roles.md) | POST | Yes | Assign a role to a member |
-| [`/groups/{tag}/members/{user}/roles/{id}`](member-roles.md) | DELETE | Yes | Remove a role from a member |
+| [`/v2/groups/mine`](mine.md) | GET | Yes | List groups you're a member of |
+| [`/v2/groups/search`](search.md) | GET | Yes | Search public groups |
+| [`/v2/groups/top`](top.md) | GET | No | Top 10 groups by member count |
+| [`/v2/groups`](create.md) | POST | Yes | Create a group (50 credits) |
+| [`/v2/groups/{tag}`](get.md) | GET | No | Get a group's info |
+| [`/v2/groups/{tag}`](update.md) | PATCH | Yes | Update group settings |
+| [`/v2/groups/{tag}`](delete.md) | DELETE | Yes | Delete a group (owner only) |
+| [`/v2/groups/{tag}/join`](join.md) | POST | Yes | Join a public group |
+| [`/v2/groups/{tag}/leave`](leave.md) | POST | Yes | Leave a group |
+| [`/v2/groups/{tag}/represent`](represent.md) | PUT / DELETE | Yes | Represent or stop representing a group |
+| [`/v2/groups/{tag}/report`](report.md) | POST | Yes | Report a group |
+| [`/v2/groups/{tag}/icon`](icon.md) | POST / GET | Mixed | Upload or fetch the group icon |
+| [`/v2/groups/{tag}/banner`](banner.md) | POST / GET | Mixed | Upload or fetch the group banner |
+| [`/v2/groups/{tag}/announcements`](announcements.md) | GET / POST / DELETE | Mixed | Announcements |
+| [`/v2/groups/{tag}/events`](events.md) | GET / POST / PATCH / DELETE | Yes | Events |
+| [`/v2/groups/{tag}/tips`](tips.md) | GET / POST | Yes | Tips and withdrawals |
+| [`/v2/groups/{tag}/products`](products.md) | GET / POST / DELETE | Mixed | Purchasable role products and subscriptions |
+| [`/v2/groups/{tag}/roles`](roles.md) | GET / POST / PATCH / DELETE | Yes | Roles |
+| [`/v2/groups/{tag}/members`](members.md) | GET / DELETE | Yes | Member list, member info, kicking |
+| [`/v2/groups/{tag}/members/{user}/roles`](member-roles.md) | GET / PUT / DELETE | Yes | Member roles, permissions, and benefits |
+| [`/v2/groups/{tag}/bans`](bans.md) | GET / PUT / DELETE | Yes | Bans |
+| [`/v2/groups/{tag}/invites`](invites.md) | GET / POST / DELETE | Yes | Invites |
+| [`/v2/groups/{tag}/join-requests`](join-requests.md) | GET / POST | Yes | Join requests |
+| [`/v2/groups/{tag}/transfer/{userid}`](transfer.md) | POST | Yes | Transfer ownership |
 
 ***
 
 ## Data Models
 
-### Group (public response)
+### Group
 
-All group API responses return the **public** version with `owner_user_id` resolved to a username:
+Group responses resolve `owner_user_id` to a username and include `member_count`:
 
 ```json
 {
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "tag": "mygroup",
   "name": "My Group",
   "description": "A cool group",
@@ -194,14 +127,13 @@ All group API responses return the **public** version with `owner_user_id` resol
 }
 ```
 
-### Member (API response)
-
-Member responses use `username` instead of `user_id`:
+### Member
 
 ```json
 {
   "id": "abc-123",
   "group_tag": "mygroup",
+  "user_id": "user-id-here",
   "username": "alice",
   "role_ids": ["role-1", "role-2"],
   "joined_at": 1717000000,
@@ -209,7 +141,22 @@ Member responses use `username` instead of `user_id`:
 }
 ```
 
-### Announcement (API response)
+### Role
+
+```json
+{
+  "id": "role-1",
+  "group_tag": "mygroup",
+  "name": "Moderator",
+  "description": "Can manage announcements",
+  "assign_on_join": false,
+  "self_assignable": true,
+  "benefits": ["custom_color"],
+  "permissions": ["groups.announcements.send"]
+}
+```
+
+### Announcement
 
 ```json
 {
@@ -223,7 +170,7 @@ Member responses use `username` instead of `user_id`:
 }
 ```
 
-### Event (API response)
+### Event
 
 ```json
 {
@@ -240,7 +187,7 @@ Member responses use `username` instead of `user_id`:
 }
 ```
 
-### Tip (API response)
+### Tip
 
 ```json
 {
@@ -248,33 +195,7 @@ Member responses use `username` instead of `user_id`:
   "group_tag": "mygroup",
   "from_username": "bob",
   "amount_credits": 25.0,
+  "note": "keep it up!",
   "created_at": 1717000000
-}
-```
-
-### Withdrawal (API response)
-
-```json
-{
-  "id": "withdrawal-1",
-  "group_tag": "mygroup",
-  "to_username": "alice",
-  "amount_credits": 50.0,
-  "created_at": 1717200000
-}
-```
-
-### Role
-
-```json
-{
-  "id": "role-1",
-  "group_tag": "mygroup",
-  "name": "Moderator",
-  "description": "Can manage announcements",
-  "assign_on_join": false,
-  "self_assignable": true,
-  "benefits": ["custom_color"],
-  "permissions": ["groups.announcements.send"]
 }
 ```

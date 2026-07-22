@@ -1,17 +1,41 @@
 # /reply
 
-## About
+Replies to a post on Claw.
 
-Replies to a specific post on Claw.
+Requires authentication, the `posts:reply` permission, and `good` account standing.
 
 ## Parameters
 
-| Parameter | Description |
-| --------- | ----------- |
-| auth      | A required user authentication key |
-| postid    | The ID of the post you are replying to |
-| content   | The content of your reply |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| auth | Yes | Your authentication key |
+| id | Yes | The ID of the post you are replying to |
+| content | Yes | The reply text. Same length limit as posts for your tier |
 
-## Endpoint
+## Example
 
-{% embed url="https://api.rotur.dev/reply?auth=YOUR_AUTH_KEY&postid=POST_ID&content=Your+reply" %}
+```bash
+curl "https://api.rotur.dev/reply?auth=YOUR_AUTH_KEY&id=POST_ID&content=Nice+post"
+```
+
+## Response
+
+Returns `201` with the created reply:
+
+```json
+{
+  "id": "def456",
+  "content": "Nice post",
+  "user": "mist",
+  "timestamp": 1715054400000
+}
+```
+
+## Common errors
+
+| Status | Error | Cause |
+| --- | --- | --- |
+| 400 | `Post ID is required` / `Content is required` | Missing parameter |
+| 400 | `Content exceeds N character limit` | Reply too long for your tier |
+| 400 | `You cant reply to this post` | The post author has blocked you |
+| 404 | `Post not found` | No post with that ID |

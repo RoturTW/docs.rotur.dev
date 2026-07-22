@@ -1,41 +1,30 @@
 # Member Roles, Permissions & Benefits
 
-These endpoints let you inspect and manage role assignments for individual members.
+Inspect and manage the roles held by an individual member.
+
+{% hint style="info" %}
+The `{userid}` path segment on these endpoints accepts either a username or a user ID.
+{% endhint %}
 
 ## Get a Member's Roles
 
-### GET `/groups/{tag}/members/{userid}/roles`
+### GET `/v2/groups/{tag}/members/{userid}/roles`
 
-Returns all roles assigned to a specific member.
+**Auth:** required. Token permission: `groups:view`.
 
-**Path Parameters:**
+Returns every role assigned to the member. The Owner role includes the full permission list.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-| `userid` | string | Yes | The user's ID (username) |
+**Example request:**
 
-**Query Parameters:**
+```bash
+curl "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles?auth=YOUR_TOKEN"
+```
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
-
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
   "roles": [
-    {
-      "id": "role-1",
-      "group_tag": "mygroup",
-      "name": "Owner",
-      "description": "Group owner",
-      "assign_on_join": false,
-      "self_assignable": false,
-      "benefits": [],
-      "permissions": ["groups.manage", "..."]
-    },
     {
       "id": "role-2",
       "group_tag": "mygroup",
@@ -50,84 +39,61 @@ Returns all roles assigned to a specific member.
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
 | 404 | `User is not a member of this group` | User not in the group |
 | 404 | `Group not found` | Group doesn't exist |
 
----
+***
 
 ## Get a Member's Permissions
 
-### GET `/groups/{tag}/members/{userid}/permissions`
+### GET `/v2/groups/{tag}/members/{userid}/permissions`
 
-Returns the aggregated list of permissions a member has across all their roles.
+**Auth:** required. Token permission: `groups:view`.
 
-**Path Parameters:**
+Returns the combined permissions from all the member's roles. Members with the Owner role always get the full list.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-| `userid` | string | Yes | The user's ID (username) |
+**Example request:**
 
-**Query Parameters:**
+```bash
+curl "https://api.rotur.dev/v2/groups/mygroup/members/alice/permissions?auth=YOUR_TOKEN"
+```
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
-
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
-  "permissions": [
-    "groups.manage",
-    "groups.members.invite",
-    "groups.members.remove",
-    "groups.roles.manage",
-    "groups.roles.assign",
-    "groups.announcements.send",
-    "groups.events.manage",
-    "groups.events.publish",
-    "groups.tips.manage",
-    "groups.group.edit"
-  ]
+  "permissions": ["groups.announcements.send", "groups.events.manage"]
 }
 ```
 
-The **Owner** role automatically grants all permissions dynamically, regardless of what's listed in the role's `permissions` array. When you request a member's permissions and they have the Owner role, the API returns the full list of all group permissions rather than what's stored in the group's JSON data.
-
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
 | 404 | `User is not a member of this group` | User not in the group |
 | 404 | `Group not found` | Group doesn't exist |
 
----
+***
 
 ## Get a Member's Benefits
 
-### GET `/groups/{tag}/members/{userid}/benefits`
+### GET `/v2/groups/{tag}/members/{userid}/benefits`
 
-Returns the aggregated list of benefits a member has across all their roles.
+**Auth:** required. Token permission: `groups:view`.
 
-**Path Parameters:**
+Returns the combined benefits from all the member's roles.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-| `userid` | string | Yes | The user's ID (username) |
+**Example request:**
 
-**Query Parameters:**
+```bash
+curl "https://api.rotur.dev/v2/groups/mygroup/members/alice/benefits?auth=YOUR_TOKEN"
+```
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
-
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
@@ -135,36 +101,28 @@ Returns the aggregated list of benefits a member has across all their roles.
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
 | 404 | `User is not a member of this group` | User not in the group |
 | 404 | `Group not found` | Group doesn't exist |
 
----
+***
 
-## Assign a Role to a Member
+## Assign a Role
 
-### POST `/groups/{tag}/members/{userid}/roles/{roleid}`
+### PUT `/v2/groups/{tag}/members/{userid}/roles/{roleid}`
 
-Assign a role to a member. Requires `groups.roles.assign` permission, unless the role is `self_assignable` and the user is assigning it to themselves.
+**Auth:** required. Token permission: `groups:manage`. Requires the `groups.roles.assign` group permission, unless the role is `self_assignable` and you're assigning it to yourself.
 
-**Path Parameters:**
+**Example request:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-| `userid` | string | Yes | The target user's ID (username) |
-| `roleid` | string | Yes | The role ID to assign |
+```bash
+curl -X PUT "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles/role-3?auth=YOUR_TOKEN"
+```
 
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
-
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
@@ -172,38 +130,31 @@ Assign a role to a member. Requires `groups.roles.assign` permission, unless the
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
 | 400 | `User already has this role` | Role already assigned |
-| 403 | `You don't have permission to assign roles` | Missing `groups.roles.assign` and role is not self-assignable |
+| 403 | `You don't have permission to assign roles` | Missing `groups.roles.assign` and not self-assigning a self-assignable role |
 | 404 | `Role not found` | Role ID doesn't exist in this group |
-| 404 | `User is not a member of this group` | Target user not in the group |
+| 404 | `User is not a member of this group` | Target not in the group |
+| 404 | `Group not found` | Group doesn't exist |
 
----
+***
 
-## Remove a Role from a Member
+## Remove a Role
 
-### DELETE `/groups/{tag}/members/{userid}/roles/{roleid}`
+### DELETE `/v2/groups/{tag}/members/{userid}/roles/{roleid}`
 
-Remove a role from a member. Requires `groups.roles.assign` permission. Cannot remove the **Owner** role.
+**Auth:** required. Token permission: `groups:manage`. Requires the `groups.roles.assign` group permission. The Owner role can't be removed this way; use [ownership transfer](transfer.md) instead.
 
-**Path Parameters:**
+**Example request:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-| `userid` | string | Yes | The target user's ID (username) |
-| `roleid` | string | Yes | The role ID to remove |
+```bash
+curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles/role-3?auth=YOUR_TOKEN"
+```
 
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
-
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
@@ -211,12 +162,13 @@ Remove a role from a member. Requires `groups.roles.assign` permission. Cannot r
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
-| 400 | `Cannot remove Owner role` | Attempting to remove the Owner role |
+| 400 | `Cannot remove Owner role` | Tried to remove the Owner role |
 | 400 | `User doesn't have this role` | Role not assigned to this member |
 | 403 | `You don't have permission to remove roles` | Missing `groups.roles.assign` |
 | 404 | `Role not found` | Role ID doesn't exist in this group |
-| 404 | `User is not a member of this group` | Target user not in the group |
+| 404 | `User is not a member of this group` | Target not in the group |
+| 404 | `Group not found` | Group doesn't exist |

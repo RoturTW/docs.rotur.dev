@@ -1,30 +1,40 @@
 # avatars.rotur.dev
 
-Rotur avatars are served from avatars.rotur.dev allowing a client to render a minimal rotur account ui with only the username.
-
-### About
-
-* Images are all stored as jpeg
-* Images are 256x256
-* Patreon supporters get 512x512 image uploads
-* Images are cached for performance
-* If the user has not set a profile picture, a default image is returned
+Rotur avatars are served from `avatars.rotur.dev`, so you can render a minimal Rotur account UI with only a username.
 
 ### How do I get a profile picture?
 
-Simply take the base api url "https://avatars.rotur.dev/" and add the rotur username on the end of it. The username is case insensitive, the same as rotur usernames generally are in all other apis.
+Take the base URL `https://avatars.rotur.dev/` and add the Rotur username on the end. The username is case-insensitive, the same as everywhere else in Rotur:
 
 * https://avatars.rotur.dev/mist
 * https://avatars.rotur.dev/MiSt
 
-### What if the user doesn't have a profile picture?
+You can also pass a user ID (36 characters) instead of a username, and an optional `.gif` suffix is accepted and ignored. `GET` and `HEAD` both work.
 
-If the user does not have a profile picture set, a default image will be returned. This image is a simple silhouette of a person on a colored background.
+### About
+
+* Avatars are stored at 256x256 and served as JPEG, PNG or GIF depending on what was uploaded
+* Responses are cached (`ETag` and `Cache-Control: max-age=300`), so repeat requests are cheap
+* If the user has not set a profile picture, a default placeholder image is returned
+
+### Animated avatars
+
+Animated GIF avatars only play if the user has a **Plus** subscription or higher. For everyone else the first frame is served as a still PNG. Add `?no_animate=1` to force a still image regardless of tier.
 
 ### Query Parameters
 
-You can add the following query parameters to customize the avatar:
+| Parameter | Description |
+|---|---|
+| `s` | Size in pixels, from 1 to 256. Default is the stored size (256). Example: `?s=128` |
+| `radius` | Corner radius in pixels (a `px` suffix is accepted). `?radius=128` gives a circle. Capped at 128 for GIFs and at half the image height for stills. Rounded stills are returned as PNG. |
+| `no_animate` | Set to `1` to always get a still image |
 
-* `s`: Specify the size of the avatar. Default is 256. Example: `?s=128`
-* `radius`: Specify the border radius of the avatar. Default is 0 (square). Example: `?radius=128` for a circular avatar.
-* `no_animate`: Set to `1` to force an animated (GIF) avatar to be served as a still image. The value must be exactly `1` — any other value is ignored. Example: `?no_animate=1`
+### Other endpoints on this host
+
+| Endpoint | Description |
+|---|---|
+| [`/.banners/:username`](.banners.md) | The user's profile banner |
+| [`/.overlay/:username`](overlay.md) | The user's equipped avatar overlay |
+| [`POST /rotur-upload-pfp`, `POST /rotur-upload-banner`](upload.md) | Upload a new avatar or banner |
+
+The same routes are also available with v2-style paths: `/v2/avatars/:username`, `/v2/avatars/:username/banner`, `/v2/avatars/:username/overlay`, `/v2/avatars/upload/pfp` and `/v2/avatars/upload/banner`.

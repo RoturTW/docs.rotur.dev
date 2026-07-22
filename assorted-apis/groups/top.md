@@ -1,16 +1,21 @@
 # Top Groups
 
-### GET `/groups/top`
+Get the 10 biggest public groups by member count. No authentication needed.
 
-Returns the top 10 public groups sorted by member count (descending).
+### GET `/v2/groups/top`
 
-**Query Parameters:** None (no auth required).
+**Example request:**
 
-**Response (200):**
+```bash
+curl "https://api.rotur.dev/v2/groups/top"
+```
+
+**Example response (200):**
 
 ```json
 [
   {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
     "tag": "biggroup",
     "name": "Big Group",
     "description": "The biggest group",
@@ -29,4 +34,4 @@ Returns the top 10 public groups sorted by member count (descending).
 ]
 ```
 
-Returns up to 10 groups. Only public groups are included.
+Returns up to 10 groups, largest first. Private groups are never included.

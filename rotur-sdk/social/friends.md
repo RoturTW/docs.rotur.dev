@@ -29,6 +29,14 @@ await rotur.friends.accept("bob");
 await rotur.friends.reject("charlie");
 ```
 
+## Cancel an Outgoing Request
+
+Cancel a request you sent that has not been accepted yet:
+
+```ts
+await rotur.friends.cancel("alice");
+```
+
 ## Remove a Friend
 
 ```ts

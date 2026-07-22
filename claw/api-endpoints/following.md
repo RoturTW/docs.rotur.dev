@@ -1,15 +1,32 @@
 # /following
 
-## About
+Lists the users a given user is following.
 
-Retrieves a list of users that a specific user is following on Claw.
+No authentication required. Uses the profile rate limit (30 per minute, 120 when authenticated).
 
 ## Parameters
 
-| Parameter | Description |
-| --------- | ----------- |
-| name      | The username to fetch the list of users following from |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| name | Yes | The username whose following list you want. `username` also works |
 
-## Endpoint
+## Example
 
-{% embed url="https://api.rotur.dev/following?name=TargetUser" %}
+```bash
+curl "https://api.rotur.dev/following?name=mist"
+```
+
+## Response
+
+```json
+{
+  "following": ["rm", "temp"]
+}
+```
+
+## Common errors
+
+| Status | Error | Cause |
+| --- | --- | --- |
+| 400 | `Username is required` | Missing `name` parameter |
+| 404 | `User not found` | No account with that username |

@@ -2,7 +2,7 @@
 
 Equip a cosmetic you own. This sets it as your active cosmetic for its type. For overlays, this also updates `sys.overlay` on your user object so the avatar server renders it.
 
-**Authentication:** Required.
+**Authentication:** Required. **Permission:** `cosmetics:equip`.
 
 **Path Parameter:**
 
@@ -10,26 +10,24 @@ Equip a cosmetic you own. This sets it as your active cosmetic for its type. For
 |---|---|
 | `:id` | The cosmetic's unique ID (must be one you own) |
 
-**Example:**
+**Example request:**
 
 ```http
 POST /cosmetics/equip/cat_ears?auth=YOUR_TOKEN
 ```
 
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
-  "message": "Cosmetic equipped successfully",
-  "active_cosmetics": {
-    "overlay": "cat_ears"
-  }
+  "message": "Cosmetic equipped successfully"
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error |
 |---|---|
+| `400` | `Invalid cosmetic id` |
 | `403` | `You do not own this cosmetic` |
 | `404` | `Cosmetic not found` |

@@ -1,28 +1,29 @@
 # Update a Sub-Token
 
-> **Authentication:** Required (main account token only — sub-tokens cannot modify other sub-tokens)
+Update a sub-token's name, permissions, description, or associated websites.
+
+> **Authentication:** Required (main account token only, sub-tokens cannot modify other sub-tokens)
 
 ### PATCH `/tokens/:id`
 
-**Description:**
-Update a sub-token's name, permissions, description, or associated websites. You cannot update a revoked token.
+You cannot update a revoked token.
 
 **Path Parameter:**
-* `:id` — the sub-token ID (e.g. `st_abc123`)
+* `:id`: the sub-token ID (e.g. `st_abc123`)
 
 **Query Parameters:**
-* `auth` — your rotur user token (required, must be the main account token)
+* `auth`: your rotur user token (required, must be the main account token)
 
 **Request Body (JSON):**
 
-All fields are optional — only include the fields you want to change.
+All fields are optional. Only include the fields you want to change.
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `name` | string | No | New name (1–50 characters) |
-| `permissions` | string[] | No | New permission set (replaces all existing permissions) |
-| `description` | string | No | New description |
-| `websites` | string[] | No | New list of associated websites |
+| Field | Type | Description |
+|---|---|---|
+| `name` | string | New name (1-50 characters) |
+| `permissions` | string[] | New permission set (replaces all existing permissions) |
+| `description` | string | New description |
+| `websites` | string[] | New list of associated websites |
 
 **Example:**
 
@@ -39,6 +40,8 @@ Content-Type: application/json
 
 **Response (200):**
 
+The updated token object.
+
 ```json
 {
   "id": "st_abc123",
@@ -46,9 +49,8 @@ Content-Type: application/json
   "permissions": ["account:view", "posts:view", "posts:create", "posts:reply"],
   "created_at": 1715512345678,
   "last_used_at": 1715599999999,
-  "expires_at": null,
+  "token": "rotur_st_xYz123...",
   "revoked": false,
-  "revoked_at": null,
   "origin": "https://myapp.example.com",
   "description": "Read and post access for My App",
   "websites": ["https://myapp.example.com"]

@@ -29,7 +29,7 @@ const result = await rotur.tokens.create("my-bot", ["posts:view", "posts:create"
   description: "Bot access for my app",
   websites: ["https://myapp.com"],
 });
-console.log(result.token); // save this — it's shown only once
+console.log(result.token); // save this, it's shown only once
 ```
 
 ## Get a Token

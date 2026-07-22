@@ -1,39 +1,57 @@
 # /notifications
 
-## About
+Returns your recent notification events: follows, replies, likes, mentions, reposts, item sales, and more.
 
-Returns a list of notification events for the authenticated user, such as follows, replies, and other interactions.
+Requires authentication and the `notifications:view` permission.
 
 ## Parameters
 
-| Parameter | Description |
-| --- | --- |
-| auth | A required user authentication key |
-| after | Optional. A number of days to look back (default 1). Only events after this period are returned |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| auth | Yes | Your authentication key |
+| after | No | How many days to look back. Must be a whole number of 1 or more. Default 1 |
 
-## Endpoint
+## Example
 
-```
-GET /notifications?auth=YOUR_AUTH_KEY&after=7
+```bash
+curl "https://api.rotur.dev/notifications?auth=YOUR_AUTH_KEY&after=7"
 ```
 
 ## Response
 
+Every event has `type`, `id`, and `timestamp`, plus fields specific to its type:
+
 ```json
 [
+  {
+    "type": "reply",
+    "id": "e5f6a7b8",
+    "timestamp": 1715054400000,
+    "post_id": "abc123",
+    "reply_id": "def456",
+    "user": "user_id",
+    "content": "Nice post"
+  },
   {
     "type": "follow",
     "id": "a1b2c3d4",
     "timestamp": 1715054321000,
-    "followers": ["mist", "rm"]
+    "follower": "user_id"
   },
   {
-    "type": "reply",
-    "id": "e5f6a7b8",
-    "timestamp": 1715054000000,
-    "post_id": "abc123"
+    "type": "like",
+    "id": "c9d0e1f2",
+    "timestamp": 1715054300000,
+    "post_id": "abc123",
+    "user": "user_id"
   }
 ]
 ```
 
-Events are sorted newest first, with a maximum of 100 events stored per user.
+Events are sorted newest first. The server keeps at most 100 events per user.
+
+## Common errors
+
+| Status | Error | Cause |
+| --- | --- | --- |
+| 400 | `Invalid time period` | `after` is not a whole number of 1 or more |

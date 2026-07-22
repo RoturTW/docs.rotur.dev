@@ -1,79 +1,68 @@
 # Friend Notes
 
-Friend Notes let you privately store small bits of information about other users on Rotur, similar to Discord-style notes. These notes are **visible only to you**, never to the other user, and can be used for reminders, context, or anything else you want to remember about someone.
+Friend Notes let you privately store small bits of information about other users on Rotur, similar to Discord-style notes. Your notes are **visible only to you**, never to the other user. Use them for reminders, context, or anything you want to remember about someone.
 
-This feature is **paid**, available to anyone subscribed to any tier on [Ko-fi](https://ko-fi.com/mistium/tiers).
+This is a paid feature. You need a **Plus** subscription or higher on [Ko-fi](https://ko-fi.com/mistium/tiers).
 
-Friend Notes are stored directly on your account under the key `sys.notes`, indexed by username.
-
----
+Notes are stored on your account under the `sys.notes` key.
 
 ## How to Use Friend Notes
 
 ### Writing Notes
 
-To update the note for a specific user, send a request to:
+To set or update your note for a user:
 
 ```
 POST https://api.rotur.dev/me/note/{username}?auth={token}&note={encoded_note}
 ```
 
+You can also send the note as JSON: `{"note": "your note"}`.
+
 ### Deleting Notes
 
-To delete a note for a specific user, send a request to:
+To delete your note for a user:
 
 ```
 DELETE https://api.rotur.dev/me/note/{username}?auth={token}
 ```
 
-
 ### Reading Notes
 
-Friend Notes are stored in your personal account data under:
+To read all your notes:
 
 ```
-sys.notes
+GET https://api.rotur.dev/me/notes?auth={token}
 ```
 
-This key is a dictionary where each key is a username and the value is the note text you saved.
-
-Example:
+The response is a dictionary keyed by username:
 
 ```json
 {
-  "sys.notes": {
+  "notes": {
     "goober123": "Met in Origin chat\nLikes purple themes",
-    "colon_three": "Artist — commissions open"
+    "colon_three": "Artist, commissions open"
   }
 }
 ```
 
-If a user has no note, they simply won’t appear in the `sys.notes` object.
-
----
+If you have no note for a user, they simply won't appear in the response.
 
 ## Privacy
 
-Friend Notes are **100% private**:
+Friend Notes are 100% private:
 
-* Only **you** can view your notes.
-* Other users are **never** notified that you added, edited, or deleted a note about them.
-* Notes are **never** included in exports, public APIs, or profile data exposed to others.
-
----
+* Only you can view your notes.
+* Other users are never notified that you added, edited, or deleted a note about them.
+* Notes never appear in public profile data.
 
 ## Limits
 
 * Maximum note length: 300 characters.
-* Notes must be plain text, no formatting or markup is interpreted.
-* Each user can have one note entry; rewriting the note replaces the previous text.
-
----
+* Notes are plain text. No formatting or markup is interpreted.
+* Each user gets one note. Writing again replaces the previous text.
 
 ## Who Can Use Friend Notes?
 
-Any paid subscription tier → includes Friend Notes<br>
-Free accounts → not available
+Plus tier and above include Friend Notes. Free and Lite accounts do not have them.
 
-Subscribe here to unlock this feature:
-**[https://ko-fi.com/mistium/tiers](https://ko-fi.com/mistium/tiers)**
+Subscribe here to unlock this feature: **[https://ko-fi.com/mistium/tiers](https://ko-fi.com/mistium/tiers)**

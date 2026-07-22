@@ -1,20 +1,19 @@
 # Create a Sub-Token
 
-> **Authentication:** Required (main account token only — sub-tokens cannot create other sub-tokens)
+Create a new sub-token with a name, a set of permissions, and an optional expiry.
+
+> **Authentication:** Required (main account token only, sub-tokens cannot create other sub-tokens)
 
 ### POST `/tokens/create`
 
-**Description:**
-Create a new sub-token with a name, set of permissions, and optional expiry. The full token value is only returned in this response — it cannot be retrieved later.
-
 **Query Parameters:**
-* `auth` — your rotur user token (required, must be the main account token)
+* `auth`: your rotur user token (required, must be the main account token)
 
 **Request Body (JSON):**
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `name` | string | Yes | A label for this token (1–50 characters) |
+| `name` | string | Yes | A label for this token (1-50 characters) |
 | `permissions` | string[] | Yes | At least one valid permission string. See [Permissions](permissions.md) for the full list. |
 | `expires_in_hrs` | int | No | Hours until the token expires. Max 8760 (1 year). Omit for no expiry. |
 | `origin` | string | No | The origin/app this token is for |
@@ -53,7 +52,9 @@ Content-Type: application/json
 }
 ```
 
-> ⚠️ **Save the `token` value now.** It is never returned again in any API response.
+{% hint style="warning" %}
+Save the `token` value now. You can also see it later via the listing endpoints, but treat it like a password: anyone who has it can act with this token's permissions.
+{% endhint %}
 
 **Error Responses:**
 

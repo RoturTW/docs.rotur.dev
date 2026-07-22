@@ -1,4 +1,4 @@
-# Me — Your Account
+# Me: Your Account
 
 Accessed via `rotur.me`. All methods require authentication.
 
@@ -7,6 +7,21 @@ Accessed via `rotur.me`. All methods require authentication.
 ```ts
 const me = await rotur.me.get();
 // Returns the full user object (all keys except password)
+```
+
+## Live Key Cache
+
+Once the WebSocket is connected (see [Status & WebSocket](../realtime/status.md)), your account keys are cached locally and kept up to date in real time:
+
+```ts
+rotur.me.getKey("bio");       // read one cached key
+rotur.me.getAllKeys();        // read all cached keys
+
+// React to changes
+const unsub = rotur.me.onKeyChange((key, value, oldValue) => {
+  console.log(key, "changed from", oldValue, "to", value);
+});
+unsub(); // stop listening
 ```
 
 ## Update Profile Key
@@ -73,8 +88,12 @@ await rotur.me.deleteNote("alice");
 ## Pending Friend Requests
 
 ```ts
+// Incoming requests
 const { requests } = await rotur.me.requests();
 // e.g. ["bob", "charlie"]
+
+// Outgoing requests you have sent
+const { outgoing } = await rotur.me.outgoing();
 ```
 
 ## Transactions
@@ -89,20 +108,4 @@ const txs = await rotur.me.transactions();
 ```ts
 const sub = await rotur.me.subscription();
 // { active: true, tier: "Plus", next_billing: 1735689600000 }
-```
-
-## Email Verification
-
-```ts
-// Resend verification email
-await rotur.me.resendVerification();
-
-// Verify with token from email link
-await rotur.me.verifyEmail("token-from-email");
-```
-
-## Terms of Service
-
-```ts
-await rotur.me.acceptTos();
 ```

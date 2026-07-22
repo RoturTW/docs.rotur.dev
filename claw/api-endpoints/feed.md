@@ -1,16 +1,45 @@
 # /feed
 
-## About
+The feed is the main display of Claw. It returns public posts, newest first.
 
-The feed is the main display of Claw, allowing you to view an array of posts.
+Authentication is optional. If you pass your token, poll data includes which option you voted for.
 
 ## Parameters
 
-| Parameter | Description |
-| --------- | ----------- |
-| limit     | The limit can be between 1 and 100, and restricts how many posts to ask the server for |
-| offset    | If you have an offset of 1, the server will return post 2, to 101. By default offset is 0 |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| limit | No | How many posts to return, between 1 and 100. Default 100 |
+| offset | No | How many posts to skip from the top. Default 0 |
 
-## Endpoint
+## Example
 
-{% embed url="https://api.rotur.dev/feed?limit=10&offset=0" %}
+```bash
+curl "https://api.rotur.dev/feed?limit=2&offset=0"
+```
+
+## Response
+
+Returns an array of post objects:
+
+```json
+[
+  {
+    "id": "abc123",
+    "content": "Hello Claw!",
+    "user": "mist",
+    "timestamp": 1715054321000,
+    "likes": ["rm"],
+    "replies": [
+      {
+        "id": "def456",
+        "content": "Hi!",
+        "user": "rm",
+        "timestamp": 1715054400000
+      }
+    ],
+    "views": 12
+  }
+]
+```
+
+Posts can also include `attachment`, `attachments`, `os`, `pinned`, `is_repost`, `original_post`, `edited_at`, `premium`, `tier`, `group_tag`, and `poll` fields when they apply.

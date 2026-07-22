@@ -1,17 +1,18 @@
 # Revoke a Sub-Token
 
+Revoke a sub-token, making it immediately unusable.
+
 > **Authentication:** Required (main account token only)
 
 ### POST `/tokens/:id/revoke`
 
-**Description:**
-Revoke a sub-token, making it immediately unusable. A revoked token cannot be un-revoked — you would need to create a new one.
+A revoked token cannot be un-revoked. If you need the access back, create a new token.
 
 **Path Parameter:**
-* `:id` — the sub-token ID (e.g. `st_abc123`)
+* `:id`: the sub-token ID (e.g. `st_abc123`)
 
 **Query Parameters:**
-* `auth` — your rotur user token (required, must be the main account token)
+* `auth`: your rotur user token (required, must be the main account token)
 
 **Example:**
 

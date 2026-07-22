@@ -1,21 +1,33 @@
 # /exists
 
-## About
-
 Checks whether a user account exists.
+
+No authentication required. Uses the profile rate limit (30 per minute, 120 when authenticated).
 
 ## Parameters
 
-| Parameter | Description |
-| --- | --- |
-| username | The username to check |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| username | Yes | The username to check (case-insensitive) |
 
-## Endpoint
+## Example
 
-```
-GET /exists?username=mist
+```bash
+curl "https://api.rotur.dev/exists?username=mist"
 ```
 
 ## Response
 
-Returns `200` if the account exists, `404` if it does not.
+Always returns `200`:
+
+```json
+{
+  "exists": true
+}
+```
+
+## Common errors
+
+| Status | Error | Cause |
+| --- | --- | --- |
+| 400 | `Username is required` | Missing `username` parameter |

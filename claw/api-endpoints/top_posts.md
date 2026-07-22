@@ -1,16 +1,22 @@
 # /top\_posts
 
-## About
+Returns recent public posts sorted by like count, most liked first.
 
-Returns recent posts sorted by the most number of likes
+No authentication required. Uses the search rate limit (20 per minute, 60 when authenticated).
 
 ## Parameters
 
-| Parameter    | Description                                                                                             |
-| ------------ | ------------------------------------------------------------------------------------------------------- |
-| limit        | Optional. The number of posts to return, default is 50, max is 100                                      |
-| time\_period | Optional. The number of hours to in the past to include (24 would be the past 24 hours). Defaults to 24 |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| limit | No | How many posts to return. Default 50, max 50 |
+| time\_period | No | How many hours back to look. Default 24 |
 
-## Endpoint
+## Example
 
-{% embed url="https://api.rotur.dev/top_posts" %}
+```bash
+curl "https://api.rotur.dev/top_posts?limit=10&time_period=48"
+```
+
+## Response
+
+Returns an array of post objects, same shape as [/feed](feed.md).

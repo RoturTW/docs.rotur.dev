@@ -10,13 +10,13 @@ Get details for a single cosmetic by its ID.
 |---|---|
 | `:id` | The cosmetic's unique ID |
 
-**Example:**
+**Example request:**
 
 ```http
 GET /cosmetics/items/cat_ears
 ```
 
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
@@ -35,8 +35,9 @@ GET /cosmetics/items/cat_ears
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error |
 |---|---|
+| `400` | `Invalid cosmetic id` |
 | `404` | `Cosmetic not found` |

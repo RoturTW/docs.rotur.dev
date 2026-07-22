@@ -8,20 +8,20 @@ Browse the cosmetics shop. Returns a paginated, filterable list of available cos
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `type` | string | — | Filter by cosmetic type (e.g. `overlay`) |
-| `featured` | string | — | Set to `true` to only return featured items |
-| `search` | string | — | Search by name or description (case-insensitive) |
+| `type` | string | (none) | Filter by cosmetic type (e.g. `overlay`) |
+| `featured` | string | (none) | Set to `true` to only return featured items |
+| `search` | string | (none) | Search by name or description (case-insensitive) |
 | `sort` | string | `newest` | Sort order: `newest`, `price_low`, `price_high`, `popular` |
 | `limit` | int | `50` | Results per page (max 100) |
 | `offset` | int | `0` | Pagination offset |
 
-**Example:**
+**Example request:**
 
 ```http
 GET /cosmetics/shop?type=overlay&sort=price_low&limit=10
 ```
 
-**Response (200):**
+**Example response (200):**
 
 ```json
 {

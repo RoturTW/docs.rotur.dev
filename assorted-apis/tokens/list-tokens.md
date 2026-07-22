@@ -1,14 +1,13 @@
 # List All Sub-Tokens
 
-> **Authentication:** Required (requires `tokens:manage` permission)
+List every sub-token on your account, including revoked and expired ones.
+
+> **Authentication:** Required. Needs the `tokens:manage` permission, which sub-tokens can never hold, so in practice this is main-token only.
 
 ### GET `/tokens`
 
-**Description:**
-List all sub-tokens for your account, including revoked and expired ones.
-
 **Query Parameters:**
-* `auth` — your rotur user token (required)
+* `auth`: your rotur user token (required)
 
 **Example:**
 
@@ -27,10 +26,8 @@ GET /tokens?auth=YOUR_TOKEN
       "permissions": ["account:view", "posts:view"],
       "created_at": 1715512345678,
       "last_used_at": 1715599999999,
-      "expires_at": null,
-      "token": "the token value",
+      "token": "rotur_st_xYz123...",
       "revoked": false,
-      "revoked_at": null,
       "origin": "https://myapp.example.com",
       "description": "Read-only access for My App",
       "websites": ["https://myapp.example.com"]
@@ -39,3 +36,5 @@ GET /tokens?auth=YOUR_TOKEN
   "total": 1
 }
 ```
+
+`expires_at`, `revoked_at`, and `last_used_at` are omitted when they are not set.

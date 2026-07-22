@@ -1,26 +1,33 @@
 # /claim\_time
 
-## About
+Tells you how long until you can claim your next daily credit reward.
 
-Returns the time remaining until the authenticated user can claim their next daily credit reward.
+Requires authentication and the `credits:daily` permission.
 
 ## Parameters
 
-| Parameter | Description |
-| --- | --- |
-| auth | A required user authentication key |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| auth | Yes | Your authentication key |
 
-## Endpoint
+## Example
 
-```
-GET /claim_time?auth=YOUR_AUTH_KEY
+```bash
+curl "https://api.rotur.dev/claim_time?auth=YOUR_AUTH_KEY"
 ```
 
 ## Response
 
+`wait_time` is the number of seconds until you can claim again. `0` means you can claim now.
+
 ```json
 {
-  "can_claim": false,
-  "time_remaining_ms": 43200000
+  "wait_time": 43200
 }
 ```
+
+## Common errors
+
+| Status | Error | Cause |
+| --- | --- | --- |
+| 400 | `No daily claim found` | You have never claimed a daily reward, so there is no cooldown to report. You can claim right away with [/claim\_daily](claim_daily.md) |

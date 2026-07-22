@@ -1,17 +1,16 @@
 # Token Activity
 
-> **Authentication:** Required (requires `tokens:manage` permission)
+Get a computed status for a sub-token, useful for checking whether it is still usable.
+
+> **Authentication:** Required. Needs the `tokens:manage` permission, which sub-tokens can never hold, so in practice this is main-token only.
 
 ### GET `/tokens/:id/activity`
 
-**Description:**
-Get the current status and activity information for a sub-token. This provides a computed status rather than raw fields — useful for checking whether a token is still usable.
-
 **Path Parameter:**
-* `:id` — the sub-token ID (e.g. `st_abc123`)
+* `:id`: the sub-token ID (e.g. `st_abc123`)
 
 **Query Parameters:**
-* `auth` — your rotur user token (required)
+* `auth`: your rotur user token (required)
 
 **Example:**
 

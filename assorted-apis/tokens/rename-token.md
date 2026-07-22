@@ -1,23 +1,22 @@
 # Rename a Sub-Token
 
+Change just the name of a sub-token.
+
 > **Authentication:** Required (main account token only)
 
 ### POST `/tokens/:id/rename`
 
-**Description:**
-Rename a sub-token. This is a convenience endpoint for changing just the name field.
-
 **Path Parameter:**
-* `:id` — the sub-token ID (e.g. `st_abc123`)
+* `:id`: the sub-token ID (e.g. `st_abc123`)
 
 **Query Parameters:**
-* `auth` — your rotur user token (required, must be the main account token)
+* `auth`: your rotur user token (required, must be the main account token)
 
 **Request Body (JSON):**
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `name` | string | Yes | New name (1–50 characters) |
+| `name` | string | Yes | New name (1-50 characters) |
 
 **Example:**
 

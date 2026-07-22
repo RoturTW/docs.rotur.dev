@@ -1,8 +1,8 @@
 # Get a Group
 
-### GET `/groups/{tag}`
+Fetch a group's info by tag. No authentication needed.
 
-Returns a group's public information.
+### GET `/v2/groups/{tag}`
 
 **Path Parameters:**
 
@@ -10,16 +10,17 @@ Returns a group's public information.
 |-----------|------|----------|-------------|
 | `tag` | string | Yes | The group tag |
 
-**Query Parameters:**
+**Example request:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
+```bash
+curl "https://api.rotur.dev/v2/groups/mygroup"
+```
 
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "tag": "mygroup",
   "name": "My Group",
   "description": "A cool group",
@@ -37,9 +38,8 @@ Returns a group's public information.
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
-| 400 | `Group tag is required` | No tag provided |
 | 404 | `Group not found` | Group doesn't exist |

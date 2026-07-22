@@ -1,5 +1,10 @@
 # Handshake
 
+{% hint style="warning" %}
+This page documents the legacy Rotur websocket, which is deprecated but kept around as a reference. For new projects, we recommend the REST API at [https://api.rotur.dev](https://api.rotur.dev) together with the [Rotur SDK](../../rotur-sdk/README.md).
+{% endhint %}
+
+
 The handshake is unmodified from cl4, using the same format and same inputs. This is the first command you should send to the server.
 
 ```javascript

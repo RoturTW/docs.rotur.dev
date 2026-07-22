@@ -1,16 +1,33 @@
 # /repost
 
-## About
+Reposts a post, either as a plain repost on your profile or as a quote post on the public feed.
 
-Reposts a post on claw to your profile.
+Requires authentication, the `posts:repost` permission, and `good` account standing.
 
 ## Parameters
 
-| Parameter | Description |
-| --------- | ----------- |
-| auth      | A required user authentication key |
-| id        | The ID of the post you are reposting |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| auth | Yes | Your authentication key |
+| id | Yes | The ID of the post you are reposting |
+| content | No | Quote text. If you add content, the repost becomes a quote post and appears on the public feed. Without content it only shows on your profile |
 
-## Endpoint
+## Example
 
-{% embed url="https://api.rotur.dev/repost?auth=YOUR_AUTH_KEY&id=post_id" %}
+```bash
+curl "https://api.rotur.dev/repost?auth=YOUR_AUTH_KEY&id=POST_ID&content=Look+at+this"
+```
+
+## Response
+
+Returns `201` with the new repost object. It has `is_repost: true` and includes the `original_post`.
+
+## Common errors
+
+| Status | Error | Cause |
+| --- | --- | --- |
+| 400 | `You cant repost this post` | The post author has blocked you |
+| 400 | `Content exceeds N character limit` | Quote text too long for your tier |
+| 403 | `Cannot repost a profile-only post` | The original post is profile-only |
+| 403 | `Cannot repost a repost` | The original post is itself a repost |
+| 404 | `Original post not found` | No post with that ID |

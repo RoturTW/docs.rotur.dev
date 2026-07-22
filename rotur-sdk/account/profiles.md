@@ -8,7 +8,7 @@ Accessed via `rotur.profiles`. Most methods do **not** require authentication.
 const profile = await rotur.profiles.get("alice");
 ```
 
-Returns a `UserProfile` with: `username`, `pfp`, `banner`, `bio`, `pronouns`, `system`, `created`, `followers`, `following`, `currency`, `subscription`, `badges`, `theme`, `private`, `banned`, `status`, `posts`, `followed`, `follows_me`, `id`.
+Returns a `UserProfile` with: `username`, `pfp`, `banner`, `bio`, `pronouns`, `system`, `created`, `followers`, `following`, `currency`, `subscription`, `max_size`, `badges`, `theme`, `private`, `banned`, `status`, `posts`, `followed`, `follows_me`, `id`, `index`.
 
 ```ts
 // Without posts (faster)
@@ -30,14 +30,22 @@ const supporters = await rotur.profiles.supporters();
 // [{ username: "alice", subscription: "Plus" }, ...]
 ```
 
-## Avatar URL
+## Image URL Helpers
 
-Helper to build an avatar URL:
+Build avatar, overlay, and banner URLs. These are plain string helpers, so no request is made:
 
 ```ts
-const url = rotur.profiles.getAvatarUrl("alice");
+rotur.profiles.getAvatarUrl("alice");
 // https://avatars.rotur.dev/alice?v=
 
-const url = rotur.profiles.getAvatarUrl("alice", "1234");
+rotur.profiles.getAvatarUrl("alice", "1234");
 // https://avatars.rotur.dev/alice?v=1234
+
+rotur.profiles.getOverlayUrl("alice");
+// https://avatars.rotur.dev/.overlay/alice?v=
+
+rotur.profiles.getBannerUrl("alice");
+// https://avatars.rotur.dev/.banners/alice?v=
 ```
+
+The second argument is an optional cache-busting value appended as `?v=`.

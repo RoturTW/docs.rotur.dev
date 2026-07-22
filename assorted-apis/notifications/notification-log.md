@@ -2,7 +2,13 @@
 
 ### GET `/notify/log`
 
-Returns the last 200 notifications received by the authenticated user.
+Returns the last 200 notifications you received.
+
+**Example:**
+
+```
+GET /notify/log?auth=your_auth_key
+```
 
 **Response (200):**
 
@@ -20,3 +26,5 @@ Returns the last 200 notifications received by the authenticated user.
   "count": 1
 }
 ```
+
+`title` and `body` are omitted from an entry when they were empty. `at` is a Unix timestamp in milliseconds.

@@ -1,5 +1,10 @@
 # SetID
 
+{% hint style="warning" %}
+This page documents the legacy Rotur websocket, which is deprecated but kept around as a reference. For new projects, we recommend the REST API at [https://api.rotur.dev](https://api.rotur.dev) together with the [Rotur SDK](../../rotur-sdk/README.md).
+{% endhint %}
+
+
 This command is also largely unchanged in comparison to the cl4 standard, except for one change. you are able to change your username to anything without disconnecting first. The server will make a fake disconnect and reconnect for you and rename you on all other active clients.
 
 ```javascript
@@ -10,7 +15,7 @@ This command is also largely unchanged in comparison to the cl4 standard, except
 }
 ```
 
-You should then recieve these packets from the server
+You should then receive these packets from the server
 
 ```javascript
 {

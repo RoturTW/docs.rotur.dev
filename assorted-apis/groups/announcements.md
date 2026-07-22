@@ -1,12 +1,12 @@
 # Announcements
 
-Announcements are messages posted by members with the `groups.announcements.send` permission. When a new announcement is created, push notifications are sent to all non-muted members via the Rotur notification system.
+Announcements are messages posted to the whole group. New announcements trigger push notifications to every member who hasn't muted them.
 
 ## List Announcements
 
-### GET `/groups/{tag}/announcements`
+### GET `/v2/groups/{tag}/announcements`
 
-Returns announcements for a group, newest first.
+Returns announcements, newest first. No authentication needed.
 
 **Path Parameters:**
 
@@ -20,7 +20,13 @@ Returns announcements for a group, newest first.
 |-----------|------|----------|-------------|
 | `limit` | int | No | Max number of results (default: 10) |
 
-**Response (200):**
+**Example request:**
+
+```bash
+curl "https://api.rotur.dev/v2/groups/mygroup/announcements?limit=5"
+```
+
+**Example response (200):**
 
 ```json
 [
@@ -36,87 +42,79 @@ Returns announcements for a group, newest first.
 ]
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
-| 400 | `Group tag is required` | No tag provided |
 | 404 | `Group not found` | Group doesn't exist |
 
----
+***
 
 ## Create an Announcement
 
-### POST `/groups/{tag}/announcements`
+### POST `/v2/groups/{tag}/announcements`
 
-Create a new announcement. Requires `groups.announcements.send` permission. Push notifications are sent to all non-muted group members.
+**Auth:** required. Token permission: `groups:manage`. Requires the `groups.announcements.send` group permission.
 
-**Path Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
+Push notifications (source `group_{tag}`) go to every member who hasn't muted announcements and allows notifications from you.
 
 **Query Parameters:**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
 | `title` | string | Yes | Announcement title (max 100 chars) |
-| `body` | string | No | Announcement body (max 2000 chars) |
+| `body` | string | No | Announcement body (max 2,000 chars) |
 | `ping_members` | string | No | `"true"` to ping members (default: `"false"`) |
 
-**Response (201):**
+**Example request:**
+
+```bash
+curl -X POST "https://api.rotur.dev/v2/groups/mygroup/announcements?auth=YOUR_TOKEN&title=New%20Event&body=Check%20it%20out"
+```
+
+**Example response (201):**
 
 ```json
 {
   "id": "ann-2",
   "group_tag": "mygroup",
-  "title": "New Event!",
-  "body": "Check out our new event.",
-  "author_username": "alice",
+  "title": "New Event",
+  "body": "Check it out",
+  "author_user_id": "user-id-here",
   "created_at": 1717100000,
-  "ping_members": true
+  "ping_members": false
 }
 ```
 
-**Push Notifications:** The system sends a notification with source `group_{tag}` to each member who:
-- Is not the announcement author
-- Has not muted announcements for this group
-- Has allowed notifications from the author via `isNotifyAllowed`
+{% hint style="info" %}
+The create response contains `author_user_id` (the raw user ID). The list endpoint returns `author_username` instead.
+{% endhint %}
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
 | 400 | `Title is required` | No title provided |
 | 400 | `Title length exceeded` | Title longer than 100 chars |
-| 400 | `Body length exceeded` | Body longer than 2000 chars |
-| 403 | `You don't have permission to send announcements` | Missing `groups.announcements.send` permission |
+| 400 | `Body length exceeded` | Body longer than 2,000 chars |
+| 403 | `You don't have permission to send announcements` | Missing `groups.announcements.send` |
 | 404 | `Group not found` | Group doesn't exist |
 
----
+***
 
 ## Delete an Announcement
 
-### DELETE `/groups/{tag}/announcements/{announcementid}`
+### DELETE `/v2/groups/{tag}/announcements/{announcementid}`
 
-Delete an announcement. Requires `groups.announcements.send` permission.
+**Auth:** required. Token permission: `groups:manage`. Requires the `groups.announcements.send` group permission.
 
-**Path Parameters:**
+**Example request:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-| `announcementid` | string | Yes | The announcement ID |
+```bash
+curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/announcements/ann-2?auth=YOUR_TOKEN"
+```
 
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
-
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
@@ -124,7 +122,7 @@ Delete an announcement. Requires `groups.announcements.send` permission.
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
@@ -132,27 +130,23 @@ Delete an announcement. Requires `groups.announcements.send` permission.
 | 404 | `Announcement not found` | Announcement ID doesn't exist |
 | 404 | `Group not found` | Group doesn't exist |
 
----
+***
 
 ## Toggle Announcement Mute
 
-### POST `/groups/{tag}/announcements/mute`
+### POST `/v2/groups/{tag}/announcements/mute`
 
-Toggle whether you receive push notifications for announcements in this group.
+**Auth:** required. Token permission: `groups:manage`. You must be a member.
 
-**Path Parameters:**
+Toggles whether you receive announcement push notifications for this group.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
+**Example request:**
 
-**Query Parameters:**
+```bash
+curl -X POST "https://api.rotur.dev/v2/groups/mygroup/announcements/mute?auth=YOUR_TOKEN"
+```
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
-
-**Response (200):**
+**Example response (200):**
 
 ```json
 {
@@ -160,7 +154,7 @@ Toggle whether you receive push notifications for announcements in this group.
 }
 ```
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|

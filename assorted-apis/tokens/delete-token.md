@@ -1,17 +1,18 @@
 # Delete a Sub-Token
 
+Permanently remove a sub-token from your token store.
+
 > **Authentication:** Required (main account token only)
 
 ### DELETE `/tokens/:id`
 
-**Description:**
-Permanently delete a sub-token from your token store. Unlike revocation, this removes the token record entirely.
+Unlike revocation, this removes the token record entirely.
 
 **Path Parameter:**
-* `:id` — the sub-token ID (e.g. `st_abc123`)
+* `:id`: the sub-token ID (e.g. `st_abc123`)
 
 **Query Parameters:**
-* `auth` — your rotur user token (required, must be the main account token)
+* `auth`: your rotur user token (required, must be the main account token)
 
 **Example:**
 

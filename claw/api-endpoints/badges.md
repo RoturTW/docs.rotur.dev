@@ -1,21 +1,39 @@
 # /badges
 
-## About
+Returns the badges the authenticated user currently has.
 
-Returns the list of badges available on the platform, along with which badges the authenticated user has.
+Requires authentication and the `account:view` permission. Badges are computed from your account: the system you signed up on, credits over 1000, 10 or more friends, a linked Discord account, a Pro subscription, and any manually granted badges.
 
 ## Parameters
 
-| Parameter | Description |
-| --- | --- |
-| auth | A required user authentication key |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| auth | Yes | Your authentication key |
 
-## Endpoint
+## Example
 
-```
-GET /badges?auth=YOUR_AUTH_KEY
+```bash
+curl "https://api.rotur.dev/badges?auth=YOUR_AUTH_KEY"
 ```
 
 ## Response
 
-Returns badge metadata including name, icon, and description.
+```json
+{
+  "badge_names": [
+    {
+      "name": "rich",
+      "icon": "c #DAF0F2 w 3 line 3 5 -3 5 ...",
+      "description": "This user has over 1k Rotur Credits"
+    }
+  ]
+}
+```
+
+`icon` is a vector drawing string, not an image URL.
+
+## Common errors
+
+| Status | Error | Cause |
+| --- | --- | --- |
+| 404 | `User not found` | The account could not be resolved |

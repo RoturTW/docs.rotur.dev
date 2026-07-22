@@ -1,5 +1,10 @@
 # Get User Data
 
+{% hint style="warning" %}
+This page documents the legacy Rotur websocket, which is deprecated but kept around as a reference. For new projects, we recommend the REST API at [https://api.rotur.dev](https://api.rotur.dev) together with the [Rotur SDK](../../rotur-sdk/README.md).
+{% endhint %}
+
+
 To fetch a user's data from Rotur, hit the `/get_user` endpoint:
 
 > **Note:** The `password` needs to be an **MD5 hash**, not plain text.
@@ -32,12 +37,12 @@ fetch(`https://api.rotur.dev/get_user?username=${username}&password=${password}`
 
 ***
 
-The response (`data`) is a full **Rotur account object**. Details on what’s inside: [rotur-account-objects](../../my-account/rotur-account-objects/)
+The response (`data`) is a full **Rotur account object**. Details on what's inside: [rotur-account-objects](../../my-account/rotur-account-objects/)
 
 ***
 
 ## Logging in via WebSocket
 
-Once you have the user data, you can auth with the WebSocket server using the `auth` command. This is the recommended way to log in — way faster than doing it through HTTP.
+Once you have the user data, you can auth with the WebSocket server using the `auth` command. This is the recommended way to log in. It is much faster than doing it through HTTP.
 
 Docs for that here: [login-to-rotur-auth.md](../websocket-commands/login-to-rotur-auth.md)

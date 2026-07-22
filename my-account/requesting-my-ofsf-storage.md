@@ -1,68 +1,64 @@
 # Accessing OFSF Storage
 
-OFSF (OriginFS File System) is specific to originOS and provides cloud-based file storage for users.
-
-## Overview
-
-The new OFSF system provides direct HTTP access to user files through a simple REST API endpoint. This replaces the previous WebSocket-based rotur system with a more straightforward approach.
+OFSF (OriginFS File System) is the cloud file storage used by originOS. You can download all your files with one simple request.
 
 ## Authentication
 
-All requests require a valid user authentication token (`userObject.key`) that serves as both identification and authorization.
+All requests need your account token (`userObject.key`). Pass it as the `auth` query parameter, or as a `Bearer` token in the `Authorization` header.
 
 ## Endpoint
 
-### Get User Files
-Retrieve all OFSF data associated with your account.
+### Get All Your Files
 
-**URL:** `https://originfiles.mistium.com/read-files`
+**URL:** `https://api.rotur.dev/read-files`
 
 **Method:** `GET`
 
-**Authentication:** Query parameter
-
 **Parameters:**
-- `auth` (required): Your user authentication token
+
+- `auth` (required): your account token
 
 ### Request Example
 
 ```bash
-curl "https://originfiles.mistium.com/read-files?auth=YOUR_USER_TOKEN"
+curl "https://api.rotur.dev/read-files?auth=YOUR_USER_TOKEN"
 ```
 
 ```javascript
-// JavaScript fetch example
 const userToken = "your_user_token_here";
-const response = await fetch(`https://originfiles.mistium.com/read-files?auth=${userToken}`);
+const response = await fetch(`https://api.rotur.dev/read-files?auth=${userToken}`);
 const ofsfData = await response.json();
 ```
 
 ### Response
 
-The endpoint returns the complete OFSF data structure for the authenticated user. The exact format depends on your stored files and directory structure.
+The endpoint returns your complete OFSF file index as JSON, including file contents, metadata, and folder structure. The exact shape depends on what you have stored.
 
 **Success Response:**
 - **Status Code:** 200 OK
-- **Content-Type:** application/json
-- **Body:** Complete OFSF file system data
+- **Body:** Complete OFSF file system data (served as a binary JSON stream)
 
 **Error Responses:**
-- **401 Unauthorized:** Invalid or missing authentication token
-- **404 Not Found:** No OFSF data found for the user
+- **401 / 403:** Invalid or missing authentication token
 - **500 Internal Server Error:** Server-side processing error
+
+## Finer-Grained Access
+
+If you don't want everything at once, the `/files` endpoints let you work with individual files:
+
+- `GET /files/index` returns the file index
+- `GET /files/usage` returns your storage usage
+- `GET /files/by-path/{path}` returns a single file by path
+- `GET /files/by-uuid?uuid=...` returns a single file by UUID
+
+All of these take the same `auth` parameter.
 
 ## Usage Notes
 
-- The response contains your complete file system data, including file contents, metadata, and directory structure
-- Ensure your authentication token is kept secure and not exposed in client-side code
-- The response size may be large depending on your stored files
-- This endpoint provides read-only access to your OFSF data
+- The `/read-files` response can be large depending on how much you have stored.
+- Your storage limit depends on your subscription tier: 5 MB on Free, up to 1 GB on Pro.
+- Keep your token secure. Never expose it in client-side code.
 
-## Migration from Legacy System
-
-This new HTTP-based system replaces the previous rotur WebSocket system. Key differences:
-
-- **Simplified Authentication:** Single token parameter instead of complex message structure
-- **Direct Access:** HTTP GET request instead of WebSocket message exchange
-- **Immediate Response:** Files data returned directly instead of download URL
-- **No Client Version Requirements:** No need to specify originOS version
+{% hint style="warning" %}
+This HTTP endpoint replaces the old WebSocket-based system and the legacy `originfiles.mistium.com` host. Use `api.rotur.dev` for all new integrations.
+{% endhint %}

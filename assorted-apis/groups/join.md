@@ -1,8 +1,18 @@
 # Join a Group
 
-### POST `/groups/{tag}/join`
+Join a public group directly.
 
-Join a public group. The group must be public and have an `OPEN` join policy. If the group has an **entry fee**, the required credits are deducted from your balance and added to the group's `credits_balance`. If the group has **rules**, the client should present them and require agreement before calling this endpoint.
+### POST `/v2/groups/{tag}/join`
+
+**Auth:** required. Token permission: `groups:join`.
+
+The group must be public. How the join works depends on the group's `join_policy`:
+
+* `OPEN`: you join immediately.
+* `INVITE`: you can only join if you have a pending [invite](invites.md). Joining accepts the invite.
+* `REQUEST`: this endpoint refuses. Send a [join request](join-requests.md) instead.
+
+If the group has an **entry fee**, the credits are deducted from your balance and added to the group's `credits_balance`. If the group has **rules**, show them and get agreement before calling this endpoint.
 
 **Path Parameters:**
 
@@ -10,18 +20,19 @@ Join a public group. The group must be public and have an `OPEN` join policy. If
 |-----------|------|----------|-------------|
 | `tag` | string | Yes | The group tag |
 
-**Query Parameters:**
+**Example request:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
+```bash
+curl -X POST "https://api.rotur.dev/v2/groups/mygroup/join?auth=YOUR_TOKEN"
+```
 
-**Response (200):**
+**Example response (200):**
 
-Returns the updated group info with incremented `member_count`:
+Returns the updated group info:
 
 ```json
 {
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "tag": "mygroup",
   "name": "My Group",
   "description": "A cool group",
@@ -39,15 +50,16 @@ Returns the updated group info with incremented `member_count`:
 }
 ```
 
-You are automatically assigned the default **Member** role (the role with `assign_on_join: true`).
+You are automatically given every role marked `assign_on_join` (the default **Member** role if none are).
 
-**Error Responses:**
+**Common errors:**
 
 | Status | Error | Cause |
 |--------|-------|-------|
 | 400 | `You are already a member of this group` | Already joined |
+| 400 | `This group requires a join request. Use the join request endpoint instead.` | Join policy is `REQUEST` |
+| 400 | `Insufficient funds to join this group` | Not enough credits for the entry fee (response includes `required` and `available`) |
 | 403 | `Group is private` | Group is not public |
-| 403 | `This group is invite-only` | Join policy is `INVITE` |
-| 400 | `Join requests not yet implemented` | Join policy is `REQUEST` |
-| 400 | `Insufficient funds to join this group` | Not enough credits for the entry fee |
+| 403 | `This group is invite-only and you don't have a pending invite` | Join policy is `INVITE` and no invite exists |
+| 403 | `You are banned from this group` | You're on the group's ban list |
 | 404 | `Group not found` | Group doesn't exist |

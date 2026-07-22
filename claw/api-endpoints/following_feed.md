@@ -1,15 +1,22 @@
-# /following_feed
+# /following\_feed
 
-## About
+Returns recent posts from the users you follow, newest first. Other users' profile-only posts are hidden.
 
-Retrieves recent posts from users that the authenticated user is following on Claw.
+Requires authentication and the `posts:view` permission.
 
 ## Parameters
 
-| Parameter | Description |
-| --------- | ----------- |
-| auth      | A required user authentication key |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| auth | Yes | Your authentication key |
+| limit | No | How many posts to return. Default 100. Max 100, or 200 with Plus or higher |
 
-## Endpoint
+## Example
 
-{% embed url="https://api.rotur.dev/following_feed?auth=YOUR_AUTH_KEY" %}
+```bash
+curl "https://api.rotur.dev/following_feed?auth=YOUR_AUTH_KEY&limit=50"
+```
+
+## Response
+
+Returns an array of post objects, same shape as [/feed](feed.md).

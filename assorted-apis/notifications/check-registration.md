@@ -2,7 +2,7 @@
 
 ### GET `/notify/check`
 
-Checks whether a specific device is already registered for a given source.
+Checks whether a device is already registered for a given source.
 
 **Query Parameters:**
 
@@ -14,7 +14,7 @@ Checks whether a specific device is already registered for a given source.
 **Example:**
 
 ```
-GET /notify/check?source=originChats&fingerprint=a1b2c3d4e5f6
+GET /notify/check?source=originChats&fingerprint=a1b2c3d4e5f6&auth=your_auth_key
 ```
 
 **Response (registered):**
@@ -24,8 +24,6 @@ GET /notify/check?source=originChats&fingerprint=a1b2c3d4e5f6
   "registered": true,
   "device_id": "a4f8b2c1d3e5f7a9b0c2d4e6",
   "endpoint": "https://push.example.com/deliver/abc123",
-  "p256dh": "BASE64URL_P256DH_KEY",
-  "auth": "BASE64URL_AUTH_SECRET",
   "source": "originChats",
   "created_at": 1715054321000
 }
@@ -40,4 +38,10 @@ GET /notify/check?source=originChats&fingerprint=a1b2c3d4e5f6
 }
 ```
 
-The `device_id` is always returned so the client can persist it without needing to register first.
+The `device_id` is always returned, so you can persist it without needing to register first.
+
+**Common Errors:**
+
+| Status | Body | Condition |
+| --- | --- | --- |
+| 400 | `{"error": "source and fingerprint query params are required"}` | Missing query parameters |

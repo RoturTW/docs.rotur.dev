@@ -1,14 +1,13 @@
 # List Active Sub-Tokens
 
-> **Authentication:** Required (requires `tokens:manage` permission)
+List only the sub-tokens that are still usable: not revoked and not expired.
+
+> **Authentication:** Required. Needs the `tokens:manage` permission, which sub-tokens can never hold, so in practice this is main-token only.
 
 ### GET `/tokens/active`
 
-**Description:**
-List only active sub-tokens — those that are not revoked and have not expired.
-
 **Query Parameters:**
-* `auth` — your rotur user token (required)
+* `auth`: your rotur user token (required)
 
 **Example:**
 
@@ -27,9 +26,8 @@ GET /tokens/active?auth=YOUR_TOKEN
       "permissions": ["account:view", "posts:view"],
       "created_at": 1715512345678,
       "last_used_at": 1715599999999,
-      "expires_at": null,
+      "token": "rotur_st_xYz123...",
       "revoked": false,
-      "revoked_at": null,
       "origin": "https://myapp.example.com",
       "description": "Read-only access for My App",
       "websites": ["https://myapp.example.com"]

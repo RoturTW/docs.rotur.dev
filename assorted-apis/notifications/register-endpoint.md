@@ -2,15 +2,15 @@
 
 ### POST `/notify/register`
 
-Registers a push notification endpoint for the authenticated user. If the device (identified by the fingerprint + source combination) already exists, its endpoint URL is updated instead of creating a duplicate.
+Registers a push notification endpoint for your account. If the device (identified by the fingerprint + source combination) already exists, its endpoint and keys are updated instead of creating a duplicate.
 
 **Body (JSON):**
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| `endpoint` | string | Yes | The push URL to deliver notifications to (must be `http://` or `https://`) |
-| `p256dh` | string | Yes | Base64url-encoded P-256 public key for the push subscription |
-| `auth` | string | Yes | Base64url-encoded authentication secret for the push subscription |
+| `endpoint` | string | Yes | The push URL to deliver notifications to (`http://` or `https://`, max 2048 chars) |
+| `p256dh` | string | Yes | Base64url-encoded uncompressed P-256 public key for the push subscription (65 bytes, starting with `0x04`) |
+| `auth` | string | Yes | Base64url-encoded authentication secret for the push subscription (16 bytes) |
 | `source` | string | Yes | The application/site name (max 64 chars, e.g. `originChats`) |
 | `fingerprint` | string | Yes | A stable device fingerprint (e.g. hash of user-agent + screen + timezone) |
 
@@ -37,9 +37,17 @@ Registers a push notification endpoint for the authenticated user. If the device
 }
 ```
 
-The `device_id` is server-generated and deterministic. Persist it client-side so you can check registration status or delete the device later. The `updated` field is `true` when an existing endpoint was updated rather than newly created.
+The `device_id` is server-generated and deterministic. Persist it client-side so you can check registration status or delete the device later. `updated` is `true` when an existing endpoint was updated rather than newly created.
 
-Users are limited to **20 registered endpoints**.
+**Common Errors:**
+
+| Status | Body | Condition |
+| --- | --- | --- |
+| 400 | `{"error": "endpoint, p256dh, auth, source, and fingerprint are required"}` | Missing fields |
+| 400 | `{"error": "endpoint must be a valid HTTP(S) URL"}` | Bad endpoint URL |
+| 400 | `{"error": "invalid p256dh key"}` | Key does not decode to a 65-byte uncompressed P-256 point |
+| 400 | `{"error": "invalid auth key"}` | Secret does not decode to 16 bytes |
+| 400 | `{"error": "maximum number of notification endpoints reached (20)"}` | You already have 20 endpoints |
 
 ## Example: Subscribe & Register from JavaScript
 

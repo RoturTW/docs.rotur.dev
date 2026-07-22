@@ -1,68 +1,69 @@
 # Keys
 
-> **Authentication:**\
-> All routes use the **GET** method.\
-> All required parameters must be passed as **URL query parameters** (after `?` in the URL).
+Keys are sellable access passes. You create a key, optionally give it a price or a subscription, and other users can buy it. Your app can then check whether a user owns your key.
+
+> **Base URL:** `https://api.rotur.dev/`
 >
+> All v1 key routes use the **GET** method and take their parameters as URL query parameters. The key's `id` in each path is the key string itself.
 >
->
-> **The base url for this api is:**\
-> https://api.rotur.dev/\
-> \
-> \
 > **Manage your keys with the GUI:**\
 > [https://rotur.dev/key-manager](https://rotur.dev/key-manager)
+
+{% hint style="info" %}
+Authenticated endpoints accept your token as an `auth` query parameter or an `Authorization: Bearer` header. Sub-tokens need the `keys:manage` permission for everything except `/keys/mine` (which needs `keys:view`). `/keys/get` and `/keys/check` are public.
+{% endhint %}
 
 ***
 
 ### GET `/keys/create`
 
-**Description:**\
-Create a new key, the data of a key is hidden unless the user owns it.
+Create a new key. You are added to it automatically as its creator.
 
 **Query Parameters:**
 
-* `auth` — your rotur user token (required)
-* `data` — data to associate with the key (required)
-* `price` — price for the key (required)
+* `auth`: your rotur user token (required)
+* `name`: a name for the key (required)
+* `description`: text stored in the key's `data` field (optional)
+* `price`: price in credits, whole number, defaults to 0 (optional)
+* `subscription`: set to `true` or `1` to make this a subscription key (optional)
+* `frequency`: how many periods between charges, defaults to 1 (optional)
+* `period`: `day`, `week`, `month`, or `year`, defaults to `month` (optional)
 
 **Example:**
 
 ```http
-GET /keys/create?auth=YOUR_TOKEN&data=exampledata&price=10
+GET /keys/create?auth=YOUR_TOKEN&name=My%20App%20Pro&price=10
 ```
 
-***
+**Example Response (200):**
 
-### GET `/keys/get/<id>`
-
-**Description:**\
-Retrieve information about a specific key by ID.
-
-**Path Parameter:**
-
-* `<id>` — the ID of the key
-
-**Query Parameters:**
-
-* `auth` — your rotur user token (required)
-
-**Example:**
-
-```http
-GET /keys/get/1234?auth=YOUR_TOKEN
+```json
+{
+  "status": "Key created successfully",
+  "key": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+  "type": "standard",
+  "price": 10
+}
 ```
+
+Subscription keys also include a `subscription` object with `active`, `frequency`, `period`, and `next_billing`.
+
+**Common Errors:**
+
+| Status | Condition |
+|---|---|
+| 400 | `name` is missing |
+| 400 | You have reached your key limit (depends on your subscription tier) |
 
 ***
 
 ### GET `/keys/mine`
 
-**Description:**\
-Retrieve an array of all keys you own.
+List every key you have access to, whether you created it or bought it.
 
 **Query Parameters:**
 
-* `auth` — your rotur user token (required)
+* `auth`: your rotur user token (required)
 
 **Example:**
 
@@ -70,112 +71,383 @@ Retrieve an array of all keys you own.
 GET /keys/mine?auth=YOUR_TOKEN
 ```
 
+**Example Response (200):**
+
+A JSON array of key objects.
+
+```json
+[
+  {
+    "key": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+    "name": "My App Pro",
+    "price": 10,
+    "type": "standard",
+    "total_income": 30,
+    "users": {
+      "misty": { "time": 1715512345 }
+    },
+    "creator": "misty"
+  }
+]
+```
+
+For keys you did not create, `total_income` is hidden (reported as 0).
+
+***
+
+### GET `/keys/get/<id>`
+
+Get public info about a key. No authentication needed.
+
+**Path Parameter:**
+
+* `<id>`: the key string
+
+**Example:**
+
+```http
+GET /keys/get/a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
+```
+
+**Example Response (200):**
+
+```json
+{
+  "key": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+  "name": "My App Pro",
+  "price": 10,
+  "type": "standard"
+}
+```
+
+**Common Errors:**
+
+| Status | Condition |
+|---|---|
+| 404 | Key not found |
+
 ***
 
 ### GET `/keys/check/<username>`
 
-**Description:**\
-Check if a user owns a specific key.
+Check whether a user owns a specific key. No authentication needed.
 
 **Path Parameter:**
 
-* `<username>` — the username to check
+* `<username>`: the username to check
 
 **Query Parameters:**
 
-* `key` — the key to check against (required)
+* `key`: the key string to check against (required)
 
 **Example:**
 
 ```http
-GET /keys/check/misty?key=KEY_ID
+GET /keys/check/misty?key=a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
 ```
+
+**Example Response (200):**
+
+```json
+{
+  "owned": true,
+  "username": "misty",
+  "key": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"
+}
+```
+
+**Common Errors:**
+
+| Status | Condition |
+|---|---|
+| 400 | `key` is missing |
 
 ***
 
-### GET `/keys/revoke/<id>`
+### GET `/keys/name/<id>`
 
-**Description:**\
-Revoke a user's access to a key.
+Rename a key you created.
 
 **Path Parameter:**
 
-* `<id>` — the ID of the key
+* `<id>`: the key string
 
 **Query Parameters:**
 
-* `auth` — your rotur user token (required)
-* `user` — the username to remove (required)
+* `auth`: your rotur user token (required)
+* `name`: the new name (required)
 
 **Example:**
 
 ```http
-GET /keys/revoke/1234?auth=YOUR_TOKEN&user=misty
+GET /keys/name/a1b2c3d4?auth=YOUR_TOKEN&name=New%20Name
 ```
 
-***
+**Example Response (200):**
 
-### GET `/keys/delete/<id>`
-
-**Description:**\
-Delete a key by ID.
-
-**Path Parameter:**
-
-* `<id>` — the ID of the key
-
-**Query Parameters:**
-
-* `auth` — your rotur user token (required)
-
-**Example:**
-
-```http
-GET /keys/delete/1234?auth=YOUR_TOKEN
+```json
+{ "status": "Key name updated successfully" }
 ```
+
+**Common Errors:**
+
+| Status | Condition |
+|---|---|
+| 400 | `name` is missing |
+| 403 | You are not the key's creator |
+| 404 | Key not found |
 
 ***
 
 ### GET `/keys/update/<id>`
 
-**Description:**\
-Update the data associated with a key.
+Update a single field on a key you created.
 
 **Path Parameter:**
 
-* `<id>` — the ID of the key
+* `<id>`: the key string
 
 **Query Parameters:**
 
-* `auth` — your rotur user token (required)
-* `key` — the key to update (required)
-* `data` — new data to set (optional)
+* `auth`: your rotur user token (required)
+* `key`: the field to update: `name`, `price`, `data`, `type`, or `webhook` (required)
+* `data`: the new value. Valid JSON is parsed (so `5` becomes a number), anything else is stored as a string (optional)
 
 **Example:**
 
 ```http
-GET /keys/update/1234?auth=YOUR_TOKEN&key=price&data=5
+GET /keys/update/a1b2c3d4?auth=YOUR_TOKEN&key=price&data=5
 ```
+
+**Example Response (200):**
+
+```json
+{ "status": "Key updated successfully" }
+```
+
+**Common Errors:**
+
+| Status | Condition |
+|---|---|
+| 403 | `key` parameter is missing |
+| 403 | You are not the key's creator |
+| 404 | Key not found |
+
+***
+
+### GET `/keys/buy/<id>`
+
+Buy access to a key. Also accepts POST. The price is taken from your credits and the creator receives 90% of it (a 10% tax applies). Buying a subscription key sets up recurring billing.
+
+**Path Parameter:**
+
+* `<id>`: the key string
+
+**Query Parameters:**
+
+* `auth`: your rotur user token (required)
+
+**Example:**
+
+```http
+GET /keys/buy/a1b2c3d4?auth=YOUR_TOKEN
+```
+
+**Example Response (200):**
+
+```json
+{ "message": "Key purchased successfully" }
+```
+
+**Common Errors:**
+
+| Status | Condition |
+|---|---|
+| 400 | Key is not for sale |
+| 400 | You already have access to this key |
+| 400 | Insufficient balance |
+| 404 | Key not found |
+
+***
+
+### GET `/keys/cancel/<id>`
+
+Give up your access to a key. Also accepts POST. For subscription keys, your access continues until the next billing date and is removed then. For standard keys, access is removed immediately.
+
+**Path Parameter:**
+
+* `<id>`: the key string
+
+**Query Parameters:**
+
+* `auth`: your rotur user token (required)
+
+**Example:**
+
+```http
+GET /keys/cancel/a1b2c3d4?auth=YOUR_TOKEN
+```
+
+**Example Response (200):**
+
+```json
+{ "status": "Cancellation scheduled", "cancel_at": 1718191234000 }
+```
+
+For non-subscription keys the response is:
+
+```json
+{ "status": "Cancelled" }
+```
+
+**Common Errors:**
+
+| Status | Condition |
+|---|---|
+| 400 | The subscription has no next billing date |
+| 404 | Key not found, or you do not have this key |
+
+***
+
+### GET `/keys/revoke/<id>`
+
+Remove a user's access to a key you created.
+
+**Path Parameter:**
+
+* `<id>`: the key string
+
+**Query Parameters:**
+
+* `auth`: your rotur user token (required)
+* `user`: the username to remove (required)
+
+**Example:**
+
+```http
+GET /keys/revoke/a1b2c3d4?auth=YOUR_TOKEN&user=misty
+```
+
+**Example Response (200):**
+
+```json
+{ "status": "Key access revoked successfully" }
+```
+
+**Common Errors:**
+
+| Status | Condition |
+|---|---|
+| 400 | Target user not found |
+| 400 | You cannot revoke access from the key creator |
+| 403 | You are not the key's creator |
+| 404 | Key not found |
+
+***
+
+### GET `/keys/delete/<id>`
+
+Delete a key you created. Also accepts DELETE.
+
+**Path Parameter:**
+
+* `<id>`: the key string
+
+**Query Parameters:**
+
+* `auth`: your rotur user token (required)
+
+**Example:**
+
+```http
+GET /keys/delete/a1b2c3d4?auth=YOUR_TOKEN
+```
+
+**Example Response (200):**
+
+```json
+{ "status": "Key deleted successfully" }
+```
+
+**Common Errors:**
+
+| Status | Condition |
+|---|---|
+| 403 | You are not the key's creator |
+| 404 | Key not found |
 
 ***
 
 ### GET `/keys/admin_add/<id>`
 
-**Description:**\
-Manually add a user to a key (admin action).
+Manually give a user access to a key you created, without them paying.
 
 **Path Parameter:**
 
-* `<id>` — the ID of the key
+* `<id>`: the key string
 
 **Query Parameters:**
 
-* `auth` — your rotur user token (required)
-* `key` — the key to add the user to (required)
-* `username` — the username to add (required)
+* `auth`: your rotur user token (required)
+* `user`: the username to add (required, `username` also accepted)
 
 **Example:**
 
 ```http
-GET /keys/admin_add/1234?auth=YOUR_TOKEN&key=KEY_ID&username=misty
+GET /keys/admin_add/a1b2c3d4?auth=YOUR_TOKEN&user=misty
 ```
+
+**Example Response (200):**
+
+```json
+{ "status": "User added to key successfully" }
+```
+
+**Common Errors:**
+
+| Status | Condition |
+|---|---|
+| 400 | Target user missing or not found |
+| 403 | You are not the key's creator |
+| 404 | Key not found |
+
+***
+
+### GET `/keys/admin_remove/<id>`
+
+Manually remove a user from a key you created. Same parameters and errors as `admin_add`.
+
+**Example:**
+
+```http
+GET /keys/admin_remove/a1b2c3d4?auth=YOUR_TOKEN&user=misty
+```
+
+**Example Response (200):**
+
+```json
+{ "status": "User removed from key successfully" }
+```
+
+***
+
+## v2 Equivalents
+
+The same handlers are exposed RESTfully under `https://api.rotur.dev/v2/keys`:
+
+| v1 | v2 |
+|---|---|
+| GET `/keys/create` | POST `/v2/keys` |
+| GET `/keys/mine` | GET `/v2/keys/mine` |
+| GET `/keys/get/:id` | GET `/v2/keys/:id` |
+| GET `/keys/check/:username` | GET `/v2/keys/check/:username` |
+| GET `/keys/name/:id` | PATCH `/v2/keys/:id/name` |
+| GET `/keys/update/:id` | PATCH `/v2/keys/:id` |
+| GET `/keys/buy/:id` | POST `/v2/keys/:id/buy` |
+| GET `/keys/cancel/:id` | POST `/v2/keys/:id/cancel` |
+| GET `/keys/revoke/:id` | POST `/v2/keys/:id/revoke` |
+| GET `/keys/delete/:id` | DELETE `/v2/keys/:id` |
+| GET `/keys/admin_add/:id` | POST `/v2/keys/:id/members` |
+| GET `/keys/admin_remove/:id` | DELETE `/v2/keys/:id/members` |
+
+Parameters are still passed as query parameters in v2.

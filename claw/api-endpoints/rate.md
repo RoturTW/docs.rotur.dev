@@ -1,17 +1,40 @@
 # /rate
 
-## About
+Likes or unlikes a post.
 
-Allows a user to like or unlike a post on Claw.
+Requires authentication and the `posts:like` permission.
 
 ## Parameters
 
-| Parameter | Description |
-| --------- | ----------- |
-| auth      | A required user authentication key |
-| id        | The ID of the post to rate |
-| rating    | Set to `1` to like the post or `0` to unlike the post |
+| Parameter | Required | Description |
+| --------- | -------- | ----------- |
+| auth | Yes | Your authentication key |
+| id | Yes | The ID of the post to rate |
+| rating | Yes | `1` to like the post, `0` to remove your like |
 
-## Endpoint
+## Example
 
-{% embed url="https://api.rotur.dev/rate?auth=YOUR_AUTH_KEY&id=POST_ID&rating=1" %}
+```bash
+curl "https://api.rotur.dev/rate?auth=YOUR_AUTH_KEY&id=POST_ID&rating=1"
+```
+
+## Response
+
+```json
+{
+  "message": "Post rated successfully",
+  "likes": ["user_id_1", "user_id_2"]
+}
+```
+
+{% hint style="info" %}
+The `likes` array here contains user IDs. Post objects returned by the feed endpoints resolve likes to usernames.
+{% endhint %}
+
+## Common errors
+
+| Status | Error | Cause |
+| --- | --- | --- |
+| 400 | `Rating must be 1 (like) or 0 (unlike)` | Invalid `rating` value |
+| 400 | `You cant like this post` | The post author has blocked you |
+| 404 | `Post not found` | No post with that ID |
