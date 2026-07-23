@@ -26,9 +26,9 @@ The default tier for all Rotur accounts. No subscription required.
 - **1x Daily Credit Multiplier**: earn 1 credit per daily claim
 
 > on claw/pounce
-- 1 pinned post
-- 1 attachment max
 - 400-character posts
+- 1 pinned post
+- 1 attachment per post
 
 > on roturGate
 - **20 free roturGate urls**: shorten 20 urls
