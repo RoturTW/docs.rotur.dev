@@ -12,29 +12,7 @@ Free → Lite → Plus → Pro
 
 Each tier inherits everything from the tier below it and adds new benefits.
 
-## Quick Comparison
-
-| Benefit | Free | Lite | Plus | Pro |
-|---|---|---|---|---|
-| **Max Currency Keys** | 5 | 5 | 20 | 50 |
-| **Max Login History** | 10 | 10 | 100 | 100 |
-| **Max Transaction History** | 20 | 20 | 100 | 500 |
-| **Max Rmails** | 100 | 100 | 1,000 | 100,000 |
-| **File System Size** | 5 MB | 10 MB | 15 MB | 1 GB |
-| **Bio Length** | 200 chars | 200 chars | 500 chars | 1,000 chars |
-| **Animated Profile Picture** | No | No | Yes | Yes |
-| **Animated Banner** | No | No | No | Yes |
-| **Free Banner Uploads** | No | No | No | Yes |
-| **Bio Templating** | No | Yes | Yes | Yes |
-| **Friend Notes** | No | No | Yes | Yes |
-| **Daily Credit Multiplier** | 1x | 1x | 2x | 3x |
-| **Pro Subscriber Badge** | No | No | No | Yes |
-| **Bio `{{ time }}` Template** | No | No | Yes | Yes |
-| **Bio `{{ url }}` Template** | No | No | No | Yes |
-
-## Tier Details
-
-### Free
+# Free
 
 The default tier for all Rotur accounts. No subscription required.
 
@@ -47,10 +25,15 @@ The default tier for all Rotur accounts. No subscription required.
 - **200 Character Bio**: write a bio up to 200 characters
 - **1x Daily Credit Multiplier**: earn 1 credit per daily claim
 
+> on claw/pounce
+- 1 pinned post
+- 1 attachment max
+- 400-character posts
+
 > on roturGate
 - **20 free roturGate urls**: shorten 20 urls
 
-### Lite
+# Lite - 15rc/month
 
 A lightweight upgrade that introduces profile customization.
 
@@ -59,7 +42,7 @@ A lightweight upgrade that introduces profile customization.
 - **10 MB File System**: double the storage capacity (up from 5 MB)
 - **Bio Templating**: use template expressions like `{{ user username }}` in your bio to dynamically display profile data
 
-### Plus
+# Plus - £1/month
 
 The sweet spot for active users who want animated avatars and more capacity.
 
@@ -75,6 +58,13 @@ The sweet spot for active users who want animated avatars and more capacity.
 - **Friend Notes**: add private notes about other users via the `/me/note/:username` endpoint
 - **`{{ time }}` Bio Template**: display your local time in your bio using `{{ time HH:MM }}`
 
+> on claw/pounce
+- 600-character posts
+- Edit your posts
+- 2 attachments per post
+- 3 pinned posts
+- Premium crown
+
 > on mail
 - **1,000 Rmails**: store up to 1,000 rmail messages (up from 100)
 
@@ -86,7 +76,7 @@ The sweet spot for active users who want animated avatars and more capacity.
 - Access to the full model catalogue
 - 25% cheaper tokens compared to free
 
-### Pro
+# Pro - £5/month
 
 The premium tier for power users and developers.
 
@@ -101,6 +91,11 @@ The premium tier for power users and developers.
 - **3x Daily Credit Multiplier**: earn 3 credits per daily claim (up from 2x)
 - **Pro Subscriber Badge**: a special badge displayed on your profile
 - **`{{ url }}` Bio Template**: fetch and display external URL content in your bio using `{{ url https://... }}`. Can also be used to track profile visits.
+
+> on claw/pounce
+- 800-character posts
+- 4 attachments per post
+- 5 pinned posts
 
 > on mail
 - **100,000 Rmails**: store up to 100,000 rmail messages (up from 1,000)
