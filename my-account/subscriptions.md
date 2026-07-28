@@ -33,6 +33,9 @@ The default tier for all Rotur accounts. No subscription required.
 > on roturGate
 - **20 free roturGate urls**: shorten 20 urls
 
+> on Connect
+- 1GB per day, 10GB per month
+
 # Lite - 15rc/month
 
 A lightweight upgrade that introduces profile customization.
@@ -76,6 +79,9 @@ The sweet spot for active users who want animated avatars and more capacity.
 - Access to the full model catalogue
 - 25% cheaper tokens compared to free
 
+> on Connect
+- 10GB per day, 100GB per month
+
 # Pro - £5/month
 
 The premium tier for power users and developers.
@@ -106,9 +112,8 @@ The premium tier for power users and developers.
 > on sable
 - 50% cheaper tokens compared to free
 
-{% hint style="info" %}
-A special **Max** tier also exists (500 keys and 10 GB of storage on top of the Pro benefits). It is assigned by administrators and cannot be purchased.
-{% endhint %}
+> on Connect
+- 50GB per day, 1000GB per month
 
 ### Daily Credit Claims
 
