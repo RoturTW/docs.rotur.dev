@@ -2,17 +2,14 @@
 
 `/emojis` is the Plus+ emoji system for Rotur accounts. It lets users upload custom emoji images, keep them under their account, and add other users' emojis to their collection.
 
-All endpoints use SHA-256 hashes for filenames and slug identifiers.
+All endpoint path identifiers use numeric emoji IDs. Emoji binary files are still stored by SHA-256 hash on disk.
+Authentication should be sent using the `Authorization` header whenever it is required.
 
 ## Storage model
 
 * Uploaded and added emojis are tracked per user in `emojis.json` under that user's userdata folder.
 * Binary emoji files are stored at `./rotur/emojis/<sha256-hash>`.
-* Slugs use the format:
-
-```
-<owner_user_id>-<sha256_hash>
-```
+* Each saved emoji has a numeric `id` field in `emojis.json` (derived from the hash).
 
 Hash is lowercased by the service and must be 64 hex characters.
 
@@ -31,11 +28,11 @@ If you have no Plus+ subscription, all write endpoints return `403` with:
 ```
 
 `GET /emojis` returns `404` if your account is not Plus+.
-`GET /emojis/:slug` returns `404` if the emoji owner is not Plus+.
+`GET /emojis/:emojiId` returns `404` if the emoji owner is not Plus+.
 
 ## Endpoints
 
-### GET `/emojis/:slug`
+### GET `/emojis/:emojiId`
 
 Returns the raw emoji image for an uploaded emoji. This is unauthenticated.
 
@@ -43,12 +40,12 @@ Returns the raw emoji image for an uploaded emoji. This is unauthenticated.
 
 | Parameter | Required | Description |
 | --- | --- | --- |
-| slug | Yes | `user_id-hash` |
+| emojiId | Yes | Numeric emoji id |
 
 ### Example
 
 ```bash
-curl "https://api.rotur.dev/emojis/12345-a3b9...9c1f"
+curl "https://api.rotur.dev/emojis/12345"
 ```
 
 ### GET `/emojis`
@@ -68,10 +65,10 @@ curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis"
 ```json
 {
   "uploaded": [
-    { "hash": "...", "name": "my smiley", "owner": "12345", "url": "https://api.rotur.dev/emojis/12345-..." }
+    { "id": 12345, "hash": "...", "name": "my smiley", "owner": "12345", "url": "https://api.rotur.dev/emojis/12345" }
   ],
   "added": [
-    { "hash": "...", "name": "funny", "owner": "67890", "url": "https://api.rotur.dev/emojis/67890-..." }
+    { "id": 12346, "hash": "...", "name": "funny", "owner": "67890", "url": "https://api.rotur.dev/emojis/12346" }
   ]
 }
 ```
@@ -84,7 +81,7 @@ Uploads a new emoji and adds it to your uploaded list.
 
 | Parameter | Required | Description |
 | --- | --- | --- |
-| auth | Yes | Your authentication key |
+| Authorization | Yes | `Bearer YOUR_AUTH_KEY` in request header |
 | image | Yes | A data URI containing PNG/GIF/JPEG binary |
 | name | Yes | Display name (max 80 chars) |
 
@@ -102,13 +99,14 @@ curl -X POST -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emo
 {
   "status": "uploaded",
   "hash": "a3b9...9c1f",
+  "id": 12345,
   "name": "sparkles",
   "content_type": "image/png",
-  "url": "https://api.rotur.dev/emojis/12345-a3b9...9c1f"
+  "url": "https://api.rotur.dev/emojis/12345"
 }
 ```
 
-### POST `/emojis/:slug/add`
+### POST `/emojis/:emojiId/add`
 
 Adds another user's emoji to your own account. This may optionally rename it.
 
@@ -116,19 +114,19 @@ Adds another user's emoji to your own account. This may optionally rename it.
 
 | Parameter | Required | Description |
 | --- | --- | --- |
-| auth | Yes | Your authentication key |
-| slug | Yes | `user_id-hash` of the source emoji |
+| Authorization | Yes | `Bearer YOUR_AUTH_KEY` in request header |
+| emojiId | Yes | Numeric id of the source emoji |
 | name | No | Optional replacement name (max 80 chars) |
 
 ### Example
 
 ```bash
-curl -X POST -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis/12345-a3b9...9c1f/add" \
+curl -X POST -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis/12345/add" \
   -H "Content-Type: application/json" \
   -d '{ "name":"favorite mist emoji" }'
 ```
 
-### POST `/emojis/:slug/unsave`
+### POST `/emojis/:emojiId/unsave`
 
 Removes an emoji from your **added** list.
 
@@ -137,10 +135,10 @@ Uploaded emojis cannot be unsaved.
 ### Example
 
 ```bash
-curl -X POST -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis/12345-a3b9...9c1f/unsave"
+curl -X POST -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis/12345/unsave"
 ```
 
-### DELETE `/emojis/:slug`
+### DELETE `/emojis/:emojiId`
 
 Deletes an uploaded emoji from your own uploaded list.
 
@@ -151,19 +149,19 @@ Only the uploader can delete.
 ### Example
 
 ```bash
-curl -X DELETE -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis/12345-a3b9...9c1f"
+curl -X DELETE -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis/12345"
 ```
 
-### DELETE `/admin/emojis/:hash`
+### DELETE `/admin/emojis/:id`
 
-Network admins can remove an emoji by hash globally.
+Network admins can remove an emoji globally by numeric id.
 
 ### Parameters
 
 | Parameter | Required | Description |
 | --- | --- | --- |
-| auth | Yes | A network admin authentication key |
-| hash | Yes | 64-character lowercase hex hash |
+| Authorization | Yes | `Bearer YOUR_AUTH_KEY` in request header |
+| id | Yes | Numeric emoji id |
 
 ### Response
 
@@ -175,4 +173,4 @@ Network admins can remove an emoji by hash globally.
 }
 ```
 
-This endpoint is also available under `/v2/admin/emojis/:hash` with the same behavior.
+This endpoint is also available under `/v2/admin/emojis/:id` with the same behavior.
