@@ -76,6 +76,7 @@ Includes everything in **Lite**, with the following upgrades:
 * **2 credits per daily claim**
 * **Friend notes**, allowing you to privately save notes about other users through the `/me/note/:username` endpoint
 * **Time bio templates** using expressions such as `{{ time HH:MM }}`
+* 50 user emojis that you can use in originchats and across rotur
 
 ## Claw and Pounce
 
@@ -123,6 +124,7 @@ Includes everything in **Plus**, with the following upgrades:
 * **3 credits per daily claim**
 * Pro subscriber badge
 * **URL bio templates** using expressions such as `{{ url https://... }}`, allowing your bio to display content retrieved from an external URL
+* 500 user emoji slots that you can use in originchats and across rotur
 
 > URL bio templates may also be used to track profile visits.
 
