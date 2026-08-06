@@ -15,7 +15,7 @@ Leave a group you're a member of. Owners can't leave their own group; [transfer 
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/leave?auth=YOUR_TOKEN"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/leave"
 ```
 
 **Example response (200):**

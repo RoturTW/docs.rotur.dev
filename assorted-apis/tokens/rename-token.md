@@ -10,7 +10,7 @@ Change just the name of a sub-token.
 * `:id`: the sub-token ID (e.g. `st_abc123`)
 
 **Query Parameters:**
-* `auth`: your rotur user token (required, must be the main account token)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Request Body (JSON):**
 
@@ -21,7 +21,7 @@ Change just the name of a sub-token.
 **Example:**
 
 ```http
-POST /tokens/st_abc123/rename?auth=YOUR_MAIN_TOKEN
+POST /tokens/st_abc123/rename
 Content-Type: application/json
 
 {

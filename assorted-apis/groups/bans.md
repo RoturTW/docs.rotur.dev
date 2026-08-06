@@ -23,7 +23,7 @@ Banning removes the user's membership, pending invites, and pending join request
 **Example request:**
 
 ```bash
-curl -X PUT "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID/ban?auth=YOUR_TOKEN&reason=spam"
+curl -X PUT -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID/ban?reason=spam"
 ```
 
 **Example response (200):**
@@ -66,7 +66,7 @@ curl -X PUT "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID/ban?auth=YO
 **Example request:**
 
 ```bash
-curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID/ban?auth=YOUR_TOKEN"
+curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID/ban"
 ```
 
 **Example response (200):**
@@ -96,7 +96,7 @@ curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID/ban?auth
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/bans?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/bans"
 ```
 
 **Example response (200):**
@@ -136,7 +136,7 @@ Checks whether a user ID is banned from the group.
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/bans/USER_ID?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/bans/USER_ID"
 ```
 
 **Example response (200):**

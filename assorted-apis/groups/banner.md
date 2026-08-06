@@ -25,8 +25,7 @@ The image is resized to **900x300**. JPEG and PNG uploads keep their format; GIF
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/banner?auth=YOUR_TOKEN" \
-  -F "banner=@banner.png"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/banner" \  -F "banner=@banner.png"
 ```
 
 **Example response (200):**

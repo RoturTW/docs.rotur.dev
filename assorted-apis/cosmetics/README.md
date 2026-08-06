@@ -4,7 +4,7 @@ Cosmetics are visual items you can buy for your Rotur account. The first cosmeti
 
 > **Base URL:** `https://api.rotur.dev`
 >
-> **Authentication:** Endpoints marked "Auth" accept your token as an `auth` query parameter or an `Authorization: Bearer <token>` header.
+> **Authentication:** Endpoints marked "Auth" accept your token in the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as a legacy fallback.
 
 {% hint style="info" %}
 Authenticated endpoints require a verified email address and an accepted Terms of Service. If either is missing you get a `403` explaining which one.

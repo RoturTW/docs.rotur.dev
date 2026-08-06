@@ -25,8 +25,7 @@ The image is resized to **256x256** and saved as JPEG. Any previous icon is repl
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/icon?auth=YOUR_TOKEN" \
-  -F "icon=@icon.png"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/icon" \  -F "icon=@icon.png"
 ```
 
 **Example response (200):**

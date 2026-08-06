@@ -13,7 +13,7 @@ Returns the group's events. `MEMBERS` events are filtered out unless you're a me
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/events?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/events"
 ```
 
 **Example response (200):**
@@ -64,7 +64,7 @@ curl "https://api.rotur.dev/v2/groups/mygroup/events?auth=YOUR_TOKEN"
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/events?auth=YOUR_TOKEN&title=Tournament&start_time=1717100000&duration_hours=4"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/events?title=Tournament&start_time=1717100000&duration_hours=4"
 ```
 
 **Example response (201):**
@@ -123,8 +123,7 @@ The create response contains the creator's raw user ID in `created_by`. The list
 **Example request:**
 
 ```bash
-curl -X PATCH "https://api.rotur.dev/v2/groups/mygroup/events/evt-2?auth=YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
+curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/events/evt-2" \  -H "Content-Type: application/json" \
   -d '{"title": "Big Tournament", "published": true}'
 ```
 
@@ -152,7 +151,7 @@ curl -X PATCH "https://api.rotur.dev/v2/groups/mygroup/events/evt-2?auth=YOUR_TO
 **Example request:**
 
 ```bash
-curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/events/evt-2?auth=YOUR_TOKEN"
+curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/events/evt-2"
 ```
 
 **Example response (200):**

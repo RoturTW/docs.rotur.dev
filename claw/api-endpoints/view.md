@@ -8,7 +8,7 @@ Requires authentication.
 
 | Parameter | Required | Description |
 | --------- | -------- | ----------- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | id | Yes* | The ID of a single post to view |
 | ids | No* | A comma-separated list of post IDs to view in one request |
 
@@ -17,7 +17,7 @@ Requires authentication.
 ## Example
 
 ```bash
-curl "https://api.rotur.dev/view?auth=YOUR_AUTH_KEY&id=POST_ID"
+curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/view?id=POST_ID"
 ```
 
 ## Response

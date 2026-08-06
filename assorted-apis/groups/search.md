@@ -15,7 +15,7 @@ Search public groups by tag, name, or description.
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/search?auth=YOUR_TOKEN&query=gamedev"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/search?query=gamedev"
 ```
 
 **Example response (200):**

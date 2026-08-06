@@ -83,7 +83,7 @@ To create additional keys, subscribe to a higher [Ko-fi](https://ko-fi.com/misti
 You can view all your key data with:
 
 ```
-GET https://api.rotur.dev/keys/mine?auth=YOUR_ROTUR_AUTH_TOKEN
+GET https://api.rotur.dev/keys/mine
 ```
 
 This returns every key you own, including prices, types, users, webhook configuration, and subscription settings.

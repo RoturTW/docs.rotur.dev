@@ -12,12 +12,12 @@ Unlike revocation, this removes the token record entirely.
 * `:id`: the sub-token ID (e.g. `st_abc123`)
 
 **Query Parameters:**
-* `auth`: your rotur user token (required, must be the main account token)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Example:**
 
 ```http
-DELETE /tokens/st_abc123?auth=YOUR_MAIN_TOKEN
+DELETE /tokens/st_abc123
 ```
 
 **Response (200):**

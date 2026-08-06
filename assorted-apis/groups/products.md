@@ -11,7 +11,7 @@ Groups can sell **role products**: pay credits, get a role (and its benefits). P
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/products?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/products"
 ```
 
 **Example response (200):**
@@ -64,7 +64,7 @@ curl "https://api.rotur.dev/v2/groups/mygroup/products?auth=YOUR_TOKEN"
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/products?auth=YOUR_TOKEN&name=VIP&price_credits=100&role_id=role-3&subscription=true&period=month"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/products?name=VIP&price_credits=100&role_id=role-3&subscription=true&period=month"
 ```
 
 **Example response (201):** the created product object, as in the list response.
@@ -92,7 +92,7 @@ curl -X POST "https://api.rotur.dev/v2/groups/mygroup/products?auth=YOUR_TOKEN&n
 **Example request:**
 
 ```bash
-curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/products/prod-1?auth=YOUR_TOKEN"
+curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/products/prod-1"
 ```
 
 **Example response (200):**
@@ -124,7 +124,7 @@ Charges the price to your account (a `group_role_purchase` transaction), grants 
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/products/prod-1/purchase?auth=YOUR_TOKEN"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/products/prod-1/purchase"
 ```
 
 **Example response (200):**
@@ -186,7 +186,7 @@ Schedules your active subscription to end at the next billing date. You keep the
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/products/prod-1/cancel?auth=YOUR_TOKEN"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/products/prod-1/cancel"
 ```
 
 **Example response (200):**
@@ -266,7 +266,7 @@ Returns your active subscriptions across all groups.
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/products/subscriptions/mine?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/products/subscriptions/mine"
 ```
 
 **Example response (200):** an array of subscription objects, as shown above. Empty array if you have none.

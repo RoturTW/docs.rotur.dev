@@ -13,7 +13,7 @@ Equip a cosmetic you own. This sets it as your active cosmetic for its type. For
 **Example request:**
 
 ```http
-POST /cosmetics/equip/cat_ears?auth=YOUR_TOKEN
+POST /cosmetics/equip/cat_ears
 ```
 
 **Example response (200):**

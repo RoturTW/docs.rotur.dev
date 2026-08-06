@@ -21,7 +21,7 @@ Free cosmetics cannot be gifted. The recipient can claim those directly through 
 **Example request:**
 
 ```http
-POST /cosmetics/gift?auth=YOUR_TOKEN
+POST /cosmetics/gift
 Content-Type: application/json
 
 {

@@ -17,7 +17,7 @@ Generate a validator string for the authenticated user. The validator is valid f
 > **Authentication:** Required. Sub-tokens need the `validators:generate` permission.
 
 **Query Parameters:**
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 * `key`: the application key to bind into the validator hash (required)
 
 {% hint style="info" %}
@@ -27,7 +27,7 @@ If you authenticate with a sub-token, the server still uses your main account ke
 **Example:**
 
 ```http
-GET /generate_validator?auth=YOUR_TOKEN&key=myAppKey
+GET /generate_validator?key=myAppKey
 ```
 
 **Response (200):**

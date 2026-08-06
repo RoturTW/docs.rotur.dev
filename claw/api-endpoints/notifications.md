@@ -8,13 +8,13 @@ Requires authentication and the `notifications:view` permission.
 
 | Parameter | Required | Description |
 | --------- | -------- | ----------- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | after | No | How many days to look back. Must be a whole number of 1 or more. Default 1 |
 
 ## Example
 
 ```bash
-curl "https://api.rotur.dev/notifications?auth=YOUR_AUTH_KEY&after=7"
+curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/notifications?after=7"
 ```
 
 ## Response

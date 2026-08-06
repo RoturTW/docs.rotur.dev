@@ -14,7 +14,7 @@ Checks whether a device is already registered for a given source.
 **Example:**
 
 ```
-GET /notify/check?source=originChats&fingerprint=a1b2c3d4e5f6&auth=your_auth_key
+GET /notify/check?source=originChats&fingerprint=a1b2c3d4e5f6
 ```
 
 **Response (registered):**

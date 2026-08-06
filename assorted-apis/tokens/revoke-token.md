@@ -12,12 +12,12 @@ A revoked token cannot be un-revoked. If you need the access back, create a new 
 * `:id`: the sub-token ID (e.g. `st_abc123`)
 
 **Query Parameters:**
-* `auth`: your rotur user token (required, must be the main account token)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Example:**
 
 ```http
-POST /tokens/st_abc123/revoke?auth=YOUR_MAIN_TOKEN
+POST /tokens/st_abc123/revoke
 ```
 
 **Response (200):**

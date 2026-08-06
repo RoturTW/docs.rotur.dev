@@ -7,12 +7,12 @@ List only the sub-tokens that are still usable: not revoked and not expired.
 ### GET `/tokens/active`
 
 **Query Parameters:**
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Example:**
 
 ```http
-GET /tokens/active?auth=YOUR_TOKEN
+GET /tokens/active
 ```
 
 **Response (200):**

@@ -2,12 +2,14 @@
 
 Rotur has an integrated currency and economy system. You can send credits to other users and earn credits from them.
 
+> **Authentication:** Required. Send your token in an `Authorization` header as `Authorization: Bearer YOUR_TOKEN` (preferred). `auth` query parameter is still accepted as a legacy fallback.
+
 ## Transferring Credits
 
 Transfer credits with the `transfer` endpoint:
 
 ```
-POST https://api.rotur.dev/me/transfer?auth=YOUR_AUTH_KEY
+POST https://api.rotur.dev/me/transfer
 ```
 
 **Body (JSON):**

@@ -17,7 +17,7 @@ Returns every role assigned to the member. The Owner role includes the full perm
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles"
 ```
 
 **Example response (200):**
@@ -59,7 +59,7 @@ Returns the combined permissions from all the member's roles. Members with the O
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/members/alice/permissions?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/alice/permissions"
 ```
 
 **Example response (200):**
@@ -90,7 +90,7 @@ Returns the combined benefits from all the member's roles.
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/members/alice/benefits?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/alice/benefits"
 ```
 
 **Example response (200):**
@@ -119,7 +119,7 @@ curl "https://api.rotur.dev/v2/groups/mygroup/members/alice/benefits?auth=YOUR_T
 **Example request:**
 
 ```bash
-curl -X PUT "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles/role-3?auth=YOUR_TOKEN"
+curl -X PUT -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles/role-3"
 ```
 
 **Example response (200):**
@@ -151,7 +151,7 @@ curl -X PUT "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles/role-3?
 **Example request:**
 
 ```bash
-curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles/role-3?auth=YOUR_TOKEN"
+curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles/role-3"
 ```
 
 **Example response (200):**

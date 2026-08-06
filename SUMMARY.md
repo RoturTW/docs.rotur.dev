@@ -21,6 +21,7 @@
   * [.banners](assorted-apis/avatars.rotur.dev/.banners.md)
   * [.overlay](assorted-apis/avatars.rotur.dev/overlay.md)
   * [Uploading](assorted-apis/avatars.rotur.dev/upload.md)
+* [Emojis](assorted-apis/emojis.md)
 * [share.rotur.dev](assorted-apis/share.rotur.dev.md)
 * [rotur.dev/auth](assorted-apis/rotur.dev-auth.md)
 * [Gate](assorted-apis/gate.md)

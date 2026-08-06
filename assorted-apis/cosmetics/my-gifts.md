@@ -7,7 +7,7 @@ List cosmetic gifts you have sent and received.
 **Example request:**
 
 ```http
-GET /cosmetics/gifts/mine?auth=YOUR_TOKEN
+GET /cosmetics/gifts/mine
 ```
 
 **Example response (200):**

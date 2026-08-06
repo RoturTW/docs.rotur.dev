@@ -7,12 +7,12 @@ List every sub-token on your account, including revoked and expired ones.
 ### GET `/tokens`
 
 **Query Parameters:**
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Example:**
 
 ```http
-GET /tokens?auth=YOUR_TOKEN
+GET /tokens
 ```
 
 **Response (200):**

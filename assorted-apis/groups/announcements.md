@@ -69,7 +69,7 @@ Push notifications (source `group_{tag}`) go to every member who hasn't muted an
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/announcements?auth=YOUR_TOKEN&title=New%20Event&body=Check%20it%20out"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/announcements?title=New%20Event&body=Check%20it%20out"
 ```
 
 **Example response (201):**
@@ -111,7 +111,7 @@ The create response contains `author_user_id` (the raw user ID). The list endpoi
 **Example request:**
 
 ```bash
-curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/announcements/ann-2?auth=YOUR_TOKEN"
+curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/announcements/ann-2"
 ```
 
 **Example response (200):**
@@ -143,7 +143,7 @@ Toggles whether you receive announcement push notifications for this group.
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/announcements/mute?auth=YOUR_TOKEN"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/announcements/mute"
 ```
 
 **Example response (200):**

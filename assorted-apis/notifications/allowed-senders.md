@@ -11,7 +11,7 @@ Returns a map of sources to their allowed senders and notification counts.
 **Example:**
 
 ```
-GET /notify/allowed?auth=your_auth_key
+GET /notify/allowed
 ```
 
 **Response (200):**
@@ -102,7 +102,7 @@ Revokes a user's permission to send you notifications from a specific source.
 **Example:**
 
 ```
-DELETE /notify/allowed/mist?source=originChats&auth=your_auth_key
+DELETE /notify/allowed/mist?source=originChats
 ```
 
 **Response (200):**

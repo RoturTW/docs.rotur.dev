@@ -9,7 +9,7 @@ Get every group you're a member of.
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mine?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mine"
 ```
 
 **Example response (200):**

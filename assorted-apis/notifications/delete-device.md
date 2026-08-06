@@ -17,7 +17,7 @@ On v2 this is `DELETE /v2/notify/devices/:device_id`.
 **Example:**
 
 ```
-DELETE /notify/device/a4f8b2c1d3e5f7a9b0c2d4e6?auth=your_auth_key
+DELETE /notify/device/a4f8b2c1d3e5f7a9b0c2d4e6
 ```
 
 **Response (200):**

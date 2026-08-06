@@ -1,6 +1,6 @@
 # Status WebSocket
 
-The status websocket provides real-time presence and activity information for Rotur users. It is room-based: you join rooms to see other members' status, and you receive live updates when anyone in a shared room changes their status, presence, or activities.
+The status websocket is Rotur's real-time connection. It is room-based: you join rooms to see other members, receive live updates when anyone in a shared room changes their status, presence, or activities, and send messages to the room or to individual members. It replaces the legacy Rotur websocket — the `gmsg` and `pmsg` room messaging documented under [Room Messaging](#room-messaging) cover the same primitives.
 
 ## Connecting
 
@@ -196,6 +196,91 @@ Request the current state of a room you are in.
 
 **Errors:** `room required`, `not in room: <room>`.
 
+## Room Messaging
+
+Rooms are also message channels. You can broadcast a value to everyone in a room, or send a private value to a single member. Messages are ephemeral — they are delivered live to whoever is connected and are never stored. The `val` can be any JSON value (string, number, object, array), and each message may be up to 64&nbsp;KB. You must be a member of the room you send to.
+
+Unlike status and presence, messaging works with any valid token — no extra permission is required. `invisible` members are still delivered messages; visibility only affects presence and member lists.
+
+### `gmsg`
+
+Broadcast a value to every other member of a room.
+
+**Send:**
+
+```json
+{
+  "cmd": "gmsg",
+  "room": "originChats",
+  "val": "hello everyone",
+  "listener": "optional-echo-tag"
+}
+```
+
+Everyone else in the room receives:
+
+```json
+{
+  "cmd": "gmsg",
+  "room": "originChats",
+  "val": "hello everyone",
+  "origin": { "user_id": "abc123", "username": "mist" },
+  "timestamp": 1715054000000
+}
+```
+
+The sender does **not** receive their own broadcast. Instead they get an acknowledgement, with `listener` echoed back if it was supplied:
+
+```json
+{
+  "cmd": "gmsg_ok",
+  "room": "originChats",
+  "listener": "optional-echo-tag"
+}
+```
+
+**Errors:** `room required`, `not in room: <room>`, `val required`.
+
+### `pmsg`
+
+Send a private value to a single member of a room. The recipient is identified with `to` (a username or a user id).
+
+**Send:**
+
+```json
+{
+  "cmd": "pmsg",
+  "room": "originChats",
+  "to": "rm",
+  "val": { "type": "wave" },
+  "listener": "optional-echo-tag"
+}
+```
+
+Only the target's connections that are in that room receive:
+
+```json
+{
+  "cmd": "pmsg",
+  "room": "originChats",
+  "val": { "type": "wave" },
+  "origin": { "user_id": "abc123", "username": "mist" },
+  "timestamp": 1715054000000
+}
+```
+
+The sender receives an acknowledgement (with `listener` echoed back if supplied):
+
+```json
+{
+  "cmd": "pmsg_ok",
+  "room": "originChats",
+  "listener": "optional-echo-tag"
+}
+```
+
+**Errors:** `room required`, `not in room: <room>`, `val required`, `to required`, `user not in room` (the recipient exists but is not a member of that room).
+
 ## Status and Presence
 
 Your **status** is a text string (max 128 characters) shown alongside your **presence**. Presence determines your visibility in rooms:
@@ -380,7 +465,7 @@ If the user is offline, their last persisted status and presence are returned wi
 
 ### POST `/status/set`
 
-Sets your status text, presence, or both. Requires authentication (`auth` query parameter or `Authorization: Bearer` header).
+Sets your status text, presence, or both. Requires authentication (`Authorization: Bearer` header preferred; `auth` query parameter remains supported as a legacy fallback).
 
 {% hint style="info" %}
 On v2 this is `PUT /v2/status/live`.

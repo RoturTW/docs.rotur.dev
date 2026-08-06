@@ -75,9 +75,13 @@ async function getFingerprint() {
 }
 
 async function api(path, authToken, options = {}) {
-  const res = await fetch(`https://api.rotur.dev${path}?auth=${authToken}`, {
+  const headers = { "Content-Type": "application/json", ...options.headers };
+  if (authToken) {
+    headers.Authorization = authToken.startsWith("Bearer ") ? authToken : `Bearer ${authToken}`;
+  }
+  const res = await fetch(`https://api.rotur.dev${path}`, {
     ...options,
-    headers: { "Content-Type": "application/json", ...options.headers },
+    headers,
   });
   if (!res.ok) {
     const { error } = await res.json().catch(() => ({}));

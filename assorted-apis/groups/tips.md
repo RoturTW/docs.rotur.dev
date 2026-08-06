@@ -23,7 +23,7 @@ Returns tips, newest first.
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/tips?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/tips"
 ```
 
 **Example response (200):**
@@ -67,7 +67,7 @@ Send credits to a group. You must be a member, unless the group is public. The a
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/tips?auth=YOUR_TOKEN&amount=10&note=thanks"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/tips?amount=10&note=thanks"
 ```
 
 **Example response (201):**
@@ -116,7 +116,7 @@ Moves credits from the group's `credits_balance` to your account. Recorded as a 
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/tips/withdraw?auth=YOUR_TOKEN&amount=50"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/tips/withdraw?amount=50"
 ```
 
 **Example response (201):**
@@ -159,7 +159,7 @@ Returns withdrawals, newest first.
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/tips/withdrawals?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/tips/withdrawals"
 ```
 
 **Example response (200):**
@@ -201,7 +201,6 @@ Withdraw credits from the group's tip jar to your own balance. You must have the
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
 | `amount` | float | Yes | Amount of credits to withdraw (must be positive) |
 
 **Response (201):**
@@ -246,8 +245,12 @@ Returns withdrawals from the group's tip jar, newest first. You must have the `g
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `auth` | string | Yes | Your Rotur user token |
 | `limit` | int | No | Max number of results (default: 20) |
+
+{% hint style="info" %}
+These v1 endpoints accept auth via the `Authorization` header (`Authorization: Bearer <token>` preferred). `auth` query parameter is accepted as legacy fallback.
+{% endhint %}
+
 
 **Response (200):**
 

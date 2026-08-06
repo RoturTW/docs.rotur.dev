@@ -21,7 +21,7 @@ Members are returned newest first and paginated.
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/members?auth=YOUR_TOKEN&page=1&per_page=20"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members?page=1&per_page=20"
 ```
 
 **Example response (200):**
@@ -70,7 +70,7 @@ Returns a member's record plus their resolved roles, permissions, and benefits i
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID"
 ```
 
 **Example response (200):**
@@ -127,7 +127,7 @@ The group owner can't be kicked. Members holding the Owner role can only be kick
 **Example request:**
 
 ```bash
-curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID?auth=YOUR_TOKEN"
+curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID"
 ```
 
 **Example response (200):**

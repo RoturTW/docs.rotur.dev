@@ -12,7 +12,7 @@ You cannot update a revoked token.
 * `:id`: the sub-token ID (e.g. `st_abc123`)
 
 **Query Parameters:**
-* `auth`: your rotur user token (required, must be the main account token)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Request Body (JSON):**
 
@@ -28,7 +28,7 @@ All fields are optional. Only include the fields you want to change.
 **Example:**
 
 ```http
-PATCH /tokens/st_abc123?auth=YOUR_MAIN_TOKEN
+PATCH /tokens/st_abc123
 Content-Type: application/json
 
 {

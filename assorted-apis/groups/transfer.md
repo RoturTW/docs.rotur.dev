@@ -22,7 +22,7 @@ The target must already be a member. They receive the Owner role and become the 
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/transfer/USER_ID?auth=YOUR_TOKEN"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/transfer/USER_ID"
 ```
 
 **Example response (200):**

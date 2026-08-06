@@ -8,13 +8,13 @@ Requires authentication and the `posts:view` permission.
 
 | Parameter | Required | Description |
 | --------- | -------- | ----------- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | limit | No | How many posts to return. Default 100. Max 100, or 200 with Plus or higher |
 
 ## Example
 
 ```bash
-curl "https://api.rotur.dev/following_feed?auth=YOUR_AUTH_KEY&limit=50"
+curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/following_feed?limit=50"
 ```
 
 ## Response

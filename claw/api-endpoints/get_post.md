@@ -9,7 +9,7 @@ Authentication is optional. If you pass your token and the post has a poll, the 
 | Parameter | Required | Description |
 | --------- | -------- | ----------- |
 | id | Yes | The ID of the post to fetch |
-| auth | No | Your authentication key |
+| auth | No | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 
 ## Example
 

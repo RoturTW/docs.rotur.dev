@@ -8,14 +8,14 @@ Requires authentication, the `posts:repost` permission, and `good` account stand
 
 | Parameter | Required | Description |
 | --------- | -------- | ----------- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | id | Yes | The ID of the post you are reposting |
 | content | No | Quote text. If you add content, the repost becomes a quote post and appears on the public feed. Without content it only shows on your profile |
 
 ## Example
 
 ```bash
-curl "https://api.rotur.dev/repost?auth=YOUR_AUTH_KEY&id=POST_ID&content=Look+at+this"
+curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/repost?id=POST_ID&content=Look+at+this"
 ```
 
 ## Response

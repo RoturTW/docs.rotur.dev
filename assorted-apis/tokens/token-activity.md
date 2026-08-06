@@ -10,12 +10,12 @@ Get a computed status for a sub-token, useful for checking whether it is still u
 * `:id`: the sub-token ID (e.g. `st_abc123`)
 
 **Query Parameters:**
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Example:**
 
 ```http
-GET /tokens/st_abc123/activity?auth=YOUR_TOKEN
+GET /tokens/st_abc123/activity
 ```
 
 **Response (200):**

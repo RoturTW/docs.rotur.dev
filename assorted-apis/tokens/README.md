@@ -7,7 +7,7 @@ Sub-tokens let you grant limited, scoped access to your Rotur account. Instead o
 > The same endpoints are also available under `https://api.rotur.dev/v2/tokens`. The only path difference is that creating a token is `POST /v2/tokens` instead of `POST /tokens/create`.
 
 {% hint style="info" %}
-You can authenticate in three ways: an `auth` query parameter, an `Authorization: Bearer <token>` header, or a session cookie. The examples on these pages use the query parameter.
+Prefer `Authorization: Bearer <token>`. You can still authenticate with `auth` query parameter as a legacy fallback or a session cookie.
 {% endhint %}
 
 ***

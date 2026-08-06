@@ -19,7 +19,7 @@ The group must be public and have the `REQUEST` join policy. Members with invite
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/join-requests?auth=YOUR_TOKEN&message=Hi%20there"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/join-requests?message=Hi%20there"
 ```
 
 **Example response (201):**
@@ -61,7 +61,7 @@ Returns the group's pending join requests.
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/join-requests?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/join-requests"
 ```
 
 **Example response (200):** an array of join request objects like the one above.
@@ -86,7 +86,7 @@ The requester joins the group with the `assign_on_join` roles. If the group has 
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/join-requests/req-1/accept?auth=YOUR_TOKEN"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/join-requests/req-1/accept"
 ```
 
 **Example response (200):**
@@ -129,7 +129,7 @@ The requester gets a `group_request_declined` event and a push notification.
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/join-requests/req-1/decline?auth=YOUR_TOKEN"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/join-requests/req-1/decline"
 ```
 
 **Example response (200):**

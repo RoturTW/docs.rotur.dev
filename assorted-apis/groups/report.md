@@ -15,7 +15,7 @@ Report a group to the Rotur moderation team. Reports go to a moderation channel 
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/report?auth=YOUR_TOKEN"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/report"
 ```
 
 **Example response (200):**

@@ -57,7 +57,7 @@ The same endpoints exist under `/v2` with a few path differences:
 
 ## Authentication
 
-All endpoints except `GET /notify/vapid` require your Rotur auth key. Pass it as the `auth` query parameter, an `Authorization: Bearer` header, or a session cookie.
+All endpoints except `GET /notify/vapid` require your Rotur auth key. Prefer passing it in the `Authorization` header (`Authorization: Bearer <token>`). A session cookie is also accepted. The `auth` query parameter is still accepted as a legacy fallback.
 
 If you authenticate with a scoped sub-token instead of your main account key, the token needs these permissions:
 

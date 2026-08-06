@@ -10,7 +10,7 @@ Keys are sellable access passes. You create a key, optionally give it a price or
 > [https://rotur.dev/key-manager](https://rotur.dev/key-manager)
 
 {% hint style="info" %}
-Authenticated endpoints accept your token as an `auth` query parameter or an `Authorization: Bearer` header. Sub-tokens need the `keys:manage` permission for everything except `/keys/mine` (which needs `keys:view`). `/keys/get` and `/keys/check` are public.
+Authenticated endpoints accept your token in an `Authorization: Bearer` header (preferred). The `auth` query parameter is also accepted as a legacy fallback. Sub-tokens need the `keys:manage` permission for everything except `/keys/mine` (which needs `keys:view`). `/keys/get` and `/keys/check` are public.
 {% endhint %}
 
 ***
@@ -21,7 +21,7 @@ Create a new key. You are added to it automatically as its creator.
 
 **Query Parameters:**
 
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 * `name`: a name for the key (required)
 * `description`: text stored in the key's `data` field (optional)
 * `price`: price in credits, whole number, defaults to 0 (optional)
@@ -32,7 +32,7 @@ Create a new key. You are added to it automatically as its creator.
 **Example:**
 
 ```http
-GET /keys/create?auth=YOUR_TOKEN&name=My%20App%20Pro&price=10
+GET /keys/create?name=My%20App%20Pro&price=10
 ```
 
 **Example Response (200):**
@@ -63,12 +63,12 @@ List every key you have access to, whether you created it or bought it.
 
 **Query Parameters:**
 
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Example:**
 
 ```http
-GET /keys/mine?auth=YOUR_TOKEN
+GET /keys/mine
 ```
 
 **Example Response (200):**
@@ -174,13 +174,13 @@ Rename a key you created.
 
 **Query Parameters:**
 
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 * `name`: the new name (required)
 
 **Example:**
 
 ```http
-GET /keys/name/a1b2c3d4?auth=YOUR_TOKEN&name=New%20Name
+GET /keys/name/a1b2c3d4?name=New%20Name
 ```
 
 **Example Response (200):**
@@ -209,14 +209,14 @@ Update a single field on a key you created.
 
 **Query Parameters:**
 
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 * `key`: the field to update: `name`, `price`, `data`, `type`, or `webhook` (required)
 * `data`: the new value. Valid JSON is parsed (so `5` becomes a number), anything else is stored as a string (optional)
 
 **Example:**
 
 ```http
-GET /keys/update/a1b2c3d4?auth=YOUR_TOKEN&key=price&data=5
+GET /keys/update/a1b2c3d4?key=price&data=5
 ```
 
 **Example Response (200):**
@@ -245,12 +245,12 @@ Buy access to a key. Also accepts POST. The price is taken from your credits and
 
 **Query Parameters:**
 
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Example:**
 
 ```http
-GET /keys/buy/a1b2c3d4?auth=YOUR_TOKEN
+GET /keys/buy/a1b2c3d4
 ```
 
 **Example Response (200):**
@@ -280,12 +280,12 @@ Give up your access to a key. Also accepts POST. For subscription keys, your acc
 
 **Query Parameters:**
 
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Example:**
 
 ```http
-GET /keys/cancel/a1b2c3d4?auth=YOUR_TOKEN
+GET /keys/cancel/a1b2c3d4
 ```
 
 **Example Response (200):**
@@ -319,13 +319,13 @@ Remove a user's access to a key you created.
 
 **Query Parameters:**
 
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 * `user`: the username to remove (required)
 
 **Example:**
 
 ```http
-GET /keys/revoke/a1b2c3d4?auth=YOUR_TOKEN&user=misty
+GET /keys/revoke/a1b2c3d4?user=misty
 ```
 
 **Example Response (200):**
@@ -355,12 +355,12 @@ Delete a key you created. Also accepts DELETE.
 
 **Query Parameters:**
 
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Example:**
 
 ```http
-GET /keys/delete/a1b2c3d4?auth=YOUR_TOKEN
+GET /keys/delete/a1b2c3d4
 ```
 
 **Example Response (200):**
@@ -388,13 +388,13 @@ Manually give a user access to a key you created, without them paying.
 
 **Query Parameters:**
 
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 * `user`: the username to add (required, `username` also accepted)
 
 **Example:**
 
 ```http
-GET /keys/admin_add/a1b2c3d4?auth=YOUR_TOKEN&user=misty
+GET /keys/admin_add/a1b2c3d4?user=misty
 ```
 
 **Example Response (200):**
@@ -420,7 +420,7 @@ Manually remove a user from a key you created. Same parameters and errors as `ad
 **Example:**
 
 ```http
-GET /keys/admin_remove/a1b2c3d4?auth=YOUR_TOKEN&user=misty
+GET /keys/admin_remove/a1b2c3d4?user=misty
 ```
 
 **Example Response (200):**

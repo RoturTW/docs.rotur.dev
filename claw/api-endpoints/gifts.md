@@ -23,8 +23,7 @@ Creates a gift with a randomly generated redeem code. The amount plus a 1% tax i
 **Example:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/gifts/create?auth=YOUR_AUTH_KEY" \
-  -H "Content-Type: application/json" \
+curl -X POST -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/gifts/create" \  -H "Content-Type: application/json" \
   -d '{"amount": 10, "note": "Thanks!", "expires_in_hrs": 168}'
 ```
 

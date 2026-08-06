@@ -8,7 +8,7 @@ Requires authentication, the `posts:create` permission, and `good` account stand
 
 | Parameter | Required | Description |
 | --------- | -------- | ----------- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | content | No* | The post text. Max length depends on your subscription: 300 (Free), 400 (Lite), 600 (Plus), 800 (Pro), 1000 (Max) |
 | attachment | No | A URL to an image or video (PNG, JPEG, GIF, MP4, WEBM). Max 200 characters |
 | attachments | No | Comma-separated list of attachment URLs. Max count per tier: 1 (Free/Lite), 2 (Plus), 4 (Pro and up) |
@@ -22,7 +22,7 @@ Requires authentication, the `posts:create` permission, and `good` account stand
 ## Example
 
 ```bash
-curl "https://api.rotur.dev/post?auth=YOUR_AUTH_KEY&content=Hello%20Claw"
+curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/post?content=Hello%20Claw"
 ```
 
 ## Response

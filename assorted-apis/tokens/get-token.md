@@ -10,12 +10,12 @@ Retrieve a single sub-token by its ID.
 * `:id`: the sub-token ID (e.g. `st_abc123`)
 
 **Query Parameters:**
-* `auth`: your rotur user token (required)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Example:**
 
 ```http
-GET /tokens/st_abc123?auth=YOUR_TOKEN
+GET /tokens/st_abc123
 ```
 
 **Response (200):**

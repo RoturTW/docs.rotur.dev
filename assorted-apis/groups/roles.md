@@ -13,7 +13,7 @@ The Owner role always returns the full permission list, whatever is stored.
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/roles?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/roles"
 ```
 
 **Example response (200):**
@@ -86,7 +86,7 @@ New roles start with empty `benefits` and `permissions`. Use the update endpoint
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/roles?auth=YOUR_TOKEN&name=Moderator"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/roles?name=Moderator"
 ```
 
 **Example response (201):**
@@ -136,8 +136,7 @@ curl -X POST "https://api.rotur.dev/v2/groups/mygroup/roles?auth=YOUR_TOKEN&name
 **Example request:**
 
 ```bash
-curl -X PATCH "https://api.rotur.dev/v2/groups/mygroup/roles/role-3?auth=YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
+curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/roles/role-3" \  -H "Content-Type: application/json" \
   -d '{"permissions": ["groups.announcements.send"]}'
 ```
 
@@ -170,7 +169,7 @@ curl -X PATCH "https://api.rotur.dev/v2/groups/mygroup/roles/role-3?auth=YOUR_TO
 **Example request:**
 
 ```bash
-curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/roles/role-3?auth=YOUR_TOKEN"
+curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/roles/role-3"
 ```
 
 **Example response (200):**

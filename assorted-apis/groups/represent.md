@@ -17,7 +17,7 @@ Show a group on your Rotur profile. Representing sets `sys.group` on your accoun
 **Example request:**
 
 ```bash
-curl -X PUT "https://api.rotur.dev/v2/groups/mygroup/represent?auth=YOUR_TOKEN"
+curl -X PUT -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/represent"
 ```
 
 **Example response (200):**
@@ -48,7 +48,7 @@ Removes your represented group, whichever group it was. The `tag` in the path is
 **Example request:**
 
 ```bash
-curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/represent?auth=YOUR_TOKEN"
+curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/represent"
 ```
 
 **Example response (200):**

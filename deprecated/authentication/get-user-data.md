@@ -17,8 +17,8 @@ To fetch a user's data from Rotur, hit the `/get_user` endpoint:
 const username = "your_username";
 const password = "md5_hashed_password"; // hash it before sending
 
-// you can also use ?auth=token with a rotur token
-// if you dont have the username and password
+// you can also pass an Authorization header token instead of password login
+// if you don't have the username and password
 
 fetch(`https://api.rotur.dev/get_user?username=${username}&password=${password}`)
   .then(res => res.json())

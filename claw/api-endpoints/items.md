@@ -16,7 +16,7 @@ Creates a new marketplace item. Requires `good` account standing.
 
 | Parameter | Required | Description |
 | --- | --- | --- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | item | Yes | A JSON object describing the item (see below) |
 
 The `item` JSON supports these fields:
@@ -32,7 +32,7 @@ The `item` JSON supports these fields:
 **Example:**
 
 ```bash
-curl "https://api.rotur.dev/items/create?auth=YOUR_AUTH_KEY&item=%7B%22name%22%3A%22Sword%22%2C%22price%22%3A10%7D"
+curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/items/create?item=%7B%22name%22%3A%22Sword%22%2C%22price%22%3A10%7D"
 ```
 
 **Response (201):** the created item:
@@ -95,7 +95,7 @@ Transfers an item you own to another user at no cost. Requires `good` account st
 
 | Parameter | Required | Description |
 | --- | --- | --- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | username | Yes | The recipient username. `to` also works |
 
 **Errors:** `400` if you target yourself, `403` if you do not own the item, `404` if the item or user is not found.
@@ -126,7 +126,7 @@ Updates the price of an item you own.
 
 | Parameter | Required | Description |
 | --- | --- | --- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | price | Yes | New price in credits, cannot be negative |
 
 ## Update Item
@@ -139,7 +139,7 @@ Updates the description or private data of an item you own.
 
 | Parameter | Required | Description |
 | --- | --- | --- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | data | Yes | A JSON object with the fields to change: `description` and/or `private_data` |
 
 **Response:** the updated item.

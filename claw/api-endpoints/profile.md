@@ -12,7 +12,7 @@ Authentication is optional. If you pass your token, the response also tells you 
 | id | No* | Look up by user ID instead |
 | discord\_id | No* | Look up by linked Discord ID instead |
 | include\_posts | No | Set to `0` to leave out the user's posts. Default `1` |
-| auth | No | Your authentication key, to include follow relationship info |
+| auth | No | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 
 *Provide one of `username`, `id`, or `discord_id`.
 

@@ -13,7 +13,7 @@ Returns your pending invites across all groups.
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/invites/mine?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/invites/mine"
 ```
 
 **Example response (200):**
@@ -46,7 +46,7 @@ Returns the group's pending invites.
 **Example request:**
 
 ```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/invites?auth=YOUR_TOKEN"
+curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/invites"
 ```
 
 **Example response (200):** same invite objects as above, in an array.
@@ -77,7 +77,7 @@ The invited user gets a `group_invite` event and a push notification.
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/invites?auth=YOUR_TOKEN&username=bob"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/invites?username=bob"
 ```
 
 **Example response (201):** the created invite object with `status: "PENDING"`.
@@ -107,7 +107,7 @@ Accepts an invite addressed to you and joins the group. If the group has an entr
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/invites/inv-1/accept?auth=YOUR_TOKEN"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/invites/inv-1/accept"
 ```
 
 **Example response (200):**
@@ -147,7 +147,7 @@ The `group` field is the full updated group object (shortened here).
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/invites/inv-1/decline?auth=YOUR_TOKEN"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/invites/inv-1/decline"
 ```
 
 **Example response (200):**
@@ -178,7 +178,7 @@ Removes a pending invite.
 **Example request:**
 
 ```bash
-curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup/invites/inv-1?auth=YOUR_TOKEN"
+curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/invites/inv-1"
 ```
 
 **Example response (200):**

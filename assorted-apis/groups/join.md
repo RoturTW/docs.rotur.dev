@@ -23,7 +23,7 @@ If the group has an **entry fee**, the credits are deducted from your balance an
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups/mygroup/join?auth=YOUR_TOKEN"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/join"
 ```
 
 **Example response (200):**

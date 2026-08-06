@@ -30,8 +30,7 @@ Change a group's settings. Only fields you include are updated.
 **Example request:**
 
 ```bash
-curl -X PATCH "https://api.rotur.dev/v2/groups/mygroup?auth=YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
+curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup" \  -H "Content-Type: application/json" \
   -d '{"description": "Updated description", "entry_fee": 5}'
 ```
 

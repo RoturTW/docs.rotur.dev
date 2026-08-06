@@ -4,7 +4,7 @@ Groups let Rotur users create and manage communities. Each group has its own rol
 
 > **Base URL:** `https://api.rotur.dev/v2/groups`
 >
-> **Authentication:** Send your Rotur token as an `auth` query parameter or an `Authorization: Bearer` header. Endpoints below that say "Auth: required" reject requests without a valid token.
+> **Authentication:** Send your Rotur token as an `Authorization: Bearer` header (preferred). `auth` query auth is still accepted as a legacy fallback. Endpoints below that say "Auth: required" reject requests without a valid token.
 
 {% hint style="info" %}
 Two kinds of permissions apply to groups:

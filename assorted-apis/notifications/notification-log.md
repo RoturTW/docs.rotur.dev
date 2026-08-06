@@ -7,7 +7,7 @@ Returns the last 200 notifications you received.
 **Example:**
 
 ```
-GET /notify/log?auth=your_auth_key
+GET /notify/log
 ```
 
 **Response (200):**
@@ -19,7 +19,7 @@ GET /notify/log?auth=your_auth_key
       "from": "mist",
       "source": "originChats",
       "title": "New message",
-      "body": "Hey, are you online?",
+      "body": "Hey, are you online",
       "at": 1715054321000
     }
   ],

@@ -8,7 +8,7 @@ Uses the profile rate limit (30 per minute, 120 when authenticated).
 
 | Parameter | Required | Description |
 | --------- | -------- | ----------- |
-| auth | Yes* | Your authentication key |
+| auth | Yes* | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | username | No* | Alternative login: your username, paired with `password` |
 | password | No* | Alternative login: your password, paired with `username` |
 
@@ -17,7 +17,7 @@ Uses the profile rate limit (30 per minute, 120 when authenticated).
 ## Example
 
 ```bash
-curl "https://api.rotur.dev/me?auth=YOUR_AUTH_KEY"
+curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/me"
 ```
 
 ## Response

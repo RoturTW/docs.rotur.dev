@@ -4,7 +4,7 @@ OFSF (OriginFS File System) is the cloud file storage used by originOS. You can 
 
 ## Authentication
 
-All requests need your account token (`userObject.key`). Pass it as the `auth` query parameter, or as a `Bearer` token in the `Authorization` header.
+All requests need your account token (`userObject.key`). Prefer passing it as a `Bearer` token in the `Authorization` header. The `auth` query parameter is a legacy fallback.
 
 ## Endpoint
 
@@ -16,17 +16,23 @@ All requests need your account token (`userObject.key`). Pass it as the `auth` q
 
 **Parameters:**
 
-- `auth` (required): your account token
+- `Authorization` header: `Bearer <token>` (preferred) or your token directly
+- `auth` (legacy fallback): your account token
 
 ### Request Example
 
 ```bash
-curl "https://api.rotur.dev/read-files?auth=YOUR_USER_TOKEN"
+curl -H "Authorization: Bearer YOUR_USER_TOKEN" "https://api.rotur.dev/read-files"
+
 ```
 
 ```javascript
 const userToken = "your_user_token_here";
-const response = await fetch(`https://api.rotur.dev/read-files?auth=${userToken}`);
+const response = await fetch("https://api.rotur.dev/read-files", {
+  headers: {
+    Authorization: `Bearer ${userToken}`,
+  },
+});
 const ofsfData = await response.json();
 ```
 
@@ -51,7 +57,7 @@ If you don't want everything at once, the `/files` endpoints let you work with i
 - `GET /files/by-path/{path}` returns a single file by path
 - `GET /files/by-uuid?uuid=...` returns a single file by UUID
 
-All of these take the same `auth` parameter.
+All of these use the same auth behavior (`Authorization` header preferred, `auth` fallback).
 
 ## Usage Notes
 

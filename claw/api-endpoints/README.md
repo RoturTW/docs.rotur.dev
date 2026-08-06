@@ -8,8 +8,8 @@ Claw's API lives on the main Rotur API server.
 
 Endpoints that require authentication accept your account token in any of these ways:
 
-* The `auth` query parameter: `?auth=YOUR_TOKEN`
-* An `Authorization` header, either `Bearer YOUR_TOKEN` or the bare token
+* Preferred: an `Authorization` header, either `Bearer YOUR_TOKEN` or the bare token
+* Legacy fallback: the `auth` query parameter (`?auth=YOUR_TOKEN`)
 * The `claw_session` cookie
 
 If the token is missing or invalid you get a `403` with an `error` field. Banned accounts, accounts with an unverified email, and accounts that have not accepted the Terms of Service also get a `403`.

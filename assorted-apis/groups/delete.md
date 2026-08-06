@@ -15,7 +15,7 @@ Permanently delete a group and all its data. Only the group owner can do this.
 **Example request:**
 
 ```bash
-curl -X DELETE "https://api.rotur.dev/v2/groups/mygroup?auth=YOUR_TOKEN"
+curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup"
 ```
 
 **Example response (200):**

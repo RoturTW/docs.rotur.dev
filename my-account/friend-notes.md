@@ -6,6 +6,8 @@ This is a paid feature. You need a **Plus** subscription or higher on [Ko-fi](ht
 
 Notes are stored on your account under the `sys.notes` key.
 
+> **Authentication:** Required. Send your token in an `Authorization` header as `Authorization: Bearer YOUR_TOKEN` (preferred). `auth` query parameter is still accepted as a legacy fallback.
+
 ## How to Use Friend Notes
 
 ### Writing Notes
@@ -13,7 +15,7 @@ Notes are stored on your account under the `sys.notes` key.
 To set or update your note for a user:
 
 ```
-POST https://api.rotur.dev/me/note/{username}?auth={token}&note={encoded_note}
+POST https://api.rotur.dev/me/note/{username}?note={encoded_note}
 ```
 
 You can also send the note as JSON: `{"note": "your note"}`.
@@ -23,7 +25,7 @@ You can also send the note as JSON: `{"note": "your note"}`.
 To delete your note for a user:
 
 ```
-DELETE https://api.rotur.dev/me/note/{username}?auth={token}
+DELETE https://api.rotur.dev/me/note/{username}
 ```
 
 ### Reading Notes
@@ -31,7 +33,7 @@ DELETE https://api.rotur.dev/me/note/{username}?auth={token}
 To read all your notes:
 
 ```
-GET https://api.rotur.dev/me/notes?auth={token}
+GET https://api.rotur.dev/me/notes
 ```
 
 The response is a dictionary keyed by username:
@@ -61,7 +63,7 @@ Friend Notes are 100% private:
 * Notes are plain text. No formatting or markup is interpreted.
 * Each user gets one note. Writing again replaces the previous text.
 
-## Who Can Use Friend Notes?
+## Who Can Use Friend Notes
 
 Plus tier and above include Friend Notes. Free and Lite accounts do not have them.
 

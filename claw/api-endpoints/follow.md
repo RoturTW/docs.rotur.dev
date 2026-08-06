@@ -8,13 +8,13 @@ Requires authentication, the `following:follow` permission, and at least `warnin
 
 | Parameter | Required | Description |
 | --------- | -------- | ----------- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | username | Yes | The user to follow. `name` also works |
 
 ## Example
 
 ```bash
-curl "https://api.rotur.dev/follow?auth=YOUR_AUTH_KEY&username=mist"
+curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/follow?username=mist"
 ```
 
 ## Response

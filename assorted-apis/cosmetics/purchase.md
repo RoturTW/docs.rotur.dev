@@ -19,7 +19,7 @@ If you have any active subscription tier, the price is discounted by 20%. The di
 **Example request:**
 
 ```http
-POST /cosmetics/purchase/maga?auth=YOUR_TOKEN
+POST /cosmetics/purchase/maga
 ```
 
 **Example response (200), paid cosmetic:**

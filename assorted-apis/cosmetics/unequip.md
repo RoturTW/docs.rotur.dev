@@ -13,7 +13,7 @@ Remove your active cosmetic of a given type. For overlays, this also clears `sys
 **Example request:**
 
 ```http
-POST /cosmetics/unequip?type=overlay&auth=YOUR_TOKEN
+POST /cosmetics/unequip?type=overlay
 ```
 
 **Example response (200):**

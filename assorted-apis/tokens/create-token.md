@@ -7,7 +7,7 @@ Create a new sub-token with a name, a set of permissions, and an optional expiry
 ### POST `/tokens/create`
 
 **Query Parameters:**
-* `auth`: your rotur user token (required, must be the main account token)
+* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
 
 **Request Body (JSON):**
 
@@ -23,7 +23,7 @@ Create a new sub-token with a name, a set of permissions, and an optional expiry
 **Example:**
 
 ```http
-POST /tokens/create?auth=YOUR_MAIN_TOKEN
+POST /tokens/create
 Content-Type: application/json
 
 {

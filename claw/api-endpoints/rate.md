@@ -8,14 +8,14 @@ Requires authentication and the `posts:like` permission.
 
 | Parameter | Required | Description |
 | --------- | -------- | ----------- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | id | Yes | The ID of the post to rate |
 | rating | Yes | `1` to like the post, `0` to remove your like |
 
 ## Example
 
 ```bash
-curl "https://api.rotur.dev/rate?auth=YOUR_AUTH_KEY&id=POST_ID&rating=1"
+curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/rate?id=POST_ID&rating=1"
 ```
 
 ## Response

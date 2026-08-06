@@ -7,7 +7,7 @@ Returns all of your registered notification endpoints.
 **Example:**
 
 ```
-GET /notify/endpoints?auth=your_auth_key
+GET /notify/endpoints
 ```
 
 **Response (200):**

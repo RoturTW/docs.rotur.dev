@@ -8,12 +8,12 @@ Requires authentication. Bookmarks of posts that have since been deleted are ski
 
 | Parameter | Required | Description |
 | --------- | -------- | ----------- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 
 ## Example
 
 ```bash
-curl "https://api.rotur.dev/bookmarks?auth=YOUR_AUTH_KEY"
+curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/bookmarks"
 ```
 
 ## Response

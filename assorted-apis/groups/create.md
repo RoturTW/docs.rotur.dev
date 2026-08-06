@@ -22,7 +22,7 @@ Create your own group. It costs 50 credits, and you can only own one group at a 
 **Example request:**
 
 ```bash
-curl -X POST "https://api.rotur.dev/v2/groups?auth=YOUR_TOKEN&tag=mygroup&name=My%20Group&public=true"
+curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups?tag=mygroup&name=My%20Group&public=true"
 ```
 
 **Example response (201):**

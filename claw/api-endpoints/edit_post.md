@@ -8,14 +8,14 @@ Requires authentication, the `posts:manage` permission, and `good` account stand
 
 | Parameter | Required | Description |
 | --------- | -------- | ----------- |
-| auth | Yes | Your authentication key |
+| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
 | id | Yes | The ID of the post to edit |
 | content | Yes | The new post text. Same length limit as posts for your tier |
 
 ## Example
 
 ```bash
-curl "https://api.rotur.dev/edit_post?auth=YOUR_AUTH_KEY&id=POST_ID&content=Updated+text"
+curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/edit_post?id=POST_ID&content=Updated+text"
 ```
 
 ## Response

@@ -17,7 +17,7 @@ On v2 this is `GET /v2/notify/sources/:source/users`.
 **Example:**
 
 ```
-GET /notify/originChats/users?auth=your_auth_key
+GET /notify/originChats/users
 ```
 
 **Response (200):**
