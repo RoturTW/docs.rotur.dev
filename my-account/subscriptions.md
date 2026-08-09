@@ -125,6 +125,7 @@ Includes everything in **Plus**, with the following upgrades:
 * Pro subscriber badge
 * **URL bio templates** using expressions such as `{{ url https://... }}`, allowing your bio to display content retrieved from an external URL
 * 500 user emoji slots that you can use in originchats and across rotur
+* video backgrounds that let you set a video that plays on/behind your profile
 
 > URL bio templates may also be used to track profile visits.
 
