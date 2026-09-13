@@ -6,6 +6,9 @@ If you are making a website that connects to rotur, your users will often trust 
 
 <https://rotur.dev/auth> is a versatile authentication API that supports both redirect-based and iframe-based authentication flows, allowing you to integrate Rotur authentication seamlessly into your application.
 
+# YOU SHOULD USE THE ROTUR SDK
+https://docs.rotur.dev/rotur-sdk/rotur-sdk
+
 ## Authentication Methods
 
 ### 1. Redirect-Based Authentication (Simple)
@@ -13,16 +16,6 @@ If you are making a website that connects to rotur, your users will often trust 
 The traditional approach where you redirect your page to the auth endpoint and the user returns with a token.
 
 You should redirect with https://rotur.dev/auth?return_to=url to make sure it goes back to your original page
-
-#### How do I get a rotur token using this?
-
-Have a look at the example page here:
-
-{% embed url="https://rotur.dev/example%20auth" %}
-
-You can view the source of this page here:
-
-{% @github-files/github-code-block url="https://github.com/RoturTW/rotur.dev/blob/main/example%20auth.html" %}
 
 ### 2. Iframe-Based Authentication (Advanced)
 
