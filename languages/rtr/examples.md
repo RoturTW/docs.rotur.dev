@@ -1,6 +1,10 @@
 # Examples
 
-a script that iterates a variable by 1, 8 million times in one second
+Each example is a complete program. `exit()` and the `update` and `mouse onmove` events are provided by the host program, not by the interpreter, so check that your host supports them.
+
+## Count in a loop
+
+Adds 1 to a variable 8,000,000 times, then exits.
 
 ```js
 event (onload) {
@@ -12,7 +16,9 @@ event (onload) {
 }
 ```
 
-an update loop that does a similar thing
+## Count on each update
+
+Adds 1 on each `update` event and exits after 10,000 updates.
 
 ```js
 event (update) {
@@ -27,11 +33,12 @@ event (onload) {
 }
 ```
 
-A script that logs the mouse x and mouse y whenever the mouse moves
+## Log the mouse position
+
+Logs the mouse position whenever the mouse moves.
 
 ```js
 event (mouse onmove) {
-  mouse = window.mouse
-  log(mouse.x,mouse.y)
+  log(mouse.x, mouse.y)
 }
 ```

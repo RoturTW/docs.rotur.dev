@@ -1,43 +1,56 @@
-# Object Functions
+# Object functions
 
-RTR provides several built-in functions for object manipulation and operations.
+| Function | Returns |
+| --- | --- |
+| `obj()` | A new empty object |
+| `keys(object)` | An array of the object's property names |
+| `values(object)` | An array of the object's property values |
+| `has(object, key)` | `true` if the object has the property `key` |
+| `set(object, key, value)` | Sets `key` to `value` and returns the object |
+| `del(object, key)` | Removes `key` and returns the object |
+
+## obj
+
+```js
+person = obj()
+person.name = "John"
+person.age = 30
+```
 
 ## keys
 
-Returns an array of all enumerable property names of an object.
-
 ```js
-person = {name: "John", age: 30};
-keys(person);                 /* Returns ["name", "age"] */
-keys({});                     /* Returns [] */
+keys(person)  /* ["name", "age"] */
+keys(obj())   /* [] */
 ```
 
 ## values
 
-Returns an array of all enumerable property values of an object.
-
 ```js
-person = {name: "John", age: 30};
-values(person);               /* Returns ["John", 30] */
-values({});                   /* Returns [] */
+values(person)  /* ["John", 30] */
+values(obj())   /* [] */
 ```
 
 ## has
 
-Checks if an object has a specific property.
-
 ```js
-person = {name: "John", age: 30};
-has(person, "name");          /* Returns true */
-has(person, "address");       /* Returns false */
+has(person, "name")     /* true */
+has(person, "address")  /* false */
 ```
 
-## obj
+## set
 
-Creates a new empty object.
+Use `set` when the property name is in a variable.
 
 ```js
-person = obj();
-person.name = "John";
-person.age = 30;
-``` 
+field = "city"
+set(person, field, "Oslo")
+log(person.city)  /* Oslo */
+```
+
+## del
+
+```js
+del(person, "age")
+has(person, "age")  /* false */
+```

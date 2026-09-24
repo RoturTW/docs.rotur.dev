@@ -1,8 +1,10 @@
 # Social
 
-Interact with other users through posts, friends, following, and notifications.
+Posts, friends, follows, and notifications.
 
-* **[Posts](posts.md)**: Create, delete, like, reply, repost, search posts
-* **[Friends](friends.md)**: Friend list, send/accept/reject/cancel/remove requests
-* **[Following](following.md)**: Follow/unfollow, follower/following lists
-* **[Notifications](notifications.md)**: Claw notifications
+| Page | Covers |
+| --- | --- |
+| [Posts](posts.md) | `rotur.posts`: create, edit, like, reply, repost, polls, bookmarks, feeds, search |
+| [Friends](friends.md) | `rotur.friends`: friend list and friend requests |
+| [Following](following.md) | `rotur.following`: follow, unfollow, follower and following lists |
+| [Notifications](notifications.md) | `rotur.notifications`: read, clear, and send Claw notifications |

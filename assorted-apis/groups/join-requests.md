@@ -1,28 +1,27 @@
-# Join Requests
+# Join requests
 
-Ask to join a group with the `REQUEST` join policy. Members with invite permission review and accept or decline requests.
+Ask to join a public group whose join policy is `REQUEST`. The owner and members with `groups.members.invite` review requests and accept or decline them.
 
-## Request to Join
+## POST `/v2/groups/{tag}/join-requests`
 
-### POST `/v2/groups/{tag}/join-requests`
+Send a join request. The owner and every member with `groups.members.invite` get a push notification.
 
-**Auth:** required. Token permission: `groups:join`.
+**Auth:** Required. Sub-tokens need `groups:join`.
 
-The group must be public and have the `REQUEST` join policy. Members with invite permission are notified of your request.
+### Parameters
 
-**Query Parameters:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `message` | query | string | No | A note to the reviewers, up to 200 characters |
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `message` | string | No | A message to the reviewers (max 200 chars) |
+### Example
 
-**Example request:**
-
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/join-requests?message=Hi%20there"
+```http
+POST /v2/groups/mygroup/join-requests?message=Hi%20there
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (201):**
+**Response `201`:**
 
 ```json
 {
@@ -36,60 +35,59 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `This group does not require join requests` | Join policy isn't `REQUEST` |
-| 400 | `You are already a member of this group` | Already joined |
-| 400 | `You already have a pending join request` | Duplicate request |
-| 400 | `You already have a pending invite to this group` | Accept the invite instead |
-| 403 | `Group is private` | Group is not public |
-| 403 | `You are banned from this group` | You're banned |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | The join policy isn't `REQUEST` (`This group does not require join requests`) |
+| `400` | You're already a member (`You are already a member of this group`) |
+| `400` | You already have a pending request (`You already have a pending join request`) |
+| `400` | You have a pending invite; accept it instead (`You already have a pending invite to this group`) |
+| `400` | `message` is over 200 characters (`Message length exceeded (max 200)`) |
+| `403` | The group is private (`Group is private`) |
+| `403` | You're banned (`You are banned from this group`) |
 
-***
+## GET `/v2/groups/{tag}/join-requests`
 
-## List Join Requests
+List the group's pending join requests.
 
-### GET `/v2/groups/{tag}/join-requests`
+**Auth:** Required. Sub-tokens need `groups:invite`. You must be the owner or hold `groups.members.invite`.
 
-**Auth:** required. Token permission: `groups:invite`. You must be the group owner or hold the `groups.members.invite` group permission.
+### Example
 
-Returns the group's pending join requests.
-
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/join-requests"
+```http
+GET /v2/groups/mygroup/join-requests
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):** an array of join request objects like the one above.
+**Response `200`:** an array of join requests in the same shape as above, or `[]` if there are none.
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 403 | `You don't have permission to view join requests` | Missing `groups.members.invite` |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `403` | You lack `groups.members.invite` (`You don't have permission to view join requests`) |
 
-***
+## POST `/v2/groups/{tag}/join-requests/{requestid}/accept`
 
-## Accept a Join Request
+Accept a join request. The requester joins with the roles marked `assign_on_join` (or the Member role), and any entry fee is charged to them now. They get a `group_request_accepted` event and a push notification.
 
-### POST `/v2/groups/{tag}/join-requests/{requestid}/accept`
+**Auth:** Required. Sub-tokens need `groups:invite`. You must be the owner or hold `groups.members.invite`.
 
-**Auth:** required. Token permission: `groups:invite`. You must be the group owner or hold the `groups.members.invite` group permission.
+### Parameters
 
-The requester joins the group with the `assign_on_join` roles. If the group has an entry fee, it's charged to the requester at this point. They get a `group_request_accepted` event and a push notification.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `requestid` | path | string | Yes | The join request's `id` |
 
-**Example request:**
+### Example
 
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/join-requests/req-1/accept"
+```http
+POST /v2/groups/mygroup/join-requests/req-1/accept
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** `group` is the full updated [group object](README.md#group), shortened here.
 
 ```json
 {
@@ -103,36 +101,36 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-The `group` field is the full updated group object (shortened here).
+### Errors
 
-**Common errors:**
+| Status | When |
+| --- | --- |
+| `400` | The requester is already a member (`User is already a member of this group`). The request is marked accepted |
+| `400` | The requester can't afford the entry fee (`User has insufficient funds to join this group`). The body also has `required` and `available` |
+| `403` | You lack `groups.members.invite` (`You don't have permission to accept join requests`) |
+| `403` | The requester has been banned since asking (`User is banned from this group`) |
+| `404` | The request doesn't exist or isn't pending (`Join request not found or already handled`) |
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `User is already a member of this group` | Requester joined some other way |
-| 400 | `User has insufficient funds to join this group` | Requester can't afford the entry fee |
-| 403 | `You don't have permission to accept join requests` | Missing `groups.members.invite` |
-| 403 | `User is banned from this group` | Requester was banned after requesting |
-| 404 | `Join request not found or already handled` | Wrong ID or not pending |
-| 404 | `Group not found` | Group doesn't exist |
+## POST `/v2/groups/{tag}/join-requests/{requestid}/decline`
 
-***
+Decline a join request. The requester gets a `group_request_declined` event and a push notification.
 
-## Decline a Join Request
+**Auth:** Required. Sub-tokens need `groups:invite`. You must be the owner or hold `groups.members.invite`.
 
-### POST `/v2/groups/{tag}/join-requests/{requestid}/decline`
+### Parameters
 
-**Auth:** required. Token permission: `groups:invite`. You must be the group owner or hold the `groups.members.invite` group permission.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `requestid` | path | string | Yes | The join request's `id` |
 
-The requester gets a `group_request_declined` event and a push notification.
+### Example
 
-**Example request:**
-
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/join-requests/req-1/decline"
+```http
+POST /v2/groups/mygroup/join-requests/req-1/decline
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -140,10 +138,9 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 403 | `You don't have permission to decline join requests` | Missing `groups.members.invite` |
-| 404 | `Join request not found or already handled` | Wrong ID or not pending |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `403` | You lack `groups.members.invite` (`You don't have permission to decline join requests`) |
+| `404` | The request doesn't exist or isn't pending (`Join request not found or already handled`) |

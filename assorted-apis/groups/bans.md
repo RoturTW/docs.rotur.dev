@@ -1,32 +1,32 @@
 # Bans
 
-Ban users from a group. Banned users are removed from the group and can't rejoin, be invited, or request to join until unbanned.
+Ban users from a group. A banned user is removed from the group and can't join, accept an invite, or send a join request until they're unbanned.
 
 {% hint style="warning" %}
-The `{userid}` path segment on ban and unban must be the user's ID, not their username.
+On these endpoints `{userid}` must be a user ID, not a username. The ID isn't checked against existing accounts, so a username is stored as a ban on a user ID that doesn't exist.
 {% endhint %}
 
-## Ban a User
+## PUT `/v2/groups/{tag}/members/{userid}/ban`
 
-### PUT `/v2/groups/{tag}/members/{userid}/ban`
+Ban a user. This also removes their membership, pending invites, and pending join requests. The user gets a `group_banned` event and a push notification.
 
-**Auth:** required. Token permission: `groups:manage`. You must be the group owner or hold the `groups.members.ban` group permission.
+**Auth:** Required. Sub-tokens need `groups:manage`. You must be the owner or hold `groups.members.ban`.
 
-Banning removes the user's membership, pending invites, and pending join requests. The user gets a `group_banned` event and a push notification.
+### Parameters
 
-**Query Parameters:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `userid` | path | string | Yes | The user's ID. They don't have to be a member |
+| `reason` | query | string | No | Up to 200 characters |
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `reason` | string | No | Ban reason (max 200 chars) |
+### Example
 
-**Example request:**
-
-```bash
-curl -X PUT -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID/ban?reason=spam"
+```http
+PUT /v2/groups/mygroup/members/USER_ID/ban?reason=spam
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** `message` is `banned and removed from group` if the user was a member, or `banned` if not.
 
 ```json
 {
@@ -44,32 +44,35 @@ curl -X PUT -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/grou
 }
 ```
 
-`message` is `"banned"` if the user wasn't a member, or `"banned and removed from group"` if they were.
+### Errors
 
-**Common errors:**
+| Status | When |
+| --- | --- |
+| `400` | `reason` is over 200 characters (`Reason length exceeded (max 200)`) |
+| `400` | The user owns the group (`Cannot ban the group owner`) |
+| `400` | The user is already banned (`User is already banned from this group`) |
+| `403` | You lack `groups.members.ban` (`You don't have permission to ban members`) |
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Cannot ban the group owner` | Target owns the group |
-| 400 | `User is already banned from this group` | Duplicate ban |
-| 403 | `You don't have permission to ban members` | Missing `groups.members.ban` |
-| 404 | `Group not found` | Group doesn't exist |
+## DELETE `/v2/groups/{tag}/members/{userid}/ban`
 
-***
+Unban a user. They aren't added back to the group.
 
-## Unban a User
+**Auth:** Required. Sub-tokens need `groups:manage`. You must be the owner or hold `groups.members.ban`.
 
-### DELETE `/v2/groups/{tag}/members/{userid}/ban`
+### Parameters
 
-**Auth:** required. Token permission: `groups:manage`. You must be the group owner or hold the `groups.members.ban` group permission.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `userid` | path | string | Yes | The user's ID |
 
-**Example request:**
+### Example
 
-```bash
-curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID/ban"
+```http
+DELETE /v2/groups/mygroup/members/USER_ID/ban
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -77,29 +80,27 @@ curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/g
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 403 | `You don't have permission to unban members` | Missing `groups.members.ban` |
-| 404 | `User is not banned from this group` | No matching ban |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `403` | You lack `groups.members.ban` (`You don't have permission to unban members`) |
+| `404` | The user isn't banned (`User is not banned from this group`) |
 
-***
+## GET `/v2/groups/{tag}/bans`
 
-## List Bans
+List every ban in the group.
 
-### GET `/v2/groups/{tag}/bans`
+**Auth:** Required. Sub-tokens need `groups:manage`. You must be the owner or hold `groups.members.ban`.
 
-**Auth:** required. Token permission: `groups:manage`. You must be the group owner or hold the `groups.members.ban` group permission.
+### Example
 
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/bans"
+```http
+GET /v2/groups/mygroup/bans
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** an array of bans, in the same shape as `ban` above, or `[]` if there are none.
 
 ```json
 [
@@ -116,30 +117,32 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygr
 ]
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 403 | `You don't have permission to view bans` | Missing `groups.members.ban` |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `403` | You lack `groups.members.ban` (`You don't have permission to view bans`) |
 
-***
+## GET `/v2/groups/{tag}/bans/{userid}`
 
-## Check a Ban
+Check whether a user is banned from the group. No group permission is needed.
 
-### GET `/v2/groups/{tag}/bans/{userid}`
+**Auth:** Required. Sub-tokens need `groups:members.view`.
 
-**Auth:** required. Token permission: `groups:members.view`.
+### Parameters
 
-Checks whether a user ID is banned from the group.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `userid` | path | string | Yes | The user's ID |
 
-**Example request:**
+### Example
 
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/bans/USER_ID"
+```http
+GET /v2/groups/mygroup/bans/USER_ID
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** if the user isn't banned, the body is `{"banned": false}`.
 
 ```json
 {
@@ -156,11 +159,3 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygr
   }
 }
 ```
-
-If the user isn't banned, the response is `{"banned": false}`.
-
-**Common errors:**
-
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `Group not found` | Group doesn't exist |

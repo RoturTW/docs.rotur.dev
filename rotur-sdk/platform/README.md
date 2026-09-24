@@ -1,10 +1,12 @@
 # Platform
 
-Platform-level features: groups, systems, stats, standing, and the dev fund.
+Groups, systems, statistics, account standing, and the dev fund.
 
-* **[Groups](groups.md)**: Groups, create, join, roles, events, tips, products
-* **[Systems](systems.md)**: Registered systems
-* **[Stats](stats.md)**: Economy, user, and follower statistics
-* **[Standing](standing.md)**: User standing/reputation lookups
-* **[DevFund](devfund.md)**: Dev fund escrow transfers
-* **[Check](check.md)**: Ban status checks
+| Page | Covers |
+| --- | --- |
+| [Groups](groups.md) | `rotur.groups`: members, roles, invites, announcements, events, tips, products |
+| [Systems](systems.md) | `rotur.systems`: registered systems and system badges |
+| [Stats](stats.md) | `rotur.stats`: economy, user, post, and follower statistics |
+| [Standing](standing.md) | `rotur.standing`: account standing lookups |
+| [DevFund](devfund.md) | `rotur.devfund`: dev fund escrow transfers |
+| [Check](check.md) | `rotur.check`: bulk ban checks |

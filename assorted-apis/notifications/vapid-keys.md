@@ -1,18 +1,20 @@
-# VAPID Keys
+# VAPID keys
 
-### GET `/notify/vapid`
+## GET `/notify/vapid`
 
-Returns the server's VAPID public key used for web push authentication. You need this key to subscribe to push notifications via the Web Push API.
+Get the server's VAPID public key. Browsers need it as the `applicationServerKey` when subscribing to push.
 
-This endpoint does **not** require authentication.
+**Auth:** None.
 
-**Example:**
+The key pair is generated once and stored on the server, so it stays the same across restarts unless the server's key file is replaced.
 
-```
+### Example
+
+```http
 GET /notify/vapid
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -24,11 +26,11 @@ GET /notify/vapid
 | Field | Type | Description |
 | --- | --- | --- |
 | `public_key` | string | Uncompressed P-256 public key, base64url-encoded |
-| `subject` | string | The VAPID subject (typically a `mailto:` URI) |
+| `subject` | string | The VAPID subject the server signs pushes with, usually a `mailto:` URI |
 
-## Usage with Web Push
+## Use it with the Push API
 
-Pass `public_key` to `registration.pushManager.subscribe` as the `applicationServerKey`:
+Pass `public_key` to `pushManager.subscribe` as the `applicationServerKey`:
 
 ```js
 const res = await fetch("https://api.rotur.dev/notify/vapid");
@@ -40,4 +42,4 @@ const subscription = await registration.pushManager.subscribe({
 });
 ```
 
-Then register the subscription endpoint with [POST `/notify/register`](register-endpoint.md).
+Then register the subscription with [POST `/notify/register`](register-endpoint.md).

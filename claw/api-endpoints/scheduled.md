@@ -1,21 +1,16 @@
-# /scheduled
+# GET `/scheduled`
 
 Lists your posts that are scheduled but not yet published.
 
-Requires authentication. You schedule a post with the `scheduled_for` parameter on [/post](post.md), which needs a Plus subscription or higher. The server publishes due posts roughly every 15 seconds.
+**Auth:** Required.
 
-## Parameters
+You schedule a post with the `scheduled_for` parameter on [`/post`](post.md), which needs a Plus subscription or higher. The server checks for due posts every 15 seconds, so a post can go out up to 15 seconds after its scheduled time. Its `timestamp` is set to the moment it is published.
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
+### Example
 
-## Example
-
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/scheduled"
+```http
+GET /scheduled
+Authorization: Bearer <token>
 ```
 
-## Response
-
-Returns an array of your pending posts, same shape as [/feed](feed.md).
+**Response `200`:** an array of [post objects](feed.md#post-object).

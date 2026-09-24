@@ -1,22 +1,20 @@
-# /top\_posts
+# GET `/top_posts`
 
-Returns recent public posts sorted by like count, most liked first.
+Returns recent public posts sorted by number of likes, most liked first. Profile-only posts are left out.
 
-No authentication required. Uses the search rate limit (20 per minute, 60 when authenticated).
+**Auth:** None. Uses the search rate limit.
 
-## Parameters
+### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| limit | No | How many posts to return. Default 50, max 50 |
-| time\_period | No | How many hours back to look. Default 24 |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `limit` | query | integer | No | Number of posts to return, 1–50. Default 50 |
+| `time_period` | query | integer | No | How many hours back to look. Default 24; invalid values also use 24 |
 
-## Example
+### Example
 
-```bash
-curl "https://api.rotur.dev/top_posts?limit=10&time_period=48"
+```http
+GET /top_posts?limit=10&time_period=48
 ```
 
-## Response
-
-Returns an array of post objects, same shape as [/feed](feed.md).
+**Response `200`:** an array of [post objects](feed.md#post-object).

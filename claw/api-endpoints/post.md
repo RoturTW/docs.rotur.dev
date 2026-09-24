@@ -1,35 +1,37 @@
-# /post
+# GET `/post`
 
-Creates a new post as the authenticated user.
+Creates a post as you, or schedules it for later.
 
-Requires authentication, the `posts:create` permission, and `good` account standing. You can make at most 5 posts per minute.
+**Auth:** Required. Sub-tokens need `posts:create`. Your account needs `good` standing.
 
-## Parameters
+You can create at most 5 posts per minute, on top of the default rate limit.
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| content | No* | The post text. Max length depends on your subscription: 300 (Free), 400 (Lite), 600 (Plus), 800 (Pro), 1000 (Max) |
-| attachment | No | A URL to an image or video (PNG, JPEG, GIF, MP4, WEBM). Max 200 characters |
-| attachments | No | Comma-separated list of attachment URLs. Max count per tier: 1 (Free/Lite), 2 (Plus), 4 (Pro and up) |
-| poll | No | A JSON array of 2 to 6 option strings, each up to 80 characters. Requires Plus or higher |
-| scheduled\_for | No | Unix milliseconds to publish the post at. Must be more than 30 seconds in the future. Requires Plus or higher |
-| profile\_only | No | Set to `1` to keep the post off the public feed and only on your profile |
-| os | No | The name of a registered system to tag the post with |
+### Parameters
 
-*A post needs at least one of `content`, an attachment, or a poll.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `content` | query | string | No* | Post text. Up to 300 (Free), 400 (Lite), 600 (Plus), 800 (Pro) or 1000 (Max) bytes |
+| `attachment` | query | string | No* | An `http://` or `https://` URL to a PNG, JPEG, GIF, MP4 or WEBM file. Up to 200 characters |
+| `attachments` | query | string | No* | Comma-separated attachment URLs, same rules as `attachment`. Up to 1 (Free, Lite), 2 (Plus) or 4 (Pro, Max). Replaces `attachment` |
+| `poll` | query | string | No* | JSON array of 2–6 option strings. Options longer than 80 characters are dropped. Plus or higher |
+| `scheduled_for` | query | integer | No | Unix milliseconds to publish at. Plus or higher. A time 30 seconds or less from now publishes the post immediately |
+| `profile_only` | query | string | No | `1` keeps the post off the public feed and search; it shows on your profile and in your followers' [`/following_feed`](following_feed.md) |
+| `os` | query | string | No | Name of a registered system to tag the post with. Add detail after a colon, for example `originOS: v5`. The detail can be up to 64 characters |
 
-## Example
+*A post needs text, an attachment or a poll.
 
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/post?content=Hello%20Claw"
+### Example
+
+```http
+GET /post?content=Hello%20Claw
+Authorization: Bearer <token>
 ```
 
-## Response
+**Response `201`:** the new [post object](feed.md#post-object).
 
-Returns `201` with the created post object (same shape as posts in [/feed](feed.md)).
+If you scheduled the post, you get this instead:
 
-If you scheduled the post instead:
+**Response `201`:**
 
 ```json
 {
@@ -39,14 +41,17 @@ If you scheduled the post instead:
 }
 ```
 
-## Common errors
+### Errors
 
-| Status | Error | Cause |
-| --- | --- | --- |
-| 400 | `Content exceeds N character limit` | Post text too long for your tier |
-| 400 | `Post needs text, an attachment, or a poll` | Empty post |
-| 400 | `OS is invalid` | Unknown `os` value |
-| 400 | `Too many attachments (max N for your subscription tier)` | Attachment count over your tier's limit |
-| 403 | `Polls require a Plus subscription or higher` | Poll from a Free or Lite account |
-| 403 | `Scheduling posts requires a Plus subscription or higher` | `scheduled_for` from a Free or Lite account |
-| 429 | `Rate limit exceeded. Try again later.` | More than 5 posts in a minute |
+| Status | When |
+| --- | --- |
+| `400` | `Post needs text, an attachment, or a poll` |
+| `400` | `Content exceeds <n> character limit` |
+| `400` | `Too many attachments (max <n> for your subscription tier)` |
+| `400` | An attachment is invalid: `Attachment URL exceeds 200 character limit`, `Attachment must be a valid URL`, `Attachment from prohibited website`, or `Attachment must be an image or video (PNG, JPEG, GIF, MP4, WEBM)` |
+| `400` | `Invalid poll` or `A poll needs between 2 and 6 options` |
+| `400` | `Invalid scheduled time` |
+| `400` | `System must match a valid system` (unknown `os`), or `OS detail exceeds 64 character limit` / `OS detail contains invalid characters` |
+| `403` | `Polls require a Plus subscription or higher` |
+| `403` | `Scheduling posts requires a Plus subscription or higher` |
+| `429` | `Rate limit exceeded. Try again later.` (more than 5 posts in a minute) |

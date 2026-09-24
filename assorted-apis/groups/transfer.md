@@ -1,31 +1,31 @@
-# Transfer Ownership
+# Transfer ownership
 
 Hand your group to another member. Only the current owner can do this.
 
-### POST `/v2/groups/{tag}/transfer/{userid}`
+## POST `/v2/groups/{tag}/transfer/{userid}`
 
-**Auth:** required. Token permission: `groups:manage`.
+The new owner gets the **Owner** role and becomes the group's owner. You lose the Owner role but keep your other roles; if that leaves you with none, you get the default join roles. The new owner receives a `group_ownership_transferred` event and a push notification.
 
-The target must already be a member. They receive the Owner role and become the group owner; you lose the Owner role (keeping your other roles, or the default join roles if you had none). The new owner gets a `group_ownership_transferred` event and a push notification.
+**Auth:** Required. Sub-tokens need `groups:manage`. You must be the group owner.
 
 {% hint style="warning" %}
-`{userid}` must be the user's ID, not their username. Transfers take effect immediately and can only be reversed by the new owner.
+The transfer takes effect immediately. Only the new owner can transfer the group back.
 {% endhint %}
 
-**Path Parameters:**
+### Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-| `userid` | string | Yes | User ID of the new owner |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `userid` | path | string | Yes | The new owner's user ID. A username doesn't work here. They must already be a member |
 
-**Example request:**
+### Example
 
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/transfer/USER_ID"
+```http
+POST /v2/groups/mygroup/transfer/USER_ID
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** `group` is the full updated [group object](README.md#group), shortened here.
 
 ```json
 {
@@ -40,13 +40,10 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-The `group` field is the full updated group object (shortened here).
+### Errors
 
-**Common errors:**
-
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `You are already the owner` | Transferring to yourself |
-| 403 | `Only the group owner can transfer ownership` | You are not the owner |
-| 404 | `Target user is not a member of this group` | Target not in the group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | `userid` is your own ID (`You are already the owner`) |
+| `403` | You aren't the owner (`Only the group owner can transfer ownership`) |
+| `404` | The user isn't a member (`Target user is not a member of this group`) |

@@ -1,60 +1,60 @@
 # Tokens
 
-Sub-tokens let you grant limited, scoped access to your Rotur account. Instead of sharing your main account token (which has full access), you create a sub-token with only the permissions an application needs.
+Sub-tokens give an app limited access to your Rotur account. Instead of sharing your main account token, which can do everything, you create a sub-token that holds only the permissions the app needs.
 
-> **Base URL:** `https://api.rotur.dev/`
+> **Base URL:** `https://api.rotur.dev`
 >
-> The same endpoints are also available under `https://api.rotur.dev/v2/tokens`. The only path difference is that creating a token is `POST /v2/tokens` instead of `POST /tokens/create`.
+> **Auth:** Send your token in the `Authorization: Bearer <token>` header. The legacy `auth` query parameter and the rotur.dev session cookie are also accepted. Managing sub-tokens needs the main account token; see each endpoint's **Auth** line.
 
-{% hint style="info" %}
-Prefer `Authorization: Bearer <token>`. You can still authenticate with `auth` query parameter as a legacy fallback or a session cookie.
-{% endhint %}
+Every endpoint is also available under `/v2/tokens`. The paths are the same except for creating a token, which is `POST /v2/tokens` instead of `POST /tokens/create`.
 
-***
+## Concepts
 
-## Core Concepts
+### Main token and sub-tokens
 
-### Main Token vs Sub-Token
+| | Main token | Sub-token |
+| --- | --- | --- |
+| **Format** | URL-safe Base64 of 64 random bytes | `rotur_st_` followed by URL-safe Base64 of 32 random bytes |
+| **Scope** | Full access to the account | Only the permissions you assign |
+| **Used by** | You, the account owner | Apps and services you authorize |
+| **Can manage sub-tokens** | Yes | No |
+| **How to invalidate it** | Refresh it with `POST /me/refresh_token` | Revoke or delete it through this API |
 
-| | Main Token | Sub-Token |
-|---|---|---|
-| **Format** | Base64-encoded, 64 bytes of random entropy | Prefixed `rotur_st_`, 32 bytes of random entropy |
-| **Scope** | Full access to everything on the account | Limited to the permissions you assign |
-| **Who uses it** | You, the account owner | Third-party apps and services you authorize |
-| **Can create sub-tokens?** | Yes | No, only the main token can manage sub-tokens |
-| **Can be revoked?** | By refreshing the token via `/me/refresh_token` | By revoking or deleting via the tokens API |
+Each sub-token also has an ID of the form `st_…`. You use the ID, not the token value, in the paths below.
 
-### Token Lifecycle
+### Lifecycle
 
-1. **Created**: you create a sub-token with a name, permissions, and optional expiry.
-2. **Active**: the sub-token can authenticate to any endpoint that its permissions allow.
-3. **Expired**: if an expiry was set, the token automatically becomes invalid after that time.
-4. **Revoked**: you can manually revoke a token at any time. This is reversible only by creating a new token.
-5. **Deleted**: you can permanently delete a token from your store.
+1. **Active:** the sub-token works on every endpoint its permissions allow.
+2. **Expired:** if you set an expiry, the sub-token stops working once it passes. The server checks for expired sub-tokens every hour and marks them revoked.
+3. **Revoked:** you revoked it, or it expired. A revoked sub-token cannot be restored; create a new one instead.
+4. **Deleted:** the record is removed from your account entirely.
 
 ### Limits
 
-- Maximum of **25 active sub-tokens** per account.
-- Token names must be **1-50 characters**.
-- Maximum expiry is **1 year (8760 hours)**.
-- The `tokens:manage` permission **cannot** be granted to sub-tokens. Because of this, the listing and activity endpoints below are effectively main-token only.
-- The `full` permission group excludes `account:delete` and `tokens:manage`.
-
-***
+- Up to 25 active (not revoked and not expired) sub-tokens per account.
+- Names are 1–50 characters.
+- Expiry is at most 8760 hours (1 year).
+- `tokens:manage` cannot be granted to a sub-token, so the endpoints that require it only work with the main token.
 
 ## Endpoints
 
-| Endpoint | Method | Auth | Main Token | Description |
-|---|---|---|---|---|
-| [`/tokens/permissions`](permissions.md) | GET | No | No | List all available permissions and groups |
-| [`/tokens`](list-tokens.md) | GET | Yes | Yes | List all sub-tokens |
-| [`/tokens/active`](list-active-tokens.md) | GET | Yes | Yes | List only active (non-expired, non-revoked) sub-tokens |
-| [`/tokens/create`](create-token.md) | POST | Yes | Yes | Create a new sub-token |
-| [`/tokens/:id`](get-token.md) | GET | Yes | No | Get a single sub-token by ID |
-| [`/tokens/:id/activity`](token-activity.md) | GET | Yes | Yes | Get activity/status for a sub-token |
-| [`/tokens/:id`](update-token.md) | PATCH | Yes | Yes | Update a sub-token's permissions, name, etc. |
-| [`/tokens/:id/rename`](rename-token.md) | POST | Yes | Yes | Rename a sub-token |
-| [`/tokens/:id/revoke`](revoke-token.md) | POST | Yes | Yes | Revoke a sub-token |
-| [`/tokens/:id`](delete-token.md) | DELETE | Yes | Yes | Permanently delete a sub-token |
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| GET | [`/tokens/permissions`](permissions.md) | None | List every permission and permission group |
+| GET | [`/tokens`](list-tokens.md) | Main token | List all sub-tokens |
+| GET | [`/tokens/active`](list-active-tokens.md) | Main token | List sub-tokens that are not revoked or expired |
+| POST | [`/tokens/create`](create-token.md) | Main token | Create a sub-token |
+| GET | [`/tokens/:id`](get-token.md) | Main token, or the sub-token itself | Get one sub-token |
+| GET | [`/tokens/:id/activity`](token-activity.md) | Main token | Get a sub-token's status |
+| PATCH | [`/tokens/:id`](update-token.md) | Main token | Change a sub-token's name, permissions, description or websites |
+| POST | [`/tokens/:id/rename`](rename-token.md) | Main token | Rename a sub-token |
+| POST | [`/tokens/:id/revoke`](revoke-token.md) | Main token | Revoke a sub-token |
+| DELETE | [`/tokens/:id`](delete-token.md) | Main token | Delete a sub-token |
 
-"Main Token: Yes" means the endpoint either requires the main account token outright, or requires the `tokens:manage` permission, which sub-tokens can never hold.
+## Errors on every authenticated endpoint
+
+| Status | When |
+| --- | --- |
+| `403` | No token was sent, the token is invalid, or the account is banned |
+| `403` | The endpoint needs the main token and you sent a sub-token (`This action requires the main account token`) |
+| `403` | The sub-token lacks the required permission (`Token lacks permission: <permission>`) |

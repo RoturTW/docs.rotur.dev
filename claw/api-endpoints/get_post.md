@@ -1,29 +1,26 @@
-# /get\_post
+# GET `/get_post`
 
-Fetches a single post by its ID.
+Returns one post by its ID.
 
-Authentication is optional. If you pass your token and the post has a poll, the response includes which option you voted for.
+**Auth:** Optional. Send your main account token to get `poll.voted` if the post has a poll; sub-tokens are ignored here.
 
-## Parameters
+### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| id | Yes | The ID of the post to fetch |
-| auth | No | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | query | string | Yes | ID of the post |
 
-## Example
+### Example
 
-```bash
-curl "https://api.rotur.dev/get_post?id=POST_ID"
+```http
+GET /get_post?id=abc123
 ```
 
-## Response
+**Response `200`:** a [post object](feed.md#post-object).
 
-Returns the post object, same shape as posts in [/feed](feed.md).
+### Errors
 
-## Common errors
-
-| Status | Error | Cause |
-| --- | --- | --- |
-| 400 | `Post ID is required` | Missing `id` parameter |
-| 404 | `Post not found` | No post with that ID |
+| Status | When |
+| --- | --- |
+| `400` | `Post ID is required` |
+| `404` | `Post not found` |

@@ -1,20 +1,29 @@
 # Validators
 
-Accessed via `rotur.validators`. Validators are one-time tokens that prove a user owns a key.
+`rotur.validators` creates and checks validators: strings that let another service confirm which Rotur user generated them, without seeing the user's token. A validator is bound to a key string your app chooses. For how validators work, see [Validators](../../assorted-apis/validators/README.md).
 
-## Generate a Validator
+## rotur.validators.generate(key)
+
+Generates a validator for the signed-in user, bound to `key`.
+
+**Auth:** Required. Sub-tokens need `validators:generate`.
 
 ```ts
-const { validator } = await rotur.validators.generate("key-id");
-// "abc123def456..."
+const { validator } = await rotur.validators.generate("my-app-key");
 ```
 
-## Validate a Validator
+**Returns:** `{ validator }`
+
+## rotur.validators.validate(validator, key)
+
+Checks a validator against the key it was generated for. It needs no token, so you can call it from any service.
+
+**Auth:** None.
 
 ```ts
-const result = await rotur.validators.validate("validator-token", "key-id");
+const result = await rotur.validators.validate(validator, "my-app-key");
 // { valid: true, username: "alice", id: "user-id" }
 // { valid: false, error: "invalid" }
 ```
 
-This endpoint is public (no auth required), making it safe to call from client apps.
+**Returns:** `{ valid, username?, id?, error? }`

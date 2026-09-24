@@ -1,32 +1,59 @@
-# GET `/cosmetics/overlays/:file`
+# Cosmetic assets
 
-Fetch a raw overlay GIF asset. Use this to preview an overlay in the shop, for example.
+Fetch the raw files for catalog cosmetics: overlay GIFs and background videos. The `raw_url` returned by the [profile cosmetics endpoints](profile-cosmetics.md) points here for catalog items.
 
-**Authentication:** Not required.
+Errors from these endpoints are bare status codes with no JSON body.
 
-**Path Parameter:**
+## GET `/cosmetics/overlays/:file`
 
-| Parameter | Description |
-|---|---|
-| `:file` | The overlay's file name: the cosmetic ID followed by `.gif` |
+Fetch an overlay GIF, for example to preview it in a shop.
 
-**Example request:**
+**Auth:** None.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `file` | path | string | Yes | The cosmetic ID followed by `.gif` |
+
+### Example
 
 ```http
 GET /cosmetics/overlays/cat_ears.gif
 ```
 
-**Example response (200):** the GIF file itself (`image/gif`).
+**Response `200`:** the GIF file.
 
-{% hint style="info" %}
-The `raw_url` field returned by the [profile cosmetics endpoint](profile-cosmetics.md) points here.
-{% endhint %}
+### Errors
 
-**Common errors:**
+| Status | When |
+| --- | --- |
+| `400` | The file name is missing, contains `..`, is not a clean path, or does not end in `.gif` |
+| `404` | No overlay with that name |
 
-| Status | Cause |
-|---|---|
-| `400` | Missing file name, path traversal attempt, or a name that does not end in `.gif` |
-| `404` | No overlay asset with that name |
+## GET `/cosmetics/backgrounds/:file`
 
-Errors from this endpoint are plain status codes with no JSON body.
+Fetch a background video.
+
+**Auth:** None.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `file` | path | string | Yes | The cosmetic ID followed by `.mp4` |
+
+### Example
+
+```http
+GET /cosmetics/backgrounds/starfield.mp4
+```
+
+**Response `200`:** the video, served as `video/mp4` with `Cache-Control: public, max-age=86400`.
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | The file name is missing, contains `..`, is not a clean path, or does not end in `.mp4` |
+| `404` | No background with that name |

@@ -1,7 +1,9 @@
 # Account
 
-Manage your own account, authenticate, and look up other users' profiles.
+Log in, manage the signed-in account, and look up other users' public profiles.
 
-* **[Authentication](authentication.md)**: Login flows, link codes, token management
-* **[Me: Your Account](me.md)**: Profile, transfers, badges, blocking, notes, subscriptions
-* **[Profiles](profiles.md)**: Public user profiles, existence checks, avatars
+| Page | Covers |
+| --- | --- |
+| [Authentication](authentication.md) | Popup login, link codes, token refresh and checks |
+| [Me](me.md) | `rotur.me`: account data, credits, badges, blocking, notes, billing |
+| [Profiles](profiles.md) | `rotur.profiles`: public profiles, existence checks, image URLs |

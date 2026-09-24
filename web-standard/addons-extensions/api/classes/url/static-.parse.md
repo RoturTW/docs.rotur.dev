@@ -1,10 +1,14 @@
 # (static) .parse()
 
-Parses a url string and turns it into an instanced URL class.
+Parses a URL string and returns a [URL](README.md) instance.
 
 ## Parameters
 
-* String to parse
+| Name | Type | Description |
+| --- | --- | --- |
+| `text` | string | The URL to parse |
+
+If the string has no scheme, name, or top-level domain, the browser's defaults are used. A `local://` URL keeps the whole path in `domain_name`.
 
 ## Implementations
 

@@ -1,39 +1,59 @@
-# /badges
+# GET `/badges`
 
-Returns the badges the authenticated user currently has.
+Returns your badges and your badge display preferences.
 
-Requires authentication and the `account:view` permission. Badges are computed from your account: the system you signed up on, credits over 1000, 10 or more friends, a linked Discord account, a Pro subscription, and any manually granted badges.
+**Auth:** Required. Sub-tokens need `account:view`.
 
-## Parameters
+Badges are worked out from your account each time: the system you signed up on, your credits, your number of friends, your subscription, account age and other activity, plus badges granted by hand. Some badges, such as `rich` and `friendly`, have levels and include your progress toward the next one.
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
+### Example
 
-## Example
-
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/badges"
+```http
+GET /badges
+Authorization: Bearer <token>
 ```
 
-## Response
+**Response `200`:**
 
 ```json
 {
-  "badge_names": [
+  "badges": [
     {
+      "id": "rich",
       "name": "rich",
       "icon": "c #DAF0F2 w 3 line 3 5 -3 5 ...",
-      "description": "This user has over 1k Rotur Credits"
+      "description": "Awarded for having 1,000+ credits",
+      "issuer": "rotur",
+      "evolving": true,
+      "level": 3,
+      "progress": 1234.5,
+      "next_threshold": 2500
     }
-  ]
+  ],
+  "badge_names": [
+    { "id": "rich", "name": "rich", "...": "same as badges" }
+  ],
+  "all_badges": [
+    { "id": "rich", "name": "rich", "...": "same as badges", "hidden": false, "pinned": false }
+  ],
+  "preferences": {
+    "hidden_badges": [],
+    "badge_order": []
+  }
 }
 ```
 
+| Field | Description |
+| --- | --- |
+| `badges` | Your visible badges, in display order |
+| `badge_names` | Same as `badges`. Deprecated; use `badges` |
+| `all_badges` | Every badge you have, including hidden ones, each with `hidden` and `pinned` flags |
+| `preferences` | The IDs you have hidden (`hidden_badges`) and your custom order (`badge_order`) |
+
 `icon` is a vector drawing string, not an image URL.
 
-## Common errors
+### Errors
 
-| Status | Error | Cause |
-| --- | --- | --- |
-| 404 | `User not found` | The account could not be resolved |
+| Status | When |
+| --- | --- |
+| `500` | Your badge preferences could not be loaded |

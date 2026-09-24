@@ -1,14 +1,16 @@
 # Check
 
-Accessed via `rotur.check`. Provides bulk verification endpoints.
+`rotur.check` runs bulk checks on accounts.
 
-## Check Banned Users
+## rotur.check.banned(usernames)
 
-Submit a list of usernames and get back which ones are banned:
+Checks a list of usernames and returns the ones that are banned.
+
+**Auth:** Required. Not listed in `METHOD_PERMISSIONS`.
 
 ```ts
 const { banned } = await rotur.check.banned(["alice", "bob", "charlie"]);
-// ["bob"], only bob is banned
+// ["bob"]
 ```
 
-This endpoint requires authentication.
+**Returns:** `{ banned: string[] }`

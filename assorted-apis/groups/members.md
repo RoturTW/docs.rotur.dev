@@ -1,30 +1,29 @@
 # Members
 
-List a group's members, look up a single member, and kick members.
+List a group's members, look up one member, or kick a member.
 
-## List Members
+## GET `/v2/groups/{tag}/members`
 
-### GET `/v2/groups/{tag}/members`
+List members, newest first, one page at a time.
 
-**Auth:** required. Token permission: `groups:members.view`. You must be a member of the group, and either hold the Owner role or the `groups.members.view` group permission.
+**Auth:** Required. Sub-tokens need `groups:members.view`. You must be a member with the Owner role or `groups.members.view`.
 
-Members are returned newest first and paginated.
+### Parameters
 
-**Query Parameters:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `search` | query | string | No | Case-insensitive text to match anywhere in the username or user ID |
+| `page` | query | integer | No | Page number. Default `1` |
+| `per_page` | query | integer | No | Members per page. Default `20`, maximum `100` |
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `search` | string | No | Filter by username or user ID (case-insensitive substring) |
-| `page` | int | No | Page number (default: 1) |
-| `per_page` | int | No | Results per page (default: 20, max: 100) |
+### Example
 
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members?page=1&per_page=20"
+```http
+GET /v2/groups/mygroup/members?page=1&per_page=20
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** `members` holds [member objects](README.md#member). `total` counts members matching `search`, and `pages` is at least `1`.
 
 ```json
 {
@@ -46,34 +45,32 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygr
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 403 | `You don't have permission to view this group's members` | Not a member, or missing `groups.members.view` |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `403` | You aren't a member, or lack `groups.members.view` (`You don't have permission to view this group's members`) |
 
-***
+## GET `/v2/groups/{tag}/members/{userid}`
 
-## Get a Member
+Get one member's record together with their roles, combined permissions, and combined benefits. You don't have to be a member of the group.
 
-### GET `/v2/groups/{tag}/members/{userid}`
+**Auth:** Required. Sub-tokens need `groups:members.view`.
 
-**Auth:** required. Token permission: `groups:members.view`.
+### Parameters
 
-Returns a member's record plus their resolved roles, permissions, and benefits in one call.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `userid` | path | string | Yes | The member's user ID. A username doesn't work here |
 
-{% hint style="warning" %}
-`{userid}` here must be the user's ID, not their username.
-{% endhint %}
+### Example
 
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID"
+```http
+GET /v2/groups/mygroup/members/USER_ID
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -103,34 +100,32 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygr
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `User is not a member of this group` | User ID not in the group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `404` | No member has that user ID (`User is not a member of this group`) |
 
-***
+## DELETE `/v2/groups/{tag}/members/{userid}`
 
-## Kick a Member
+Kick a member. They can rejoin unless you also [ban](bans.md) them. The kicked user gets a `group_kicked` event and a push notification.
 
-### DELETE `/v2/groups/{tag}/members/{userid}`
+**Auth:** Required. Sub-tokens need `groups:manage`. You must be the owner or hold `groups.members.remove`. Only the owner can kick a member who has the Owner role, and nobody can kick the owner.
 
-**Auth:** required. Token permission: `groups:manage`. You must be the group owner or hold the `groups.members.remove` group permission.
+### Parameters
 
-The group owner can't be kicked. Members holding the Owner role can only be kicked by the actual owner. The kicked user gets a `group_kicked` event and a push notification.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `userid` | path | string | Yes | The member's user ID. A username doesn't work here |
 
-{% hint style="warning" %}
-`{userid}` here must be the user's ID, not their username.
-{% endhint %}
+### Example
 
-**Example request:**
-
-```bash
-curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/USER_ID"
+```http
+DELETE /v2/groups/mygroup/members/USER_ID
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** `group` is the full updated [group object](README.md#group), shortened here.
 
 ```json
 {
@@ -144,14 +139,11 @@ curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/g
 }
 ```
 
-The `group` field is the full updated group object (shortened here).
+### Errors
 
-**Common errors:**
-
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Cannot kick the group owner` | Target owns the group |
-| 403 | `You don't have permission to kick members` | Missing `groups.members.remove` |
-| 403 | `Cannot kick a member with the Owner role` | Only the owner can kick Owner-role members |
-| 404 | `User is not a member of this group` | Target not in the group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | The user owns the group (`Cannot kick the group owner`) |
+| `403` | You lack `groups.members.remove` (`You don't have permission to kick members`) |
+| `403` | The user has the Owner role and you aren't the owner (`Cannot kick a member with the Owner role`) |
+| `404` | No member has that user ID (`User is not a member of this group`) |

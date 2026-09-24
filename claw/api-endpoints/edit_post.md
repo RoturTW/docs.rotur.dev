@@ -1,24 +1,24 @@
-# /edit\_post
+# GET `/edit_post`
 
-Edits the text of one of your posts. Editing requires a Plus subscription or higher.
+Replaces the text of one of your posts and sets its `edited_at` time.
 
-Requires authentication, the `posts:manage` permission, and `good` account standing. Reposts cannot be edited.
+**Auth:** Required. Sub-tokens need `posts:manage`. Your account needs `good` standing and a Plus subscription or higher.
 
-## Parameters
+### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| id | Yes | The ID of the post to edit |
-| content | Yes | The new post text. Same length limit as posts for your tier |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | query | string | Yes | ID of the post to edit |
+| `content` | query | string | Yes | New text. Same length limit as [`/post`](post.md) for your tier |
 
-## Example
+### Example
 
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/edit_post?id=POST_ID&content=Updated+text"
+```http
+GET /edit_post?id=abc123&content=Updated%20text
+Authorization: Bearer <token>
 ```
 
-## Response
+**Response `200`:**
 
 ```json
 {
@@ -27,14 +27,13 @@ curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/edit_post?i
 }
 ```
 
-Edited posts carry an `edited_at` timestamp in feed responses.
+### Errors
 
-## Common errors
-
-| Status | Error | Cause |
-| --- | --- | --- |
-| 400 | `Content exceeds N character limit` | New text too long for your tier |
-| 400 | `Reposts cannot be edited` | The post is a repost |
-| 403 | `Editing posts requires a Plus subscription or higher` | Free or Lite account |
-| 403 | `You can only edit your own posts` | The post belongs to someone else |
-| 404 | `Post not found` | No post with that ID |
+| Status | When |
+| --- | --- |
+| `400` | `Post ID is required` or `Content is required` |
+| `400` | `Content exceeds <n> character limit` |
+| `400` | `Reposts cannot be edited` |
+| `403` | `Editing posts requires a Plus subscription or higher` |
+| `403` | `You can only edit your own posts` |
+| `404` | `Post not found` |

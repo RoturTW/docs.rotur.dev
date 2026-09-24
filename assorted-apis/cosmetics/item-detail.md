@@ -1,22 +1,22 @@
 # GET `/cosmetics/items/:id`
 
-Get details for a single cosmetic by its ID.
+Get one catalog cosmetic by its ID.
 
-**Authentication:** Not required.
+**Auth:** None.
 
-**Path Parameter:**
+### Parameters
 
-| Parameter | Description |
-|---|---|
-| `:id` | The cosmetic's unique ID |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | string | Yes | The cosmetic ID |
 
-**Example request:**
+### Example
 
 ```http
 GET /cosmetics/items/cat_ears
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -35,9 +35,9 @@ GET /cosmetics/items/cat_ears
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error |
-|---|---|
-| `400` | `Invalid cosmetic id` |
+| Status | When |
+| --- | --- |
+| `400` | `Invalid cosmetic id`: the ID is empty, longer than 50 characters, or has characters other than letters, numbers, `-` and `_` |
 | `404` | `Cosmetic not found` |

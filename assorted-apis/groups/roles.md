@@ -1,22 +1,21 @@
 # Roles
 
-Roles control member permissions and benefits inside a group. Every group starts with an **Owner** role (always all permissions, cannot be deleted) and a **Member** role (assigned on join).
+Roles give members group permissions and benefits. Every group starts with an **Owner** role, which always has every permission and can't be deleted, and a **Member** role, which is given to new members. See [group permissions](README.md#roles-and-group-permissions) for what each permission allows.
 
-## List Roles
+## GET `/v2/groups/{tag}/roles`
 
-### GET `/v2/groups/{tag}/roles`
+List a group's roles. The Owner role is always returned with the full permission list, whatever is stored.
 
-**Auth:** required. Token permission: `groups:view`.
+**Auth:** Required. Sub-tokens need `groups:view`.
 
-The Owner role always returns the full permission list, whatever is stored.
+### Example
 
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/roles"
+```http
+GET /v2/groups/mygroup/roles
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** an array of [role objects](README.md#role).
 
 ```json
 [
@@ -58,38 +57,29 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygr
 ]
 ```
 
-**Common errors:**
+## POST `/v2/groups/{tag}/roles`
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `Group not found` | Group doesn't exist |
+Create a role. New roles have no permissions or benefits; set them with the update endpoint.
 
-***
+**Auth:** Required. Sub-tokens need `groups:manage`. You need `groups.roles.manage`.
 
-## Create a Role
+### Parameters
 
-### POST `/v2/groups/{tag}/roles`
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | query | string | Yes | Up to 50 characters |
+| `description` | query | string | No | Up to 200 characters |
+| `assign_on_join` | query | string | No | `true` to give the role to new members automatically. Default `false` |
+| `self_assignable` | query | string | No | `true` to let members give the role to themselves. Default `false` |
 
-**Auth:** required. Token permission: `groups:manage`. Requires the `groups.roles.manage` group permission.
+### Example
 
-New roles start with empty `benefits` and `permissions`. Use the update endpoint to set them.
-
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `name` | string | Yes | Role name (max 50 chars) |
-| `description` | string | No | Role description (max 200 chars) |
-| `assign_on_join` | string | No | `"true"` to auto-assign to new members (default: `"false"`) |
-| `self_assignable` | string | No | `"true"` to let members assign it to themselves (default: `"false"`) |
-
-**Example request:**
-
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/roles?name=Moderator"
+```http
+POST /v2/groups/mygroup/roles?name=Moderator
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (201):**
+**Response `201`:** the new [role object](README.md#role).
 
 ```json
 {
@@ -104,43 +94,43 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Name is required` | No name provided |
-| 400 | `Name length exceeded` | Name longer than 50 chars |
-| 400 | `Description length exceeded` | Description longer than 200 chars |
-| 403 | `You don't have permission to manage roles` | Missing `groups.roles.manage` |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | `name` is missing (`Name is required`) or over 50 characters (`Name length exceeded`) |
+| `400` | `description` is over 200 characters (`Description length exceeded`) |
+| `403` | You lack `groups.roles.manage` (`You don't have permission to manage roles`) |
 
-***
+## PATCH `/v2/groups/{tag}/roles/{roleid}`
 
-## Update a Role
+Update a role. Only the fields you send are changed. Lists you send replace the existing lists.
 
-### PATCH `/v2/groups/{tag}/roles/{roleid}`
+**Auth:** Required. Sub-tokens need `groups:manage`. You need `groups.roles.manage`.
 
-**Auth:** required. Token permission: `groups:manage`. Requires the `groups.roles.manage` group permission.
+### Parameters
 
-**Body (JSON):**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `roleid` | path | string | Yes | The role's `id` |
+| `name` | body | string | No | New name |
+| `description` | body | string | No | New description |
+| `assign_on_join` | body | boolean | No | Give the role to new members automatically |
+| `self_assignable` | body | boolean | No | Let members give the role to themselves |
+| `permissions` | body | string[] | No | New permission list |
+| `benefits` | body | string[] | No | New benefit list |
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | No | New role name |
-| `description` | string | No | New description |
-| `assign_on_join` | bool | No | Auto-assign to new members |
-| `self_assignable` | bool | No | Members can self-assign |
-| `permissions` | string[] | No | New permissions list (replaces the old one) |
-| `benefits` | string[] | No | New benefits list (replaces the old one) |
+### Example
 
-**Example request:**
+```http
+PATCH /v2/groups/mygroup/roles/role-3
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
 
-```bash
-curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/roles/role-3" \  -H "Content-Type: application/json" \
-  -d '{"permissions": ["groups.announcements.send"]}'
+{ "permissions": ["groups.announcements.send"] }
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -148,31 +138,35 @@ curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gr
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Invalid request body` | Malformed JSON |
-| 400 | `Invalid permissions` / `Invalid benefits` | Not an array of strings |
-| 403 | `You don't have permission to manage roles` | Missing permission |
-| 404 | `Role not found` | Role ID doesn't exist in this group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | The body isn't valid JSON (`Invalid request body`) |
+| `400` | `permissions` or `benefits` isn't an array of strings (`Invalid permissions`, `Invalid benefits`) |
+| `403` | You lack `groups.roles.manage` (`You don't have permission to manage roles`) |
+| `404` | No role has that ID in this group (`Role not found`) |
 
-***
+## DELETE `/v2/groups/{tag}/roles/{roleid}`
 
-## Delete a Role
+Delete a role. The Owner role can't be deleted.
 
-### DELETE `/v2/groups/{tag}/roles/{roleid}`
+**Auth:** Required. Sub-tokens need `groups:manage`. You need `groups.roles.manage`.
 
-**Auth:** required. Token permission: `groups:manage`. Requires the `groups.roles.manage` group permission. The **Owner** and **Everyone** roles can't be deleted.
+### Parameters
 
-**Example request:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `roleid` | path | string | Yes | The role's `id` |
 
-```bash
-curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/roles/role-3"
+### Example
+
+```http
+DELETE /v2/groups/mygroup/roles/role-3
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -180,11 +174,10 @@ curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/g
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Cannot delete default roles` | Tried to delete Owner or Everyone |
-| 403 | `You don't have permission to manage roles` | Missing permission |
-| 404 | `Role not found` | Role ID doesn't exist in this group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | The role is named `Owner` or `Everyone` (`Cannot delete default roles`) |
+| `403` | You lack `groups.roles.manage` (`You don't have permission to manage roles`) |
+| `404` | No role has that ID in this group (`Role not found`) |

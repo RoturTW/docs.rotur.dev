@@ -1,45 +1,43 @@
 # Items
 
-## Create Item
+The **My Keys** blocks work with Rotur keys: things a user can buy or be given, such as access to a paid feature. Use them to check whether the user owns a key, read a key's data, and buy one.
 
-![block\_15\_08\_2024-02\_42\_20](https://github.com/user-attachments/assets/aff15245-85e8-47fb-91b8-c6e6d73881bd)
+You create and manage keys on [rotur.dev/keys](https://rotur.dev/keys); the **Mange My Keys** button in the palette opens that page. The extension has no blocks for creating keys. To create them from code, use the [Keys API](../assorted-apis/keys.md) or [`rotur.keys`](../rotur-sdk/marketplace/keys.md) in the SDK.
 
-### Price Tax
+## Blocks
 
-When you make an item, it charges you 10% of the cost you register it as, if you make a new item that costs 100 credits, it will charge you 10 credits to make that item
+| Block | Type | Returns |
+| --- | --- | --- |
+| `(my keys)` | Reporter | JSON of the keys the logged-in user has |
+| `<do I own key of id: [item]>` | Boolean | `true` if the logged-in user owns the key |
+| `(get key info for id: [item])` | Reporter | The key as JSON |
+| `(get key data for id: [item])` | Reporter | The key's `data` field as JSON, or the whole key if it has no `data` |
+| `(purchase key with id: [item])` | Reporter | Buys the key and returns Rotur's response as JSON. The balance refreshes afterwards. |
 
-### Sales
+If a request fails, these reporters return the error message instead. `do I own key of id:` returns `false` on any error.
 
-When you sell an item, you will receive 80% of the price you set. 10% of it being burned and 10% going to the owner of the operating system that the purchase was made on.
-
-### Conditions
+### Example
 
 ```
-The price must be between 1 and 5000 (inclusive)
-
-The name must not be longer than 50 characters
-
-The description must not be longer than 500 characters
-
-The actual data for the item must not be longer than 200,000 characters
+when authenticated
+if <not <do I own key of id: [premium-key-id]>> then
+  say (purchase key with id: [premium-key-id])
+end
 ```
 
-## Updating an item
+If a key has a price, buying it spends the user's credits. The seller's fees are listed in [Transactions and taxes](../my-account/transactions-and-taxes.md).
 
-![block\_15\_08\_2024-02\_42\_53](https://github.com/user-attachments/assets/58aa63a9-12de-4335-9ca8-fdb27b85447e)
+## Hidden blocks
 
-When you update an item all the same limits as when you create an item apply.
+Older versions of the extension had blocks for creating, updating, deleting and listing marketplace items. The item-creation and "items created by me" blocks have been removed. These blocks are hidden from the palette and only appear in older projects:
 
-If you update the price of an item, you will be charged 10% of that new price
+| Block | Current behavior |
+| --- | --- |
+| `(get public items, page: [1])` | Returns up to 50 items that are for sale, as JSON |
+| `(get public item pages)` | Always returns `1` |
+| `(keys - update [KEY] to [DATA] for id: [KEY])` | Tries to update a key's data |
+| `(keys - delete (ID) [KEY])` | Tries to delete a key |
+| `(items - disable purchases on (ID) [ITEM])` | Deletes the key `ITEM`. It runs the same code as `keys - delete`. |
+| `(items - enable purchases on (ID) [ITEM])` | Always returns `Manage key listings on rotur.dev` |
 
-## My Items
-
-![block\_15\_08\_2024-02\_41\_12](https://github.com/user-attachments/assets/58d341b2-f359-489b-ab0e-0fe2a50daa5c)
-
-If you have the roturV4, you can just click the "Items Created By Me" reporter
-
-## Delete Item
-
-![block\_15\_08\_2024-02\_41\_51](https://github.com/user-attachments/assets/0e56fe85-cf09-40c9-8ba6-b7a85152a0e6)
-
-Just use the "delete item by id" reporter in roturV4 Enter the id of one of the items you have created
+Manage your keys on [rotur.dev/keys](https://rotur.dev/keys) instead of using these blocks.

@@ -1,6 +1,8 @@
 # Realtime
 
-Real-time features via WebSocket and push notifications.
+Live presence over WebSocket, and web push notifications.
 
-* **[Status & WebSocket](status.md)**: Live presence, rooms, activities, status updates
-* **[Push Notifications](push.md)**: Web push notification management
+| Page | Covers |
+| --- | --- |
+| [Status and WebSocket](status.md) | `rotur.status` and `rotur.socket`: presence, rooms, activities, messages |
+| [Push notifications](push.md) | `rotur.push`: register devices and send push notifications |

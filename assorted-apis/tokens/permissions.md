@@ -1,18 +1,20 @@
 # Permissions
 
-List every token permission and permission group. Anyone can call this, no auth needed.
+The permissions you can grant to a sub-token, and the predefined groups that bundle them.
 
-> **Authentication:** None (public endpoint)
+## GET `/tokens/permissions`
 
-### GET `/tokens/permissions`
+Returns every permission and every permission group. Also available at `GET /v2/tokens/permissions`.
 
-**Example:**
+**Auth:** None.
+
+### Example
 
 ```http
 GET /tokens/permissions
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -34,9 +36,9 @@ GET /tokens/permissions
 }
 ```
 
-***
+A group is a convenience for building a permission list. When you create or update a token, send the individual permission strings, not the group name.
 
-## All Permissions
+## All permissions
 
 ### Account
 
@@ -75,7 +77,7 @@ GET /tokens/permissions
 | `posts:create` | Create new posts |
 | `posts:delete` | Delete posts |
 | `posts:manage` | Manage posts (edit, pin, etc.) |
-| `posts:like` | Like/unlike posts |
+| `posts:like` | Like and unlike posts |
 | `posts:reply` | Reply to posts |
 | `posts:repost` | Repost posts |
 
@@ -159,16 +161,17 @@ GET /tokens/permissions
 
 | Permission | Description |
 |---|---|
-| `validators:generate` | Generate validators |
+| `validators:generate` | Generate [validators](../validators/README.md) |
+| `signing:private` | Read the account's private signing key (`GET /v2/me/signing-key`) |
 | `blocked:view` | View blocked users list |
 | `blocked:manage` | Block and unblock users |
-| `tokens:manage` | Manage sub-tokens. **Cannot be granted to sub-tokens.** |
+| `tokens:manage` | Manage sub-tokens. Cannot be granted to a sub-token. |
 
 ***
 
-## Permission Groups
+## Permission groups
 
-Permission groups are pre-defined bundles of permissions for common use cases.
+Predefined bundles of permissions for common kinds of app.
 
 ### `read_only`
 
@@ -198,6 +201,4 @@ Permission groups are pre-defined bundles of permissions for common use cases.
 
 **Full access to everything except account deletion and token management.**
 
-Includes all permissions **except**:
-- `account:delete`
-- `tokens:manage`
+Every permission above except `account:delete` and `tokens:manage`.

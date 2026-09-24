@@ -1,24 +1,24 @@
-# Search Groups
+# Search groups
 
-Search public groups by tag, name, or description.
+Search public groups by tag, name, or description. Private groups never appear.
 
-### GET `/v2/groups/search`
+## GET `/v2/groups/search`
 
-**Auth:** required. Token permission: `groups:view`.
+**Auth:** None.
 
-**Query Parameters:**
+### Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `query` | string | No | Search term, case-insensitive. Matches tag, name, and description. Leave empty to list all public groups |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `query` | query | string | No | Case-insensitive text to match anywhere in the tag, name, or description. Leave it out to list every public group |
 
-**Example request:**
+### Example
 
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/search?query=gamedev"
+```http
+GET /v2/groups/search?query=gamedev
 ```
 
-**Example response (200):**
+**Response `200`:** an array of [group objects](README.md#group), in no particular order. If nothing matches, the body is `null`, not `[]`.
 
 ```json
 [
@@ -41,5 +41,3 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/sear
   }
 ]
 ```
-
-Only public groups appear in results. If nothing matches, the response body is `null`.

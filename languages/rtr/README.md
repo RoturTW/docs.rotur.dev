@@ -1,71 +1,39 @@
-# RTR Documentation
+# RTR
 
-RTR is a lightweight, event-driven scripting language designed for simplicity and flexibility. This documentation provides comprehensive information about the RTR language, its features, and how to use it effectively.
-
-## Documentation Sections
-
-1. [Basics](basics.md) - Learn the fundamental concepts and syntax of RTR
-2. [Structure](structure.md) - Understand the core components and structure of RTR code
-3. [Functions](functions/README.md) - Detailed documentation of all built-in functions
-
-## What is RTR?
-
-RTR is a scripting language that provides:
-
-- Event-driven programming model
-- Simple and intuitive syntax
-- Built-in functions for common operations
-- Object-oriented capabilities
-- Dynamic typing
-- Error handling
-- Modular and extensible design
-
-## Key Features
-
-- **Event System**: Organize code around events
-- **Variables**: Dynamic typing with support for various data types
-- **Functions**: Define and call functions with parameters
-- **Objects**: Create and manipulate objects with methods
-- **Control Flow**: If statements, loops, and more
-- **Built-in Functions**: Mathematical, string, array, and object operations
-- **Error Handling**: Basic error handling through events
-- **Comments**: Multiline comments using `/* */` syntax
-- **Whitespace**: Newlines have no syntactic meaning
-
-## Example
-
-Here's a simple example of RTR code:
+RTR is a small, event-driven scripting language for Rotur websites and apps. A program is a set of event blocks, and the program that hosts RTR runs each block when its event happens. [RWL](../rwl/README.md) pages use RTR for scripts, and [RDF](../rdf.md) uses a reduced form of it for constraints.
 
 ```js
 event (onload) {
     /* Create a person object */
-    person = obj();
-    person.name = "John";
-    person.age = 30;
-    
-    /* Define a greeting method */
+    person = obj()
+    person.name = "John"
+    person.age = 30
+
+    /* Store a function on it */
     person.greet = (name)~{
-        return(join("Hello, ", name, "! I am ", this.name));
+        return(join("Hello, ", name, "! I am John"))
     }
-    
-    /* Use the method */
-    message = person.greet("Alice");
-    log(message);  /* Outputs: Hello, Alice! I am John */
+
+    message = person.greet("Alice")
+    log(message)  /* Hello, Alice! I am John */
 }
 ```
 
-## Getting Started
+## Implementations
 
-To start using RTR:
+The source is at [git.rotur.dev/rotur/rtr](https://git.rotur.dev/rotur/rtr). The older [RoturTW/.rtr](https://github.com/RoturTW/.rtr) repository on GitHub is deprecated.
 
-1. Read the [Basics](basics.md) guide to learn the fundamental concepts
-2. Explore the [Structure](structure.md) documentation to understand how RTR code is organized
-3. Check out the [Functions](functions/README.md) documentation to learn about available built-in functions
-4. Try writing your own RTR code using the examples provided
-5. Use the built-in functions and features to build your applications
+| Implementation | Location | Notes |
+| --- | --- | --- |
+| RTR micro | `src/micro` (latest `v17.js`) | The JavaScript interpreter these docs describe. Reports `rtr.version` as `1.6`. |
+| RTR 2.0 | `src/2.0` | A TypeScript rewrite in progress. It adds operator precedence and `this` in methods, but does not yet support array or object literals, `%`, `^`, or comments. |
 
-## Resources
+## Pages
 
-- [GitHub Repository](https://github.com/RoturTW/.rtr) - Source code and additional resources
-- [Examples](basics.md#examples) - Code examples and use cases
-- [Best Practices](basics.md#best-practices) - Guidelines for writing effective RTR code 
+| Page | Contents |
+| --- | --- |
+| [Basics](basics.md) | Variables, operators, control flow, functions, and objects |
+| [Structure](structure.md) | How a program is laid out, statements, expressions, and scope |
+| [Functions](functions/README.md) | Built-in functions |
+| [Events](events.md) | How events run |
+| [Examples](examples.md) | Short example programs |

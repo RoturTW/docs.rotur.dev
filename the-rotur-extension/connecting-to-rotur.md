@@ -1,51 +1,97 @@
-# Connecting to Rotur
+# Connect to Rotur
 
-## Connecting with the extension!
+A project connects to Rotur by logging a user in. Logging in opens the Rotur socket, joins your designation, and loads the account, friends and balance. This page covers the connection and login blocks.
 
-Connecting to Rotur is incredibly easy using the rotur extension, simply run the blocks below
+## Quick start
 
-![block\_26\_07\_2024-22\_59\_37](https://github.com/user-attachments/assets/7056b35a-3f19-4ac9-8c26-942ce9e1492d)
+```
+when green flag clicked
+connect to server with designation: [rtr], system: [rotur] and version: [v9]
+open login prompt with style [https://origin.mistium.com/Resources/auth.css]
 
-You can find the Rotur extension on my gallery here: https://extensions.mistium.com/
+when authenticated
+say (join [Logged in as ] (client username))
+```
 
-### Version 4, (which most of the docs are for, is only available in the originOS or the Rotur discord server)
+Set the designation, system and version first, because logging in reads them. See [Designations](rotur-designations.md) for how the designation is used.
 
-## Connecting using cloudlink (less efficient)
+## Connection blocks
 
-Connecting to Rotur with cloudlink is significantly harder
+### Connect to server
 
-You will need the cloudlink extension
+```
+connect to server with designation: [rtr], system: [rotur] and version: [v9]
+```
 
-### Getting the cloudlink extension
+Command. Stores your designation, system and version. If a user is already logged in, it also opens the socket. If nobody is logged in yet it doesn't connect; use one of the login blocks below.
 
-It is recommended (by me (mistium)) to use my version of the cloudlink extension since it has two extra custom blocks that make it significantly easier to handle packets, and has a bug where it doesnt remove online users when they disconnect, fixed (shown below)
+| Argument | Default | Description |
+| --- | --- | --- |
+| `DESIGNATION` | `rtr` | The room your client joins. Other users see you on this designation. |
+| `SYSTEM` | `rotur` | The system name. The dropdown lists the systems from `https://api.rotur.dev/systems`, and you can drop a reporter in. The login prompt passes it to rotur.dev. |
+| `VERSION` | `v9` | Your app's version. It's attached to the messages you send as part of the `client` object. |
 
-![Screenshot 2024-06-29 at 21 13 47](https://github.com/RoturTW/documentation/assets/92952823/ff4498fd-b75b-4ec5-ad1b-7ebb4dab81ca)
+### Other connection blocks
 
-This version does only work with turbowarp
+| Block | Type | Description |
+| --- | --- | --- |
+| `<account server online>` | Boolean | `true` if `https://api.rotur.dev/systems` responds successfully |
+| `<connected to server>` | Boolean | `true` while the socket is open |
+| `disconnect from server` | Command | Logs out and closes the socket |
+| `when connected to server` | Hat | Fires when the socket is ready |
+| `when disconnected from server` | Hat | Fires when the socket closes |
 
-https://github.com/Mistium/extensions.mistium/blob/main/files/Cloudlink4\_Improved.js
+The socket reconnects on its own 3 seconds after it closes, as long as a user is still logged in.
 
-***
+## Log in
 
-If you just want to use the default cloudlink extension, it can be found below:
+### Login prompt
 
-These are supported on penguinmod, turbowarp, adacraft and epiques https://github.com/MikeDev101/cloudlink/tree/master/scratch
+```
+open login prompt with style [https://origin.mistium.com/Resources/auth.css]
+```
 
-### Connect to the right server
+Command. Opens `https://rotur.dev/auth` in a popup so the user can sign in there, then connects and fires `when authenticated`. If the browser blocks the popup, the page opens in a full-screen frame instead. The prompt times out after 120 seconds.
 
-You should connect to "wss://rotur.mistium.com"\
-![block\_29\_06\_2024-21\_27\_37](https://github.com/RoturTW/documentation/assets/92952823/1f5d4fdf-1ddb-4ecd-9b2d-35e6cfa0f611)
+{% hint style="info" %}
+The current extension doesn't use the `STYLE_URL` input. The login page is always rotur.dev's own.
+{% endhint %}
 
-### What room should I use?
+### Log in with a token
 
-you should use \["roturTW"] in the connect to rooms block\
-![block\_29\_06\_2024-21\_27\_49](https://github.com/RoturTW/documentation/assets/92952823/eea9f7d1-d657-4df5-84d1-8b3e07291a38)
+```
+(login with token: [token])
+```
 
-### Example code
+Reporter. Logs in with an existing Rotur token and connects.
 
-This is a working connection script
+| Returns | When |
+| --- | --- |
+| `Logged In` | The token was accepted and the socket connected |
+| `No token provided` | The input is empty |
+| Error message | The token was rejected or the connection failed |
 
-![block\_29\_06\_2024-22\_48\_06](https://github.com/RoturTW/documentation/assets/92952823/7975e06d-185a-4aa2-a163-b81d48d838cc)
+### Other login blocks
 
-The base payload block will be the template for every packet you send, just add a few keys to it, this will be explained later in the packet structure section
+| Block | Type | Description |
+| --- | --- | --- |
+| `<authenticated>` | Boolean | `true` when connected and the account has loaded |
+| `when authenticated` | Hat | Fires after a successful login with the prompt or a token |
+| `(user token)` | Reporter | The token for the current session, or empty if nobody is logged in |
+| `logout` | Command | Logs out and closes the socket, the same as `disconnect from server` |
+
+{% hint style="warning" %}
+Username and password login has been removed. The hidden `login with username: ... and password: ...` blocks in older projects now return "Username/password login was retired. Use the login prompt or login with token." The hidden `register with username: ...` block tells users to register on rotur.dev instead.
+{% endhint %}
+
+## Delete account
+
+```
+(delete account)
+```
+
+Reporter in the **DANGER ZONE** category, hidden until you click **Show Danger Zone**. It asks the user to confirm, then deletes the logged-in account and disconnects. It returns `Account Deleted Successfully`, `Cancelled`, or `Failed to delete account: ` followed by the error.
+
+## Connecting without the extension
+
+Older versions of the extension connected through CloudLink to `wss://rotur.mistium.com` in the `roturTW` room. That protocol is documented in the [Deprecated](../deprecated/what-is-a-websocket.md) section. The current extension doesn't use it. It talks to `https://api.rotur.dev` and the status socket at `wss://api.rotur.dev/status/ws` through the [Rotur SDK](../rotur-sdk/README.md), which you can use directly outside TurboWarp.

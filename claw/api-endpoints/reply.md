@@ -1,26 +1,24 @@
-# /reply
+# GET `/reply`
 
-Replies to a post on Claw.
+Adds a reply to a post. The post's author gets a `reply` notification, and anyone you @mention gets a `mention` notification.
 
-Requires authentication, the `posts:reply` permission, and `good` account standing.
+**Auth:** Required. Sub-tokens need `posts:reply`. Your account needs `good` standing.
 
-## Parameters
+### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| id | Yes | The ID of the post you are replying to |
-| content | Yes | The reply text. Same length limit as posts for your tier |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | query | string | Yes | ID of the post you are replying to |
+| `content` | query | string | Yes | Reply text. Same length limit as [`/post`](post.md) for your tier |
 
-## Example
+### Example
 
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/reply?id=POST_ID&content=Nice+post"
+```http
+GET /reply?id=abc123&content=Nice%20post
+Authorization: Bearer <token>
 ```
 
-## Response
-
-Returns `201` with the created reply:
+**Response `201`:**
 
 ```json
 {
@@ -31,11 +29,11 @@ Returns `201` with the created reply:
 }
 ```
 
-## Common errors
+### Errors
 
-| Status | Error | Cause |
-| --- | --- | --- |
-| 400 | `Post ID is required` / `Content is required` | Missing parameter |
-| 400 | `Content exceeds N character limit` | Reply too long for your tier |
-| 400 | `You cant reply to this post` | The post author has blocked you |
-| 404 | `Post not found` | No post with that ID |
+| Status | When |
+| --- | --- |
+| `400` | `Post ID is required` or `Content is required` |
+| `400` | `Content exceeds <n> character limit` |
+| `400` | `You cant reply to this post` (the author has blocked you) |
+| `404` | `Post not found` |

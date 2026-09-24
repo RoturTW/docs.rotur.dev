@@ -1,22 +1,22 @@
-# /followers
+# GET `/followers`
 
-Lists the followers of a user.
+Lists the usernames that follow a user.
 
-No authentication required. Uses the profile rate limit (30 per minute, 120 when authenticated).
+**Auth:** None. Uses the profile rate limit.
 
-## Parameters
+### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| name | Yes | The username whose followers you want. `username` also works |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | query | string | Yes | Username to look up. `username` also works |
 
-## Example
+### Example
 
-```bash
-curl "https://api.rotur.dev/followers?name=mist"
+```http
+GET /followers?name=mist
 ```
 
-## Response
+**Response `200`:**
 
 ```json
 {
@@ -24,9 +24,9 @@ curl "https://api.rotur.dev/followers?name=mist"
 }
 ```
 
-## Common errors
+### Errors
 
-| Status | Error | Cause |
-| --- | --- | --- |
-| 400 | `Username is required` | Missing `name` parameter |
-| 404 | `User not found` | No account with that username |
+| Status | When |
+| --- | --- |
+| `400` | `Username is required` |
+| `404` | `User not found` |

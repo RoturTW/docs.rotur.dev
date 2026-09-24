@@ -1,32 +1,27 @@
 # Tips
 
-Tips are credit donations to a group. They land in the group's `credits_balance`, which members with the right permission can withdraw from.
+Tips are credits given to a group. They go into the group's `credits_balance`, and members with `groups.tips.withdraw` can move credits from that balance to their own account.
 
-Users with the `groups.tips.withdraw` permission can withdraw credits from the group's tip jar to their own balance. Withdrawals are stored in a separate `withdrawals.json` file per group.
+## GET `/v2/groups/{tag}/tips`
 
----
+List a group's tips, newest first.
 
-## List Tips
+**Auth:** Required. Sub-tokens need `groups:view`.
 
-### GET `/v2/groups/{tag}/tips`
+### Parameters
 
-**Auth:** required. Token permission: `groups:view`.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `limit` | query | integer | No | Maximum number to return. Default `20`; invalid or non-positive values use the default |
 
-Returns tips, newest first.
+### Example
 
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `limit` | int | No | Max number of results (default: 20) |
-
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/tips"
+```http
+GET /v2/groups/mygroup/tips
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** an array of [tip objects](README.md#tip), or `null` if there are none.
 
 ```json
 [
@@ -35,42 +30,33 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygr
     "group_tag": "mygroup",
     "from_username": "bob",
     "amount_credits": 25.0,
-    "note": "keep it up!",
+    "note": "keep it up",
     "created_at": 1717000000
   }
 ]
 ```
 
-**Common errors:**
+## POST `/v2/groups/{tag}/tips`
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `Group not found` | Group doesn't exist |
+Send credits to a group. You can tip any public group, and private groups you're a member of. The amount is taken from your balance as a `group_tip` transaction.
 
-***
+**Auth:** Required. Sub-tokens need `credits:manage`.
 
-## Send a Tip
+### Parameters
 
-### POST `/v2/groups/{tag}/tips`
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `amount` | query | number | Yes | Credits to give. Must be positive |
+| `note` | query | string | No | Up to 200 characters |
 
-**Auth:** required. Token permission: `credits:manage`.
+### Example
 
-Send credits to a group. You must be a member, unless the group is public. The amount is deducted from your balance and recorded as a `group_tip` transaction.
-
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `amount` | float | Yes | Credits to tip (must be positive) |
-| `note` | string | No | A note with the tip (max 200 chars) |
-
-**Example request:**
-
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/tips?amount=10&note=thanks"
+```http
+POST /v2/groups/mygroup/tips?amount=10&note=thanks
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (201):**
+**Response `201`:** the new tip. Unlike the list endpoint, it has `from_user_id` (your user ID) instead of `from_username`.
 
 ```json
 {
@@ -83,43 +69,35 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-{% hint style="info" %}
-The create response contains your raw `from_user_id`. The list endpoint returns `from_username` instead.
-{% endhint %}
+### Errors
 
-**Common errors:**
+| Status | When |
+| --- | --- |
+| `400` | `amount` is missing, not a number, or not positive (`Invalid amount`) |
+| `400` | `note` is over 200 characters (`Note length exceeded (max 200)`) |
+| `400` | You don't have enough credits (`Insufficient funds`). The body also has `required` and `available` |
+| `403` | The group is private and you aren't a member (`You can only tip groups you're a member of`) |
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Invalid amount` | Amount is not a positive number |
-| 400 | `Note length exceeded (max 200)` | Note too long |
-| 400 | `Insufficient funds` | Not enough credits (response includes `required` and `available`) |
-| 403 | `You can only tip groups you're a member of` | Not a member and the group is private |
-| 404 | `Group not found` | Group doesn't exist |
+## POST `/v2/groups/{tag}/tips/withdraw`
 
-***
+Move credits from the group's `credits_balance` to your account, as a `group_tip_withdrawal` transaction.
 
-## Withdraw from the Tip Jar
+**Auth:** Required. Sub-tokens need `credits:manage`. You need `groups.tips.withdraw`.
 
-### POST `/v2/groups/{tag}/tips/withdraw`
+### Parameters
 
-**Auth:** required. Token permission: `credits:manage`. Requires the `groups.tips.withdraw` group permission.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `amount` | query | number | Yes | Credits to withdraw. Must be positive |
 
-Moves credits from the group's `credits_balance` to your account. Recorded as a `group_tip_withdrawal` transaction.
+### Example
 
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `amount` | float | Yes | Credits to withdraw (must be positive) |
-
-**Example request:**
-
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/tips/withdraw?amount=50"
+```http
+POST /v2/groups/mygroup/tips/withdraw?amount=50
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (201):**
+**Response `201`:**
 
 ```json
 {
@@ -131,38 +109,34 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Invalid amount` | Amount is not a positive number |
-| 400 | `Insufficient funds in group tip jar` | Group balance too low (response includes `required` and `available`) |
-| 403 | `You don't have permission to withdraw from the group tip jar` | Missing `groups.tips.withdraw` |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | `amount` is missing, not a number, or not positive (`Invalid amount`) |
+| `400` | The group's balance is too low (`Insufficient funds in group tip jar`). The body usually also has `required` and `available` |
+| `403` | You lack `groups.tips.withdraw` (`You don't have permission to withdraw from the group tip jar`) |
 
-***
+## GET `/v2/groups/{tag}/tips/withdrawals`
 
-## List Withdrawals
+List withdrawals from the group's balance, newest first.
 
-### GET `/v2/groups/{tag}/tips/withdrawals`
+**Auth:** Required. Sub-tokens need `groups:view`. You need `groups.tips.withdraw`.
 
-**Auth:** required. Token permission: `groups:view`. Requires the `groups.tips.withdraw` group permission.
+### Parameters
 
-Returns withdrawals, newest first.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `limit` | query | integer | No | Maximum number to return. Default `20`; invalid or non-positive values use the default |
 
-**Query Parameters:**
+### Example
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `limit` | int | No | Max number of results (default: 20) |
-
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/tips/withdrawals"
+```http
+GET /v2/groups/mygroup/tips/withdrawals
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** an array of withdrawals, or `null` if there are none.
 
 ```json
 [
@@ -176,100 +150,8 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygr
 ]
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 403 | `You don't have permission to view withdrawals` | Missing `groups.tips.withdraw` |
-| 404 | `Group not found` | Group doesn't exist |
-
----
-
-## Withdraw from Tip Jar
-
-### POST `/groups/{tag}/tips/withdraw`
-
-Withdraw credits from the group's tip jar to your own balance. You must have the `groups.tips.withdraw` permission in the group. The amount is deducted from the group's `credits_balance` and added to your balance.
-
-**Path Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `amount` | float | Yes | Amount of credits to withdraw (must be positive) |
-
-**Response (201):**
-
-```json
-{
-  "id": "withdrawal-1",
-  "group_tag": "mygroup",
-  "to_username": "alice",
-  "amount_credits": 50.0,
-  "created_at": 1717200000
-}
-```
-
-**Transaction:** A `group_tip_withdrawal` transaction is recorded on your account for the withdrawn amount. The group's `credits_balance` is reduced by the withdrawal amount.
-
-**Error Responses:**
-
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Group tag is required` | No tag provided |
-| 400 | `Invalid amount` | Amount is not a positive number |
-| 400 | `Insufficient funds in group tip jar` | Group doesn't have enough credits |
-| 403 | `You don't have permission to withdraw from the group tip jar` | Missing `groups.tips.withdraw` permission |
-| 404 | `Group not found` | Group doesn't exist |
-
----
-
-## List Withdrawals
-
-### GET `/groups/{tag}/tips/withdrawals`
-
-Returns withdrawals from the group's tip jar, newest first. You must have the `groups.tips.withdraw` permission in the group.
-
-**Path Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `limit` | int | No | Max number of results (default: 20) |
-
-{% hint style="info" %}
-These v1 endpoints accept auth via the `Authorization` header (`Authorization: Bearer <token>` preferred). `auth` query parameter is accepted as legacy fallback.
-{% endhint %}
-
-
-**Response (200):**
-
-```json
-[
-  {
-    "id": "withdrawal-1",
-    "group_tag": "mygroup",
-    "to_username": "alice",
-    "amount_credits": 50.0,
-    "created_at": 1717200000
-  }
-]
-```
-
-**Error Responses:**
-
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Group tag is required` | No tag provided |
-| 403 | `You don't have permission to view withdrawals` | Missing `groups.tips.withdraw` permission |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `403` | You lack `groups.tips.withdraw` (`You don't have permission to view withdrawals`) |

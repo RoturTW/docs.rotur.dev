@@ -1,24 +1,27 @@
-# Token Activity
+# Token activity
 
-Get a computed status for a sub-token, useful for checking whether it is still usable.
+Get a sub-token's computed status, to check whether it still works.
 
-> **Authentication:** Required. Needs the `tokens:manage` permission, which sub-tokens can never hold, so in practice this is main-token only.
+## GET `/tokens/:id/activity`
 
-### GET `/tokens/:id/activity`
+Returns the sub-token's details and a `status` field. The token value is not included.
 
-**Path Parameter:**
-* `:id`: the sub-token ID (e.g. `st_abc123`)
+**Auth:** Required. Needs `tokens:manage`, which sub-tokens cannot hold, so only the main token works.
 
-**Query Parameters:**
-* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
+### Parameters
 
-**Example:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | string | Yes | The sub-token ID, for example `st_abc123` |
+
+### Example
 
 ```http
 GET /tokens/st_abc123/activity
+Authorization: Bearer <main token>
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -36,16 +39,16 @@ GET /tokens/st_abc123/activity
 }
 ```
 
-The `status` field can be one of:
+Every field is always present; unset timestamps are `null`.
 
-| Status | Meaning |
-|---|---|
-| `active` | Token is usable |
-| `revoked` | Token has been manually revoked |
-| `expired` | Token's expiry time has passed |
+| `status` | Meaning |
+| --- | --- |
+| `active` | The token works |
+| `revoked` | The token was revoked, or it expired and the hourly cleanup has marked it revoked |
+| `expired` | The expiry time has passed and the cleanup has not run yet |
 
-**Error Responses:**
+### Errors
 
-| Status | Condition |
-|---|---|
-| 404 | Token not found |
+| Status | When |
+| --- | --- |
+| `404` | No sub-token with this ID exists on the account |

@@ -1,40 +1,39 @@
-# Update a Group
+# Update a group
 
-Change a group's settings. Only fields you include are updated.
+Change a group's settings. Only the fields you send are changed.
 
-### PATCH `/v2/groups/{tag}`
+## PATCH `/v2/groups/{tag}`
 
-**Auth:** required. Token permission: `groups:manage`. You must be the group owner or hold the `groups.group.edit` or `groups.manage` group permission.
+**Auth:** Required. Sub-tokens need `groups:manage`. You must be the owner or hold `groups.group.edit` or `groups.manage`. Moderation must not have blocked group changes on your account.
 
-**Path Parameters:**
+### Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | body | string | No | Display name, 1–50 characters after trimming spaces |
+| `tag` | body | string | No | New tag, 1–10 letters and digits, not already in use. Renames the group |
+| `description` | body | string | No | New description. No length limit is enforced here |
+| `readme` | body | string | No | Up to 10,000 characters |
+| `rules` | body | string | No | Up to 5,000 characters |
+| `icon` or `icon_url` | body | string | No | Icon URL. To upload an image, use [the icon endpoint](icon.md) |
+| `banner_url` | body | string | No | Banner URL. To upload an image, use [the banner endpoint](banner.md) |
+| `public` | body | boolean | No | Whether the group is public |
+| `join_policy` | body | string | No | `OPEN`, `REQUEST`, or `INVITE` |
+| `entry_fee` | body | number | No | Credits charged to join. `0` removes the fee |
 
-**Body (JSON):**
+Fields with the wrong JSON type (for example `"public": "true"` as a string) are ignored.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | No | New display name (max 50 chars, cannot be empty) |
-| `tag` | string | No | New tag (alphanumeric, max 10 chars, must be unused). Renames the group everywhere |
-| `description` | string | No | New description |
-| `readme` | string | No | New readme (max 10,000 chars) |
-| `rules` | string | No | New rules (max 5,000 chars) |
-| `icon` or `icon_url` | string | No | Icon URL (use the [icon upload endpoint](icon.md) for image uploads) |
-| `banner_url` | string | No | Banner URL (use the [banner upload endpoint](banner.md) for image uploads) |
-| `public` | bool | No | Whether the group is public |
-| `join_policy` | string | No | `"OPEN"`, `"REQUEST"`, or `"INVITE"` |
-| `entry_fee` | float | No | Credits required to join (set `0` to remove) |
+### Example
 
-**Example request:**
+```http
+PATCH /v2/groups/mygroup
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
 
-```bash
-curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup" \  -H "Content-Type: application/json" \
-  -d '{"description": "Updated description", "entry_fee": 5}'
+{ "description": "Updated description", "entry_fee": 5 }
 ```
 
-**Example response (200):**
+**Response `200`:** the updated [group object](README.md#group).
 
 ```json
 {
@@ -57,19 +56,18 @@ curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gr
 ```
 
 {% hint style="warning" %}
-Changing `tag` renames the group. All future API calls must use the new tag, and old links to the group stop working.
+Changing `tag` renames the group immediately. Requests and links that use the old tag stop working.
 {% endhint %}
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Invalid request body` | Malformed JSON |
-| 400 | `Name cannot be empty` | Empty `name` |
-| 400 | `Readme length exceeded` | Readme longer than 10,000 chars |
-| 400 | `Rules length exceeded` | Rules longer than 5,000 chars |
-| 400 | `Entry fee cannot be negative` | Negative entry fee |
-| 400 | `Invalid join policy` | Not one of the valid values |
-| 400 | `Group with this tag already exists` | New tag is taken |
-| 403 | `You are not authorized to update this group` | Not the owner and no edit permission |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | The body isn't valid JSON (`Invalid request body`) |
+| `400` | `name` is empty (`Name cannot be empty`) or longer than 50 characters (`Name length exceeded`) |
+| `400` | `readme` or `rules` is too long (`Readme length exceeded`, `Rules length exceeded`) |
+| `400` | `entry_fee` is negative (`Entry fee cannot be negative`) |
+| `400` | `join_policy` isn't one of the three values (`Invalid join policy`) |
+| `400` | The new `tag` is empty, too long, not letters and digits, or taken (`Tag cannot be empty`, `Tag must be 10 characters or less`, `Tag must be alphanumeric only`, `Group with this tag already exists`) |
+| `403` | You aren't the owner and lack an edit permission (`You are not authorized to update this group`) |
+| `403` | Moderation has blocked group changes on your account (`Group changes is blocked for this account`) |

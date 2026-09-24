@@ -1,35 +1,36 @@
 # Transactions and Taxes
 
-Rotur has an integrated currency and economy system. You can send credits to other users and earn credits from them.
+Rotur credits can be sent between users. This page covers sending credits, the fees on other credit operations, and the transaction history stored on your account.
 
-> **Authentication:** Required. Send your token in an `Authorization` header as `Authorization: Bearer YOUR_TOKEN` (preferred). `auth` query parameter is still accepted as a legacy fallback.
+> **Base URL:** `https://api.rotur.dev`
+> **Auth:** `Authorization: Bearer <token>`. The legacy `auth` query parameter is also accepted.
 
-## Transferring Credits
+## POST `/me/transfer`
 
-Transfer credits with the `transfer` endpoint:
+Sends credits from your account to another user. `POST /v2/me/transfers` does the same.
 
+**Auth:** Required. Sub-tokens need `credits:transfer`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `to` | body | string | Yes | Recipient username |
+| `amount` | body | number or string | Yes | Credits to send, rounded to 2 decimal places. Minimum 0.01. Prefix a string with `£` to give the amount in GBP (see below). |
+| `note` | body | string | No | Note stored on both transactions, up to 50 characters. Defaults to `transfer`. |
+
+### Example
+
+```http
+POST /me/transfer
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+
+{ "to": "mist", "amount": 5, "note": "Thanks for the help" }
 ```
-POST https://api.rotur.dev/me/transfer
-```
 
-**Body (JSON):**
+**Response `200`:**
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `to` | string | Yes | Recipient username |
-| `amount` | number or string | Yes | Amount to transfer (minimum 0.01). Prefix with `£` to specify GBP and auto-convert |
-| `note` | string | No | Optional note for the transaction (max 50 chars) |
-
-**Example:**
-```json
-{
-  "to": "mist",
-  "amount": 5,
-  "note": "Thanks for the help!"
-}
-```
-
-**Response (200):**
 ```json
 {
   "message": "Transfer successful",
@@ -40,70 +41,95 @@ POST https://api.rotur.dev/me/transfer
 }
 ```
 
-**Error Responses:**
+### Errors
 
-| Error | Condition |
+All errors return `400` with an `error` message, except authentication errors, which return `403`.
+
+| Error | When |
 | --- | --- |
-| `Minimum amount is 0.01` | Amount is below the minimum |
-| `Cannot send credits to yourself` | Sender and recipient are the same |
-| `sender user not found` | Your account could not be found |
-| `recipient user not found` | The target username does not exist |
-| `insufficient funds (required: X, available: Y)` | You don't have enough credits |
+| `Invalid request payload` | The body is not valid JSON |
+| `Amount must be provided` / `Invalid amount` | `amount` is missing or not a number |
+| `Minimum amount is 0.01` | `amount` is below 0.01 after rounding |
+| `Recipient username and amount must be provided` | `to` is missing |
+| `Cannot send credits to yourself` | `to` is your own username |
+| `recipient user not found` | No user has that username |
+| `insufficient funds (required: X, available: Y)` | Your balance is too low |
 
-### GBP Amounts
+### GBP amounts
 
-You can specify amounts in GBP by prefixing with `£`. The system auto-converts using the current platform-wide exchange rate.
+Send `amount` as a string starting with `£`, such as `"£0.50"`, to give the amount in pounds. The server converts it to credits at the current platform exchange rate, which you can see at [`GET /stats/economy`](https://api.rotur.dev/stats/economy).
 
-```json
-{
-  "to": "mist",
-  "amount": "£0.50"
-}
-```
+## Fees
 
-## Rotur Taxes
-
-User-to-user transfers are completely free. There is no tax or fee on them.
-
-Some other operations do have fees:
+Transfers between users are free. Some other operations charge a fee:
 
 | Operation | Fee |
 | --- | --- |
-| Transfers between users | Free |
-| Selling a key | 10% platform fee (you receive 90%) |
-| Creating a gift | 1% tax on top of the gift amount |
-| Banner upload | 10 credits (free with a Pro subscription) |
-| Daily claim | Free for you; the owner of your system receives a small 0.25 credit tax payment |
+| Transfer between users | Free |
+| Selling a key | 10%. The creator receives 90% of the price. |
+| Selling a cosmetic | The creator receives the cosmetic's creator share; the rest goes to the platform. |
+| Creating a credit gift | 1% on top of the gift amount |
+| Creating a group | 15 credits |
+| Unlocking banners | 30 credits, once. Free with Pro or higher. |
+| Daily claim | Free. The owner of your account's system also receives 0.25 credits, recorded as `tax`. |
 
-## Transaction Types
+## Transaction history
 
-Every credit operation is logged as a transaction on your account under `sys.transactions`. Each transaction records its type, amount, note, the other user, a timestamp, and your new total balance.
+Every credit operation is logged in `sys.transactions` on your account, newest first. Each entry has these fields:
+
+| Field | Description |
+| --- | --- |
+| `type` | The kind of transaction (see below) |
+| `user` | The username of the other party, if there is one |
+| `amount` | Credits moved |
+| `note` | Note, up to 50 characters |
+| `time` | When it happened, in milliseconds |
+| `new_total` | Your balance afterwards |
+| `key_id`, `key_name` | The key involved, for key transactions |
+| `provider`, `external_id` | The payment provider and its reference, for purchases |
+
+How far back your history goes depends on your [subscription tier](subscriptions.md):
+
+| Tier | History kept |
+| --- | --- |
+| Free | 1 month |
+| Lite | 6 months |
+| Plus | 12 months |
+| Pro | Unlimited |
+
+### Transaction types
 
 | Type | Description |
 | --- | --- |
-| `in` | Credits received from another user |
+| `in` | Credits received from another user, including daily claims |
 | `out` | Credits sent to another user |
-| `tax` | Tax credit (e.g. the system owner's share of a daily claim) |
-| `transfer` | Credits added from a Ko-fi credit purchase |
-| `key_buy` | Credits spent to purchase a key |
-| `key_sale` | Credits earned from selling a key (90% after the 10% fee) |
+| `transfer_reversal` | A failed transfer refunded to you |
+| `tax` | Your share of a daily claim made by a user on your system |
+| `credit_purchase` | Credits bought through Stripe or Ko-fi |
+| `key_buy` | Credits spent on a key, including recurring subscription charges |
+| `key_sale` | Credits earned when someone buys your key (90% after the fee) |
 | `item_buy` | Credits spent buying an item |
 | `item_sale` | Credits earned selling an item |
-| `gift_create` | Credits deducted to create a gift (amount + 1% tax) |
+| `gift_create` | Credits deducted to create a gift (amount plus 1%) |
 | `gift_claim` | Credits received from claiming a gift |
-| `gift_claimed` | Notification to the creator that their gift was claimed |
-| `gift_refund` | Credits returned from a cancelled gift |
+| `gift_claimed` | Your gift was claimed by someone |
+| `gift_refund` | Credits returned from a cancelled or expired gift |
 | `escrow_out` | Credits sent to devfund escrow |
 | `escrow_in` | Credits received from a devfund escrow release |
+| `commerce_payment` | Credits paid through a commerce payment |
+| `commerce_earning` | Credits received from a commerce payment |
+| `bounty_funded` | Credits spent funding a bounty |
+| `bounty_earning` | Credits received for winning a bounty |
+| `bounty_refund` | Credits returned from a cancelled bounty |
 | `group_create` | Credits spent creating a group |
-| `group_entry_fee` | Credits paid or received as a group entry fee |
-| `group_tip` | Credits sent as a tip to a group |
+| `group_entry_fee` | A group entry fee, paid or received |
+| `group_tip` | Credits tipped to a group |
 | `group_tip_withdrawal` | Credits withdrawn from a group's tips |
 | `group_role_purchase` | Credits spent on a group role |
-| `group_role_subscription` | Recurring charge for a group role |
+| `group_role_subscription` | A recurring charge for a group role |
 | `cosmetic_purchase` | Credits spent on a cosmetic |
-| `cosmetic_sale` | Credits earned from selling a cosmetic |
+| `cosmetic_sale` | Credits earned from a cosmetic sale |
 | `cosmetic_gift` | Credits spent gifting a cosmetic |
-| `cosmetic_platform` | Platform share of a cosmetic sale |
-
-The number of transactions kept depends on your subscription tier: 20 on Free and Lite, 100 on Plus, and 500 on Pro.
+| `cosmetic_platform` | The platform's share of a cosmetic sale |
+| `banner_unlock` | The one-time banner unlock fee |
+| `pet_purchase` | Credits spent on a pet |
