@@ -17,6 +17,9 @@ await rotur.login({
   signal: abortCtrl.signal,  // AbortController signal
   requires: ["posts:create"], // permission scopes to request
 });
+
+// Ask for full account access:
+await rotur.login({ requires: ["full"] });
 ```
 
 ### How it works
@@ -25,6 +28,10 @@ await rotur.login({
 2. If the popup is blocked, falls back to a fullscreen iframe
 3. Listens for a `postMessage` with `{ type: "rotur-auth-token", token: "..." }`
 4. Resolves the promise with the authenticated client
+
+Browsers only allow the popup when `login()` runs from a click or key press. Call it from a "Sign in" button rather than on page load or from a socket event, or your users always get the iframe.
+
+Inside the iframe, Google, GitHub and Discord sign-in are unavailable because those providers refuse to be framed, so users sign in with their username and password. See [rotur.dev/auth](../../assorted-apis/rotur.dev-auth.md) for details.
 
 On failure the promise rejects with an `AuthError` whose `code` is one of `"timeout"`, `"aborted"`, `"popup_blocked"`, or `"no_token"`:
 
