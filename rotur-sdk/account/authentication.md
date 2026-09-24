@@ -19,7 +19,7 @@ await rotur.login({
 });
 
 // Ask for full account access:
-await rotur.login({ requires: ["full"] });
+await rotur.login({ requires: "full" });
 ```
 
 ### How it works
@@ -64,7 +64,11 @@ rotur.setToken(token);
 
 ### Permission scopes
 
-The `requires` option lists the permission scopes your app needs. If you use the Vite plugin from `rotur-sdk/vite`, it scans your code for SDK calls and injects the matching scopes automatically, so you rarely need to pass `requires` by hand. The `METHOD_PERMISSIONS` and `resolvePermissions` exports expose the same mapping if you want to compute scopes yourself.
+The `requires` option lists the permission scopes your app needs. Pass either a comma-separated string (`"posts:view,posts:create"`) or an array with one scope per entry (`["posts:view", "posts:create"]`). Use `"full"` to ask for full account access.
+
+Older versions of rotur-sdk only accept an array, so pass `["full"]` there.
+
+If you use the Vite plugin from `rotur-sdk/vite`, it scans your code for SDK calls and injects the matching scopes automatically, so you rarely need to pass `requires` by hand. The `METHOD_PERMISSIONS` and `resolvePermissions` exports expose the same mapping if you want to compute scopes yourself.
 
 ## Manual Token
 
