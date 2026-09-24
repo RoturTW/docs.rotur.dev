@@ -1,22 +1,21 @@
 # Events
 
-Events are scheduled activities for a group. Each event has a visibility: `MEMBERS` events only show to group members, `PUBLIC` events show to everyone.
+Events are scheduled activities in a group. Each event has a visibility: `MEMBERS` events are only shown to group members, and `PUBLIC` events are shown to anyone who lists the group's events.
 
-## List Events
+## GET `/v2/groups/{tag}/events`
 
-### GET `/v2/groups/{tag}/events`
+List a group's events, in no particular order. If you aren't a member, `MEMBERS` events are left out. Unpublished events are included.
 
-**Auth:** required. Token permission: `groups:view`.
+**Auth:** Required. Sub-tokens need `groups:view`.
 
-Returns the group's events. `MEMBERS` events are filtered out unless you're a member.
+### Example
 
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/events"
+```http
+GET /v2/groups/mygroup/events
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** an array of [event objects](README.md#event), or `null` if there are none you can see.
 
 ```json
 [
@@ -35,39 +34,32 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygr
 ]
 ```
 
-**Common errors:**
+## POST `/v2/groups/{tag}/events`
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `Group not found` | Group doesn't exist |
+Create an event.
 
-***
+**Auth:** Required. Sub-tokens need `groups:manage`. You need `groups.events.manage`, and also `groups.events.publish` when `published` is `true`.
 
-## Create an Event
+### Parameters
 
-### POST `/v2/groups/{tag}/events`
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `title` | query | string | Yes | Up to 100 characters |
+| `description` | query | string | No | Up to 500 characters |
+| `start_time` | query | integer | Yes | Start as a Unix timestamp in seconds. Must be in the future |
+| `duration_hours` | query | integer | No | 1–72. Default `1`. Sets `end_time` |
+| `location` | query | string | No | Up to 200 characters |
+| `visibility` | query | string | No | `MEMBERS` or `PUBLIC`. Default `MEMBERS` |
+| `published` | query | string | No | `true` to publish immediately. Default `false` |
 
-**Auth:** required. Token permission: `groups:manage`. Requires the `groups.events.manage` group permission. Setting `published=true` also requires `groups.events.publish`.
+### Example
 
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `title` | string | Yes | Event title (max 100 chars) |
-| `description` | string | No | Event description (max 500 chars) |
-| `start_time` | int | Yes | Unix timestamp for the start, must be in the future |
-| `duration_hours` | int | No | Duration in hours, 1 to 72 (default: 1) |
-| `location` | string | No | Event location (max 200 chars) |
-| `visibility` | string | No | `"MEMBERS"` or `"PUBLIC"` (default: `"MEMBERS"`) |
-| `published` | string | No | `"true"` to publish immediately (default: `"false"`) |
-
-**Example request:**
-
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/events?title=Tournament&start_time=1717100000&duration_hours=4"
+```http
+POST /v2/groups/mygroup/events?title=Tournament&start_time=1717100000&duration_hours=4
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (201):**
+**Response `201`:** the new event. Unlike the other event endpoints, `created_by` is your user ID rather than your username.
 
 ```json
 {
@@ -84,77 +76,82 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-{% hint style="info" %}
-The create response contains the creator's raw user ID in `created_by`. The list and update endpoints return the username instead.
-{% endhint %}
+### Errors
 
-**Common errors:**
+| Status | When |
+| --- | --- |
+| `400` | `title` is missing (`Title is required`) or over 100 characters (`Title length exceeded`) |
+| `400` | `description` or `location` is too long (`Description length exceeded`, `Location length exceeded`) |
+| `400` | `start_time` is missing, not a number, or not in the future (`Invalid start time`) |
+| `400` | `duration_hours` is outside 1–72 (`Invalid duration (must be 1-72 hours)`) |
+| `400` | `visibility` isn't `MEMBERS` or `PUBLIC` (`Invalid visibility`) |
+| `403` | You lack `groups.events.manage` (`You don't have permission to manage events`) |
+| `403` | `published` is `true` and you lack `groups.events.publish` (`You don't have permission to publish events`) |
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Title is required` | No title provided |
-| 400 | `Invalid start time` | Missing, invalid, or in the past |
-| 400 | `Invalid duration (must be 1-72 hours)` | Duration out of range |
-| 400 | `Invalid visibility` | Not `MEMBERS` or `PUBLIC` |
-| 403 | `You don't have permission to manage events` | Missing `groups.events.manage` |
-| 403 | `You don't have permission to publish events` | `published=true` without `groups.events.publish` |
-| 404 | `Group not found` | Group doesn't exist |
+## PATCH `/v2/groups/{tag}/events/{eventid}`
 
-***
+Update an event. Only the fields you send are changed.
 
-## Update an Event
+**Auth:** Required. Sub-tokens need `groups:manage`. You need `groups.events.manage`, and also `groups.events.publish` to set `published` to `true`.
 
-### PATCH `/v2/groups/{tag}/events/{eventid}`
+### Parameters
 
-**Auth:** required. Token permission: `groups:manage`. Requires the `groups.events.manage` group permission.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `eventid` | path | string | Yes | The event's `id` |
+| `title` | body | string | No | 1–100 characters |
+| `description` | body | string | No | Up to 500 characters |
+| `location` | body | string | No | Up to 200 characters |
+| `start_time` | body | number | No | New start as a future Unix timestamp in seconds. The event keeps its current duration |
+| `duration_hours` | body | number | No | 1–72. Applied after `start_time` |
+| `visibility` | body | string | No | `MEMBERS` or `PUBLIC` |
+| `published` | body | boolean | No | Publish or unpublish |
 
-**Body (JSON):**
+### Example
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `title` | string | No | New title (max 100 chars) |
-| `description` | string | No | New description (max 500 chars) |
-| `location` | string | No | New location (max 200 chars) |
-| `start_time` | int | No | New start (future Unix timestamp). Keeps the current duration |
-| `duration_hours` | int | No | New duration, 1 to 72 hours |
-| `visibility` | string | No | `"MEMBERS"` or `"PUBLIC"` |
-| `published` | bool | No | Publish or unpublish (publishing requires `groups.events.publish`) |
+```http
+PATCH /v2/groups/mygroup/events/evt-2
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
 
-**Example request:**
-
-```bash
-curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/events/evt-2" \  -H "Content-Type: application/json" \
-  -d '{"title": "Big Tournament", "published": true}'
+{ "title": "Big Tournament", "published": true }
 ```
 
-**Example response (200):** the updated event, with `created_by` resolved to a username.
+**Response `200`:** the updated [event object](README.md#event), with `created_by` as a username.
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Invalid request body` | Malformed JSON |
-| 400 | `Invalid start time` | Start time in the past |
-| 403 | `You don't have permission to manage events` | Missing `groups.events.manage` |
-| 403 | `You don't have permission to publish events` | Publishing without `groups.events.publish` |
-| 404 | `Event not found` | Event ID doesn't exist in this group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | The body isn't valid JSON (`Invalid request body`) |
+| `400` | `title` is empty (`Title is required`) or a field is too long (`Title length exceeded`, `Description length exceeded`, `Location length exceeded`) |
+| `400` | `start_time` isn't in the future (`Invalid start time`) |
+| `400` | `duration_hours` is outside 1–72 (`Invalid duration (must be 1-72 hours)`) |
+| `400` | `visibility` isn't `MEMBERS` or `PUBLIC` (`Invalid visibility`) |
+| `403` | You lack `groups.events.manage` (`You don't have permission to manage events`) |
+| `403` | `published` is `true` and you lack `groups.events.publish` (`You don't have permission to publish events`) |
+| `404` | No event has that ID in this group (`Event not found`) |
 
-***
+## DELETE `/v2/groups/{tag}/events/{eventid}`
 
-## Delete an Event
+Delete an event.
 
-### DELETE `/v2/groups/{tag}/events/{eventid}`
+**Auth:** Required. Sub-tokens need `groups:manage`. You need `groups.events.manage`.
 
-**Auth:** required. Token permission: `groups:manage`. Requires the `groups.events.manage` group permission.
+### Parameters
 
-**Example request:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `eventid` | path | string | Yes | The event's `id` |
 
-```bash
-curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/events/evt-2"
+### Example
+
+```http
+DELETE /v2/groups/mygroup/events/evt-2
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -162,10 +159,9 @@ curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/g
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 403 | `You don't have permission to manage events` | Missing `groups.events.manage` |
-| 404 | `Event not found` | Event ID doesn't exist in this group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `403` | You lack `groups.events.manage` (`You don't have permission to manage events`) |
+| `404` | No event has that ID in this group (`Event not found`) |

@@ -1,16 +1,17 @@
 # GET `/cosmetics/mine`
 
-View your owned and active cosmetics. Returns full details for each cosmetic you own and your currently equipped cosmetics per type.
+List the cosmetics you own and the ones you have equipped, with full details for each.
 
-**Authentication:** Required (`Authorization` header preferred, `auth` query parameter is legacy fallback). **Permission:** `cosmetics:view`.
+**Auth:** Required. Sub-tokens need `cosmetics:view`.
 
-**Example request:**
+### Example
 
 ```http
 GET /cosmetics/mine
+Authorization: Bearer <token>
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -62,3 +63,11 @@ GET /cosmetics/mine
   ]
 }
 ```
+
+`active_cosmetics` is keyed by cosmetic type (`overlay`, `background`) and only contains types you have equipped. If you have uploaded a custom overlay or background, it appears with the ID `custom_overlay` or `custom_background` (see [Custom cosmetics](README.md#custom-cosmetics)). Owned IDs that are no longer in the catalog are left out.
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `500` | `Failed to load cosmetics` |

@@ -1,27 +1,25 @@
-# Rename a Sub-Token
+# Rename a token
 
-Change just the name of a sub-token.
+Change only the name of a sub-token.
 
-> **Authentication:** Required (main account token only)
+## POST `/tokens/:id/rename`
 
-### POST `/tokens/:id/rename`
+Sets a new name. This works on revoked tokens too.
 
-**Path Parameter:**
-* `:id`: the sub-token ID (e.g. `st_abc123`)
+**Auth:** Required. Main token only.
 
-**Query Parameters:**
-* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
+### Parameters
 
-**Request Body (JSON):**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | string | Yes | The sub-token ID, for example `st_abc123` |
+| `name` | body | string | Yes | New name, 1–50 characters |
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `name` | string | Yes | New name (1-50 characters) |
-
-**Example:**
+### Example
 
 ```http
 POST /tokens/st_abc123/rename
+Authorization: Bearer <main token>
 Content-Type: application/json
 
 {
@@ -29,7 +27,7 @@ Content-Type: application/json
 }
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -39,10 +37,11 @@ Content-Type: application/json
 }
 ```
 
-**Error Responses:**
+### Errors
 
-| Status | Condition |
-|---|---|
-| 400 | `name` is empty or longer than 50 characters |
-| 403 | Authenticated with a sub-token instead of the main account token |
-| 404 | Token not found |
+| Status | When |
+| --- | --- |
+| `400` | The body is not valid JSON |
+| `400` | `name` is empty or longer than 50 characters |
+| `403` | You authenticated with a sub-token |
+| `404` | No sub-token with this ID exists on the account |

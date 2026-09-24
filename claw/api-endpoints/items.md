@@ -1,41 +1,12 @@
 # Items
 
-The items API is a marketplace for creating, buying, selling, and transferring digital items.
+A marketplace for digital items. You can create items, list them for sale, buy other users' items, and transfer items you own.
 
-All endpoints except `get`, `list`, and `selling` require authentication. Sub-tokens need the matching `items:*` permission (`items:manage`, `items:buy`, `items:sell`).
+> **Auth:** Looking up items (`/items/get`, `/items/list`, `/items/selling`) needs no token. Every other endpoint requires one; sub-tokens need the permission listed on each endpoint.
 
-**Base URL:** `https://api.rotur.dev`
+Item names are unique, ASCII only, and case-insensitive in paths. Prices are whole numbers of credits. All item endpoints are `GET` requests.
 
-## Create Item
-
-### GET `/items/create`
-
-Creates a new marketplace item. Requires `good` account standing.
-
-**Parameters:**
-
-| Parameter | Required | Description |
-| --- | --- | --- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| item | Yes | A JSON object describing the item (see below) |
-
-The `item` JSON supports these fields:
-
-| Field | Required | Description |
-| --- | --- | --- |
-| `name` | Yes | Unique item name, ASCII characters only |
-| `description` | No | Item description |
-| `price` | No | Price in credits, cannot be negative |
-| `selling` | No | Whether the item is listed for sale right away |
-| `data` | No | Private data only visible to the owner |
-
-**Example:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/items/create?item=%7B%22name%22%3A%22Sword%22%2C%22price%22%3A10%7D"
-```
-
-**Response (201):** the created item:
+### Item object
 
 ```json
 {
@@ -47,113 +18,407 @@ curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/items/creat
   "owner": "mist",
   "created": 1715054321,
   "transfer_history": [
-    { "to": "mist", "timestamp": 1715054321, "type": "creation" }
+    { "from": null, "to": "", "timestamp": 0, "type": "" }
   ],
   "total_income": 0
 }
 ```
 
-## Get Item
+| Field | Description |
+| --- | --- |
+| `name` | Item name |
+| `description` | Item description |
+| `price` | Price in credits |
+| `selling` | `true` if the item is listed for sale |
+| `author` | Username of the creator |
+| `owner` | Username of the current owner |
+| `private_data` | Private data. `/items/get` returns it only to the owner, and `/items/list` and `/items/selling` never return it |
+| `created` | Creation time, in Unix seconds |
+| `transfer_history` | Ownership changes, each with `from`, `to`, `timestamp` (Unix seconds), `type` (`transfer` or `purchase`) and, for purchases, `price` |
+| `total_income` | Total credits earned from sales of this item |
 
-### GET `/items/get/:name`
+{% hint style="warning" %}
+The first `transfer_history` entry (the item's creation) currently comes back empty, as shown above.
+{% endhint %}
 
-Returns an item by name. No authentication needed. If you authenticate as the owner, `private_data` is included.
+## GET `/items/create`
 
-## List User Items
+Creates an item owned by you.
 
-### GET `/items/list/:username`
+**Auth:** Required. Sub-tokens need `items:manage`. Your account needs `good` standing.
 
-Returns all items owned by a user, without private data.
+### Parameters
 
-## Browse Selling Items
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `item` | query | string | Yes | JSON object describing the item, with the fields below |
 
-### GET `/items/selling`
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | string | Yes | Unique item name, ASCII only |
+| `description` | string | No | Item description |
+| `price` | number | No | Price in credits, 0 or more. Decimals are cut off |
+| `selling` | boolean | No | `true` lists the item for sale straight away |
+| `data` | any | No | Private data only the owner can see |
 
-Returns items currently listed for sale with a price above 0, newest first.
+### Example
 
-**Parameters:**
+```http
+GET /items/create?item=%7B%22name%22%3A%22Sword%22%2C%22price%22%3A10%7D
+Authorization: Bearer <token>
+```
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| limit | No | How many items to return. Default 50, max 100 |
+**Response `201`:** the new [item object](#item-object).
 
-## Buy Item
+### Errors
 
-### GET `/items/buy/:name`
+| Status | When |
+| --- | --- |
+| `400` | `Item data is required` or `Invalid item data` |
+| `400` | `Item name is required` |
+| `400` | `Item name must contain only ASCII characters` |
+| `400` | `Item with this name already exists` |
+| `400` | `Price cannot be negative` |
 
-Purchases an item listed for sale. Credits move from you to the seller, and the item is delisted. Requires `warning` standing or better.
+## GET `/items/get/:name`
 
-**Errors:** `400` if the item is not for sale or is your own, `403` for insufficient currency, `404` if not found.
+Returns an item by name. `private_data` is included only if you send the owner's token.
 
-## Transfer Item
+**Auth:** Optional.
 
-### GET `/items/transfer/:name`
+### Parameters
 
-Transfers an item you own to another user at no cost. Requires `good` account standing.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | path | string | Yes | Item name |
 
-**Parameters:**
+### Example
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| username | Yes | The recipient username. `to` also works |
+```http
+GET /items/get/sword
+```
 
-**Errors:** `400` if you target yourself, `403` if you do not own the item, `404` if the item or user is not found.
+**Response `200`:** an [item object](#item-object).
 
-## Sell Item
+### Errors
 
-### GET `/items/sell/:name`
+| Status | When |
+| --- | --- |
+| `404` | `Item not found` |
 
-Lists an item you own for sale at its current price. Set the price first with `set_price`. Requires `good` account standing.
+## GET `/items/list/:username`
 
-**Response:** `{ "message": "Item is now for sale" }`
+Lists the items a user owns, without private data. An unknown username returns an empty list.
 
-## Stop Selling
+**Auth:** None.
 
-### GET `/items/stop_selling/:name`
+### Parameters
 
-Removes your item from sale.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `username` | path | string | Yes | Owner's username |
 
-**Response:** `{ "message": "Item removed from sale" }`
+### Example
 
-## Set Price
+```http
+GET /items/list/mist
+```
 
-### GET `/items/set_price/:name`
+**Response `200`:** an array of [item objects](#item-object).
 
-Updates the price of an item you own.
+## GET `/items/selling`
 
-**Parameters:**
+Lists items for sale with a price above 0, most recently created first, without private data.
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| price | Yes | New price in credits, cannot be negative |
+**Auth:** None.
 
-## Update Item
+### Parameters
 
-### GET `/items/update/:name`
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `limit` | query | integer | No | Number of items to return, 1–100. Default 50 |
 
-Updates the description or private data of an item you own.
+### Example
 
-**Parameters:**
+```http
+GET /items/selling?limit=20
+```
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| data | Yes | A JSON object with the fields to change: `description` and/or `private_data` |
+**Response `200`:** an array of [item objects](#item-object).
 
-**Response:** the updated item.
+## GET `/items/buy/:name`
 
-## Delete Item
+Buys an item that is for sale. The price moves from your balance to the seller, you become the owner, and the item is taken off sale. Both of you get a notification.
 
-### GET `/items/delete/:name`
+**Auth:** Required. Sub-tokens need `items:buy`. Your account needs at least `warning` standing.
 
-Permanently deletes an item you own.
+### Parameters
 
-**Response:** `{ "message": "Item deleted successfully" }`
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | path | string | Yes | Item name |
 
-## Admin Add User
+### Example
 
-### GET `/items/admin_add/:id`
+```http
+GET /items/buy/sword
+Authorization: Bearer <token>
+```
 
-Reassigns an item's owner. Restricted to the platform admin; everyone else gets a `403`.
+**Response `200`:**
+
+```json
+{
+  "message": "Item 'Sword' purchased successfully"
+}
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `Item is not for sale` |
+| `400` | `You cannot buy your own item` |
+| `403` | `Insufficient currency` |
+| `404` | `Item not found` |
+
+## GET `/items/transfer/:name`
+
+Gives an item you own to another user for free. They get an `item_received` notification.
+
+**Auth:** Required. Sub-tokens need `items:manage`. Your account needs `good` standing.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | path | string | Yes | Item name |
+| `username` | query | string | Yes | Recipient's username. `to` also works |
+
+### Example
+
+```http
+GET /items/transfer/sword?username=rm
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
+
+```json
+{
+  "message": "Item 'Sword' transferred successfully to rm"
+}
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `Target username is required` |
+| `400` | `You cannot transfer an item to yourself` |
+| `403` | `You are not authorized to transfer this item` |
+| `404` | `Target user not found` or `Item not found` |
+
+## GET `/items/sell/:name`
+
+Lists an item you own for sale at its current price. Set the price with `/items/set_price` first: items priced at 0 do not appear in `/items/selling`.
+
+**Auth:** Required. Sub-tokens need `items:sell`. Your account needs `good` standing.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | path | string | Yes | Item name |
+
+### Example
+
+```http
+GET /items/sell/sword
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
+
+```json
+{
+  "message": "Item is now for sale"
+}
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `403` | `You are not authorized to sell this item` |
+| `404` | `Item not found` |
+
+## GET `/items/stop_selling/:name`
+
+Takes an item you own off sale.
+
+**Auth:** Required. Sub-tokens need `items:sell`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | path | string | Yes | Item name |
+
+### Example
+
+```http
+GET /items/stop_selling/sword
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
+
+```json
+{
+  "message": "Item removed from sale"
+}
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `403` | `You are not authorized to modify this item` |
+| `404` | `Item not found` |
+
+## GET `/items/set_price/:name`
+
+Changes the price of an item you own.
+
+**Auth:** Required. Sub-tokens need `items:manage`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | path | string | Yes | Item name |
+| `price` | query | integer | Yes | New price in credits, 0 or more |
+
+### Example
+
+```http
+GET /items/set_price/sword?price=25
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
+
+```json
+{
+  "message": "Item price updated to 25"
+}
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `Price is required` |
+| `400` | `Invalid price` (not a whole number) |
+| `400` | `Price cannot be negative` |
+| `403` | `You are not authorized to modify this item` |
+| `404` | `Item not found` |
+
+## GET `/items/update/:name`
+
+Changes the description or private data of an item you own.
+
+**Auth:** Required. Sub-tokens need `items:manage`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | path | string | Yes | Item name |
+| `data` | query | string | Yes | JSON object with the fields to change: `description` (string) and/or `private_data` (any) |
+
+### Example
+
+```http
+GET /items/update/sword?data=%7B%22description%22%3A%22Sharp%22%7D
+Authorization: Bearer <token>
+```
+
+**Response `200`:** the updated [item object](#item-object).
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `New data is required` or `Invalid data` |
+| `403` | `You are not authorized to update this item` |
+| `404` | `Item not found` |
+
+## GET `/items/delete/:name`
+
+Deletes an item you own.
+
+**Auth:** Required. Sub-tokens need `items:manage`.
+
+{% hint style="warning" %}
+Deletion is permanent and frees the name for anyone to use.
+{% endhint %}
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | path | string | Yes | Item name |
+
+### Example
+
+```http
+GET /items/delete/sword
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
+
+```json
+{
+  "message": "Item deleted successfully"
+}
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `403` | `You are not authorized to delete this item` |
+| `404` | `Item not found` |
+
+## GET `/items/admin_add/:id`
+
+Sets an item's owner. Network admins only.
+
+**Auth:** Required. Sub-tokens need `items:manage`. Network admin accounts only.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | string | Yes | Exact item name (case-sensitive) |
+| `username` | query | string | Yes | New owner's username. `name` also works |
+
+### Example
+
+```http
+GET /items/admin_add/Sword?username=rm
+Authorization: Bearer <token>
+```
+
+**Response `200`:** the updated [item object](#item-object).
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `Username is required` |
+| `403` | `Invalid authentication key` (you are not a network admin) |
+| `404` | `Item not found` |

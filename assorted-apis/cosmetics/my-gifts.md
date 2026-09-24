@@ -1,16 +1,17 @@
 # GET `/cosmetics/gifts/mine`
 
-List cosmetic gifts you have sent and received.
+List the cosmetic gifts you have sent and received.
 
-**Authentication:** Required. **Permission:** `cosmetics:view`.
+**Auth:** Required. Sub-tokens need `cosmetics:view`.
 
-**Example request:**
+### Example
 
 ```http
 GET /cosmetics/gifts/mine
+Authorization: Bearer <token>
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -21,7 +22,7 @@ GET /cosmetics/gifts/mine
       "cosmetic_name": "Maga",
       "from": "mist",
       "to": "allucat1000",
-      "note": "Enjoy!",
+      "note": "Enjoy",
       "amount": 50,
       "created_at": 1715100000000,
       "claimed_at": 1715100000000
@@ -32,12 +33,12 @@ GET /cosmetics/gifts/mine
 ```
 
 | Field | Description |
-|---|---|
-| `id` | Unique gift ID |
+| --- | --- |
+| `id` | Gift ID |
 | `cosmetic_id` | ID of the gifted cosmetic |
-| `cosmetic_name` | Display name of the cosmetic |
+| `cosmetic_name` | Display name of the cosmetic, or its ID if it is no longer in the catalog |
 | `from` / `to` | Sender and recipient usernames |
-| `note` | The sender's note, if any |
-| `amount` | The list price paid by the sender (excluding tax) |
+| `note` | The sender's note, or an empty string |
+| `amount` | The list price the sender paid, excluding tax |
 | `created_at` | When the gift was sent (Unix ms) |
-| `claimed_at` | When it was claimed (Unix ms). Omitted if unclaimed. |
+| `claimed_at` | When it was added to the recipient's inventory (Unix ms). Omitted if unclaimed |

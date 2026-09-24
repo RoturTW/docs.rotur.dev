@@ -1,40 +1,33 @@
 # Status WebSocket
 
-The status websocket is Rotur's real-time connection. It is room-based: you join rooms to see other members, receive live updates when anyone in a shared room changes their status, presence, or activities, and send messages to the room or to individual members. It replaces the legacy Rotur websocket — the `gmsg` and `pmsg` room messaging documented under [Room Messaging](#room-messaging) cover the same primitives.
+The status WebSocket is Rotur's real-time connection for presence. You join named rooms, see who else is in them, get live updates when their status, presence, or activities change, and send messages to a room or to one member. It replaces the legacy Rotur WebSocket: `gmsg` and `pmsg` cover the same room messaging.
 
-## Connecting
+You can also read and set your status over HTTP; see [HTTP endpoints](#http-endpoints).
 
-Connect to the websocket endpoint:
+## Connect
 
 ```
-wss://api.rotur.dev/status/ws
+wss://api.rotur.dev/v2/status/ws
 ```
 
-All messages are JSON objects with a `cmd` field. You must authenticate before using any other command. Errors always come back as:
+`wss://api.rotur.dev/status/ws`, `/ws`, and `/v2/ws` serve the same socket.
 
-```json
-{
-  "cmd": "error",
-  "message": "some error message"
-}
-```
+Every message in both directions is a JSON object with a `cmd` field. Each message you send can be up to 64 KB; a larger one closes the connection.
 
-## Authentication
+The server accepts up to 256 connections in total and 16 per IP address. Past either limit, the upgrade request is refused with HTTP `429` and `{"error": "too many websocket connections"}`.
 
-### `auth`
+## Authenticate
 
-Authenticate the connection with your Rotur auth key. Both main account keys and sub-tokens work.
-
-**Send:**
+Send `auth` first. Until you do, every other command returns the `not authenticated` error, and if you haven't authenticated within 15 seconds of connecting, the server closes the connection.
 
 ```json
 {
   "cmd": "auth",
-  "key": "your_rotur_auth_key"
+  "key": "your_rotur_token"
 }
 ```
 
-**Response:**
+`key` accepts a main account token or a sub-token. On success you receive `ready`:
 
 ```json
 {
@@ -45,32 +38,15 @@ Authenticate the connection with your Rotur auth key. Both main account keys and
 }
 ```
 
-**Errors:** `key required`, `invalid key`, `already authenticated`. Any other command before authenticating returns `not authenticated`.
+A sub-token needs `account:profile` to use `set_status`, `add_activity`, and `remove_activity`, and `gifts:view` to use `gift_subscribe`. Everything else works with any valid token.
 
-{% hint style="info" %}
-If you authenticate with a sub-token, it needs the `account:profile` permission to use `set_status`, `add_activity`, and `remove_activity`. Joining rooms and reading state work with any valid token.
-{% endhint %}
+Your status text and presence are saved to your account (`sys.status`). When your last connection closes they're kept, and they're restored the next time you authenticate. Activities aren't saved.
 
-Your status and presence persist across sessions. When your last connection closes they are saved to your account, and restored the next time you authenticate.
-
-## Rooms
-
-Rooms are the core organisational unit. You only see status updates from users who share a room with you. Room names must match `^[a-zA-Z0-9_\-:.]+$` and be at most 64 characters. Each connection can join up to 200 rooms.
+## Messages you send
 
 ### `join`
 
-Join one or more rooms.
-
-**Send (single room):**
-
-```json
-{
-  "cmd": "join",
-  "rooms": "originChats"
-}
-```
-
-**Send (multiple rooms):**
+Join one or more rooms. `rooms` is a room name or an array of names.
 
 ```json
 {
@@ -79,54 +55,19 @@ Join one or more rooms.
 }
 ```
 
-**Response (one per room):**
+Room names are 1–64 characters from `a-z`, `A-Z`, `0-9`, `_`, `-`, `:`, and `.`. A connection can be in up to 200 rooms. If any name in the list is invalid, already joined, or would go over the limit, you get an error and none of the rooms are joined.
+
+For each room you receive `join_ok` followed by `room_state`:
 
 ```json
-{
-  "cmd": "join_ok",
-  "room": "originChats"
-}
+{ "cmd": "join_ok", "room": "originChats" }
 ```
 
-After each `join_ok` you also receive the current state of the room:
-
-```json
-{
-  "cmd": "room_state",
-  "room": "originChats",
-  "members": [
-    {
-      "user_id": "abc123",
-      "username": "mist",
-      "status": "working on rotur",
-      "presence": "online",
-      "activities": []
-    }
-  ]
-}
-```
-
-Other members in the room receive a `member_join` event (unless your presence is `invisible`):
-
-```json
-{
-  "cmd": "member_join",
-  "room": "originChats",
-  "user_id": "def456",
-  "username": "rm",
-  "status": "",
-  "presence": "online",
-  "activities": []
-}
-```
-
-**Errors:** `rooms required`, `invalid room name: <name>`, `already in room: <name>`, `room limit reached`.
+Other members of the room receive `member_join`, unless your presence is `invisible`.
 
 ### `leave`
 
-Leave one or more rooms. Accepts the same `rooms` format as `join`.
-
-**Send:**
+Leave one or more rooms. `rooms` takes the same forms as in `join`.
 
 ```json
 {
@@ -135,42 +76,23 @@ Leave one or more rooms. Accepts the same `rooms` format as `join`.
 }
 ```
 
-**Response:**
+For each room you receive `leave_ok`:
 
 ```json
-{
-  "cmd": "leave_ok",
-  "room": "originChats"
-}
+{ "cmd": "leave_ok", "room": "originChats" }
 ```
 
-Other members receive a `member_leave` event:
-
-```json
-{
-  "cmd": "member_leave",
-  "room": "originChats",
-  "user_id": "def456"
-}
-```
-
-If you have multiple connections and another one is still in the room, other members receive a `status_update` instead of a `member_leave`.
-
-**Errors:** `rooms required`, `not in room: <name>`.
+Other members receive `member_leave`. If another of your connections is still in the room, they receive a `status_update` instead.
 
 ### `rooms`
 
 List the rooms this connection is in.
 
-**Send:**
-
 ```json
-{
-  "cmd": "rooms"
-}
+{ "cmd": "rooms" }
 ```
 
-**Response:**
+Reply:
 
 ```json
 {
@@ -181,9 +103,7 @@ List the rooms this connection is in.
 
 ### `room_state`
 
-Request the current state of a room you are in.
-
-**Send:**
+Get the current members of a room this connection is in. The reply is a `room_state` message (see [Messages you receive](#messages-you-receive)).
 
 ```json
 {
@@ -192,21 +112,9 @@ Request the current state of a room you are in.
 }
 ```
 
-**Response:** the same `room_state` message shown under `join`. Members with `invisible` presence are excluded.
-
-**Errors:** `room required`, `not in room: <room>`.
-
-## Room Messaging
-
-Rooms are also message channels. You can broadcast a value to everyone in a room, or send a private value to a single member. Messages are ephemeral — they are delivered live to whoever is connected and are never stored. The `val` can be any JSON value (string, number, object, array), and each message may be up to 64&nbsp;KB. You must be a member of the room you send to.
-
-Unlike status and presence, messaging works with any valid token — no extra permission is required. `invisible` members are still delivered messages; visibility only affects presence and member lists.
-
 ### `gmsg`
 
-Broadcast a value to every other member of a room.
-
-**Send:**
+Broadcast a value to everyone else in a room this connection is in. `val` can be any JSON value. Messages aren't stored; only connections that are in the room at that moment receive them, including members whose presence is `invisible`.
 
 ```json
 {
@@ -217,19 +125,7 @@ Broadcast a value to every other member of a room.
 }
 ```
 
-Everyone else in the room receives:
-
-```json
-{
-  "cmd": "gmsg",
-  "room": "originChats",
-  "val": "hello everyone",
-  "origin": { "user_id": "abc123", "username": "mist" },
-  "timestamp": 1715054000000
-}
-```
-
-The sender does **not** receive their own broadcast. Instead they get an acknowledgement, with `listener` echoed back if it was supplied:
+Other members receive a `gmsg`. You don't receive your own broadcast; instead you get `gmsg_ok`, with `listener` echoed back if you sent one:
 
 ```json
 {
@@ -239,13 +135,9 @@ The sender does **not** receive their own broadcast. Instead they get an acknowl
 }
 ```
 
-**Errors:** `room required`, `not in room: <room>`, `val required`.
-
 ### `pmsg`
 
-Send a private value to a single member of a room. The recipient is identified with `to` (a username or a user id).
-
-**Send:**
+Send a value privately to one member of a room this connection is in. `to` is the recipient's username or user ID; `id` is accepted in its place.
 
 ```json
 {
@@ -257,19 +149,7 @@ Send a private value to a single member of a room. The recipient is identified w
 }
 ```
 
-Only the target's connections that are in that room receive:
-
-```json
-{
-  "cmd": "pmsg",
-  "room": "originChats",
-  "val": { "type": "wave" },
-  "origin": { "user_id": "abc123", "username": "mist" },
-  "timestamp": 1715054000000
-}
-```
-
-The sender receives an acknowledgement (with `listener` echoed back if supplied):
+Only the recipient's connections that are in that room receive the `pmsg`. You get `pmsg_ok`, with `listener` echoed back if you sent one:
 
 ```json
 {
@@ -279,24 +159,9 @@ The sender receives an acknowledgement (with `listener` echoed back if supplied)
 }
 ```
 
-**Errors:** `room required`, `not in room: <room>`, `val required`, `to required`, `user not in room` (the recipient exists but is not a member of that room).
-
-## Status and Presence
-
-Your **status** is a text string (max 128 characters) shown alongside your **presence**. Presence determines your visibility in rooms:
-
-| Presence | Behaviour |
-| --- | --- |
-| `online` | Fully visible, appears in room member lists |
-| `idle` | Visible, indicates away/afk |
-| `dnd` | Visible, indicates do not disturb |
-| `invisible` | Hidden from room member lists entirely |
-
 ### `set_status`
 
-Sets your status text, your presence, or both. At least one of `status` and `presence` is required.
-
-**Send:**
+Set your status text, your presence, or both. Send at least one of them.
 
 ```json
 {
@@ -306,37 +171,25 @@ Sets your status text, your presence, or both. At least one of `status` and `pre
 }
 ```
 
-There is no direct reply on success. Users who share a room with you receive a `status_update` event:
+| Field | Description |
+| --- | --- |
+| `status` | Status text, up to 128 bytes. One status is shared by all your connections |
+| `presence` | `online`, `idle`, `dnd`, or `invisible` (case-insensitive). With several connections, the most recently set presence wins |
+
+`invisible` hides you from room member lists and stops your status updates from being sent. Users who aren't connected show as `offline` over HTTP.
+
+There's no direct reply. If nothing changed, nothing is sent. Otherwise everyone sharing a room with you, and your own connections, receive a `status_update`. When you switch to `invisible`, room members receive `member_leave` instead; when you switch back, they receive `member_join`.
+
+### `add_activity`
+
+Add an activity (rich presence, such as what you're listening to), or replace one with the same `id`. Put the activity's fields at the top level next to `cmd`.
 
 ```json
 {
-  "cmd": "status_update",
-  "user_id": "abc123",
-  "username": "mist",
-  "status": "working on rotur",
-  "presence": "idle",
-  "activities": []
-}
-```
-
-When you switch from visible to `invisible`, room members receive a `member_leave` instead. When you switch back to a visible presence, they receive a `member_join`.
-
-**Errors:** `status or presence required`, `status too long`, `invalid presence value`, `Token lacks permission: account:profile`.
-
-## Activities
-
-Activities are rich presence entries: what you are listening to, what app you are using, and so on. Each connection can have up to 5 activities, each identified by a unique `id`. Activities are removed automatically when the connection that added them closes.
-
-### Activity Structure
-
-```json
-{
+  "cmd": "add_activity",
   "id": "spotify",
   "title": "Listening to Spotify",
-  "application": {
-    "name": "Spotify",
-    "url": "https://spotify.com"
-  },
+  "application": { "name": "Spotify", "url": "https://spotify.com" },
   "image": "https://spotify.com/album-art.jpg",
   "url": "https://open.spotify.com/track/abc",
   "status": "Vibing",
@@ -351,34 +204,13 @@ Activities are rich presence entries: what you are listening to, what app you ar
 }
 ```
 
-All fields except `id` are optional.
+Only `id` is required. The server also stores Discord-style fields (`name`, `type`, `details`, `state`, `timestamps`, `assets`, `party`, `buttons`, and others) and passes any unknown fields through unchanged.
 
-### `add_activity`
-
-Adds or replaces an activity. Send the activity fields at the top level alongside the `cmd`:
-
-```json
-{
-  "cmd": "add_activity",
-  "id": "spotify",
-  "title": "Listening to Spotify",
-  "media": {
-    "title": "Bohemian Rhapsody",
-    "artist": "Queen",
-    "album": "A Night at the Opera",
-    "start": 1715054321000,
-    "end": 1715054600000
-  }
-}
-```
-
-Room members receive a `status_update` with your full activity list included. Sending an identical activity again is a no-op.
-
-**Errors:** `id required`, `invalid id`, `activity limit reached`, `Token lacks permission: account:profile`.
+Each connection can have up to 5 activities. Activities from all your connections are merged by `id`, and a connection's activities are removed when it closes. Room members, and your own connections, receive a `status_update` with your full activity list. Sending an activity identical to the current one does nothing.
 
 ### `remove_activity`
 
-**Send:**
+Remove one of your activities by `id`. Room members receive a `status_update`.
 
 ```json
 {
@@ -387,15 +219,155 @@ Room members receive a `status_update` with your full activity list included. Se
 }
 ```
 
-Room members receive a `status_update` reflecting the removal.
+### `gift_subscribe`
 
-**Errors:** `id required`, `activity not found`, `Token lacks permission: account:profile`.
+Get live updates for a [credit gift](../../claw/api-endpoints/gifts.md) by its `id`. You can subscribe to up to 20 gifts per connection.
 
-## Other Server Events
+```json
+{
+  "cmd": "gift_subscribe",
+  "gift_id": "gift-id"
+}
+```
+
+Reply:
+
+```json
+{
+  "cmd": "gift_subscribed",
+  "gift_id": "gift-id",
+  "gift": { "...": "the gift" }
+}
+```
+
+You then receive `gift_update` whenever the gift changes. The gift's creator and claimer get the full gift object; everyone else gets the public view.
+
+### `gift_unsubscribe`
+
+Stop updates for a gift.
+
+```json
+{
+  "cmd": "gift_unsubscribe",
+  "gift_id": "gift-id"
+}
+```
+
+Reply:
+
+```json
+{ "cmd": "gift_unsubscribed", "gift_id": "gift-id" }
+```
+
+### `ping`
+
+```json
+{ "cmd": "ping" }
+```
+
+Accepted and ignored. It gets no reply and doesn't keep the connection open; see [Keepalive](#keepalive).
+
+## Messages you receive
+
+Besides the replies above, the server sends these.
+
+### `room_state`
+
+Sent after each `join_ok` and in reply to `room_state`. `members` lists everyone in the room whose presence isn't `invisible`, including you. `data` holds the member's profile overlay and represented group tag.
+
+```json
+{
+  "cmd": "room_state",
+  "room": "originChats",
+  "members": [
+    {
+      "user_id": "abc123",
+      "username": "mist",
+      "status": "working on rotur",
+      "presence": "online",
+      "activities": [],
+      "data": { "overlay": null, "group": "mygroup" }
+    }
+  ]
+}
+```
+
+### `member_join`
+
+A user joined a room you're in, or became visible again.
+
+```json
+{
+  "cmd": "member_join",
+  "room": "originChats",
+  "user_id": "def456",
+  "username": "rm",
+  "status": "",
+  "presence": "online",
+  "activities": []
+}
+```
+
+### `member_leave`
+
+A user left a room you're in, closed their last connection in it, or switched to `invisible`.
+
+```json
+{
+  "cmd": "member_leave",
+  "room": "originChats",
+  "user_id": "def456"
+}
+```
+
+### `status_update`
+
+A user who shares a room with you changed their status, presence, or activities. You also receive your own. A user's update is sent to each of your connections once, however many rooms you share.
+
+```json
+{
+  "cmd": "status_update",
+  "user_id": "abc123",
+  "username": "mist",
+  "status": "working on rotur",
+  "presence": "idle",
+  "activities": []
+}
+```
+
+When the update is caused by one of the user's connections leaving a room while another stays, the message includes `room` and leaves out `activities`. When moderation clears a user's status, it includes `room` and leaves out `username`.
+
+### `gmsg`
+
+A room broadcast from another member. `timestamp` is in Unix milliseconds.
+
+```json
+{
+  "cmd": "gmsg",
+  "room": "originChats",
+  "val": "hello everyone",
+  "origin": { "user_id": "abc123", "username": "mist" },
+  "timestamp": 1715054000000
+}
+```
+
+### `pmsg`
+
+A private message from another member of the room.
+
+```json
+{
+  "cmd": "pmsg",
+  "room": "originChats",
+  "val": { "type": "wave" },
+  "origin": { "user_id": "abc123", "username": "mist" },
+  "timestamp": 1715054000000
+}
+```
 
 ### `profile_update`
 
-Sent to everyone who shares a room with a user when their profile changes. `key` is one of `pfp`, `sys.banner`, `sys.overlay`, `display_name`, or `username`.
+A user who shares a room with you changed their profile. `key` is `pfp`, `sys.banner`, `sys.overlay`, `display_name`, `username`, or `sys.group`. For `sys.group`, `value` is the tag of the group they now represent.
 
 ```json
 {
@@ -409,7 +381,7 @@ Sent to everyone who shares a room with a user when their profile changes. `key`
 
 ### `key_update`
 
-Sent to **your own** connections when a key on your account changes (for example `sys.friends`, `sys.requests`, `sys.blocked`, or `sys.transactions`):
+A key on **your own** account changed, such as `sys.friends`, `sys.requests`, `sys.blocked`, or `sys.transactions`. Sent to all your connections.
 
 ```json
 {
@@ -419,33 +391,76 @@ Sent to **your own** connections when a key on your account changes (for example
 }
 ```
 
-## Multiple Connections
+### `gift_update`
 
-A single user can hold several websocket connections at once (for example on different devices). Their state is merged:
+A gift you subscribed to changed. `event` is `ready`, `claimed`, `cancelled`, or `expired`.
 
-- **Presence**: the most recently set presence across all connections wins
-- **Status**: one status is shared per user; the last `set_status` wins
-- **Activities**: activities from all connections are merged by `id`
+```json
+{
+  "cmd": "gift_update",
+  "event": "claimed",
+  "gift_id": "gift-id",
+  "gift": { "...": "the gift" }
+}
+```
 
-When the last of a user's connections leaves a room, the user is removed from it and a `member_leave` is broadcast.
+## Keepalive
 
-## HTTP Endpoints
+The server sends a WebSocket ping frame every 30 seconds. After you authenticate, each pong frame you send back keeps the connection open for another 120 seconds; if 120 seconds pass without one, the server closes the connection. Browsers and most WebSocket libraries answer pings automatically.
 
-You can read and write status without a websocket connection.
-
-### GET `/status/get`
-
-{% hint style="info" %}
-On v2 this is `GET /v2/status/live`.
+{% hint style="warning" %}
+On this socket only pong frames count. JSON messages, including `{"cmd": "ping"}`, don't extend the timeout, so a client whose pongs are dropped (for example by a proxy that filters control frames) is disconnected even while it's sending commands.
 {% endhint %}
 
-**Query Parameters:**
+## Errors
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| `name` | Yes | The Rotur username to query |
+Errors come back as an `error` message. The connection stays open.
 
-**Response (200):**
+```json
+{
+  "cmd": "error",
+  "message": "not in room: originChats"
+}
+```
+
+| Command | Messages |
+| --- | --- |
+| Any | `invalid json`, `missing cmd`, `invalid cmd`, `unknown command`, `not authenticated` |
+| `auth` | `key required`, `invalid key`, `already authenticated` |
+| `join` | `rooms required`, `invalid room name: <name>`, `already in room: <name>`, `room limit reached` |
+| `leave` | `rooms required`, `not in room: <name>` |
+| `room_state` | `room required`, `not in room: <room>` |
+| `gmsg` | `invalid room`, `room required`, `not in room: <room>`, `val required` |
+| `pmsg` | `invalid room`, `room required`, `not in room: <room>`, `val required`, `to required`, `user not in room` (the recipient doesn't exist or isn't in that room) |
+| `set_status` | `Token lacks permission: account:profile`, `Custom status is blocked for this account` (with ` until <time>` if the block expires), `invalid status`, `status too long`, `invalid presence`, `invalid presence value`, `status or presence required` |
+| `add_activity` | `Token lacks permission: account:profile`, `Custom status is blocked for this account`, `id required`, `invalid id`, `invalid activity`, `activity limit reached` |
+| `remove_activity` | `Token lacks permission: account:profile`, `Custom status is blocked for this account`, `id required`, `activity not found` |
+| `gift_subscribe` | `Token lacks permission: gifts:view`, `gift_id required`, `gift not found`, `already subscribed to gift`, `gift subscription limit reached` |
+| `gift_unsubscribe` | `gift_id required`, `not subscribed to gift` |
+
+## HTTP endpoints
+
+Read and set status without a WebSocket connection.
+
+### GET `/v2/status/live`
+
+Get a user's current status. The legacy path is `GET /status/get`.
+
+**Auth:** None.
+
+#### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | query | string | Yes | The username to look up |
+
+#### Example
+
+```http
+GET /v2/status/live?name=mist
+```
+
+**Response `200`:** if the user isn't connected, you get their saved status text with `presence` `offline` and an empty `activities` list.
 
 ```json
 {
@@ -453,43 +468,43 @@ On v2 this is `GET /v2/status/live`.
   "status": "working on rotur",
   "presence": "online",
   "activities": [
-    {
-      "id": "spotify",
-      "title": "Listening to Spotify"
-    }
+    { "id": "spotify", "title": "Listening to Spotify" }
   ]
 }
 ```
 
-If the user is offline, their last persisted status and presence are returned with an empty `activities` list. If the user is connected but `invisible`, or has no stored status at all, you get a `404` with `{"error": "no status"}`. An unknown username returns a `404` with `{"error": "user not found"}`.
+#### Errors
 
-### POST `/status/set`
+| Status | When |
+| --- | --- |
+| `400` | `name` is missing (`name parameter missing`) |
+| `404` | No account has that username (`user not found`) |
+| `404` | The user is connected with presence `invisible` (`no status`) |
 
-Sets your status text, presence, or both. Requires authentication (`Authorization: Bearer` header preferred; `auth` query parameter remains supported as a legacy fallback).
+### PUT `/v2/status/live`
 
-{% hint style="info" %}
-On v2 this is `PUT /v2/status/live`.
-{% endhint %}
+Set your status text, presence, or both. The legacy path is `POST /status/set`. Room members on the WebSocket receive the same `status_update`, `member_join`, or `member_leave` messages as for `set_status`.
 
-**Body (JSON):**
+**Auth:** Required. Moderation must not have blocked custom status on your account.
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `status` | string | No* | Status text (max 128 chars) |
-| `presence` | string | No* | One of `online`, `idle`, `dnd`, `invisible` |
+#### Parameters
 
-*At least one of the two is required.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `status` | body | string | One of the two | Up to 128 bytes |
+| `presence` | body | string | One of the two | `online`, `idle`, `dnd`, or `invisible` (case-insensitive) |
 
-**Request:**
+#### Example
 
-```json
-{
-  "status": "working on rotur",
-  "presence": "dnd"
-}
+```http
+PUT /v2/status/live
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+
+{ "status": "working on rotur", "presence": "dnd" }
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -497,10 +512,12 @@ On v2 this is `PUT /v2/status/live`.
 }
 ```
 
-Room members on the websocket receive the same `status_update` / `member_join` / `member_leave` events as if you had used `set_status`.
+#### Errors
 
-**Errors:** `400` for `status or presence required`, `status too long`, or `invalid presence value`.
-
-## Keepalive
-
-The server sends websocket ping frames every 30 seconds, and the client must reply with pong frames. If nothing is received for 120 seconds, the connection is closed. You can also send `{"cmd": "ping"}` yourself; the server ignores it, but it keeps the connection active.
+| Status | When |
+| --- | --- |
+| `400` | The body isn't valid JSON (`Invalid request body`) |
+| `400` | Neither field is sent (`status or presence required`) |
+| `400` | `status` is over 128 bytes (`status too long`) |
+| `400` | `presence` isn't an allowed value (`invalid presence value`) |
+| `403` | Moderation has blocked custom status on your account (`Custom status is blocked for this account`) |

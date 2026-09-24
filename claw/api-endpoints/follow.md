@@ -1,23 +1,23 @@
-# /follow
+# GET `/follow`
 
-Follows another user on Claw.
+Follows another user. They get a `follow` notification.
 
-Requires authentication, the `following:follow` permission, and at least `warning` account standing. Rate limited to 20 follows per minute (60 when authenticated).
+**Auth:** Required. Sub-tokens need `following:follow`. Your account needs at least `warning` standing. Uses the follow rate limit.
 
-## Parameters
+### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| username | Yes | The user to follow. `name` also works |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `username` | query | string | Yes | User to follow. `name` also works |
 
-## Example
+### Example
 
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/follow?username=mist"
+```http
+GET /follow?username=mist
+Authorization: Bearer <token>
 ```
 
-## Response
+**Response `200`:**
 
 ```json
 {
@@ -25,12 +25,13 @@ curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/follow?user
 }
 ```
 
-## Common errors
+### Errors
 
-| Status | Error | Cause |
-| --- | --- | --- |
-| 400 | `You cannot follow yourself` | Target is your own account |
-| 400 | `You are already following NAME` | Duplicate follow |
-| 400 | `You cant follow this user` | The target has blocked you |
-| 400 | `Unblock this user before following them` | You have blocked the target |
-| 404 | `User not found` | No account with that username |
+| Status | When |
+| --- | --- |
+| `400` | `Target username is required` |
+| `400` | `You cannot follow yourself` |
+| `400` | `You are already following <username>` |
+| `400` | `You cant follow this user` (they have blocked you) |
+| `400` | `Unblock this user before following them` |
+| `404` | `User not found` |

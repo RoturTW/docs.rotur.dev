@@ -1,23 +1,25 @@
-# /pin\_post
+# GET `/pin_post`
 
 Pins one of your posts to the top of your profile.
 
-Requires authentication and the `posts:manage` permission. How many posts you can pin depends on your subscription: 1 (Free/Lite), 3 (Plus), 5 (Pro and up).
+**Auth:** Required. Sub-tokens need `posts:manage`.
 
-## Parameters
+You can pin 1 post on Free and Lite, 3 on Plus, and 5 on Pro and Max.
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| id | Yes | The ID of the post to pin |
+### Parameters
 
-## Example
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | query | string | Yes | ID of the post to pin |
 
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/pin_post?id=POST_ID"
+### Example
+
+```http
+GET /pin_post?id=abc123
+Authorization: Bearer <token>
 ```
 
-## Response
+**Response `200`:**
 
 ```json
 {
@@ -25,10 +27,11 @@ curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/pin_post?id
 }
 ```
 
-## Common errors
+### Errors
 
-| Status | Error | Cause |
-| --- | --- | --- |
-| 403 | `You can only pin your own posts` | The post belongs to someone else |
-| 403 | `Pin limit reached (N). ...` | You already have the maximum number of pins for your tier |
-| 404 | `Post not found` | No post with that ID |
+| Status | When |
+| --- | --- |
+| `400` | `Post ID is required` |
+| `403` | `You can only pin your own posts` |
+| `403` | `Pin limit reached (<n>). …` (you already have the most pins your tier allows) |
+| `404` | `Post not found` |

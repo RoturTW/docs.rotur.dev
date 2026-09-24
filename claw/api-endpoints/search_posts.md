@@ -1,28 +1,26 @@
-# /search\_posts
+# GET `/search_posts`
 
-Searches posts by their text content. Matching is case-insensitive.
+Searches the text of public posts, ignoring case, and returns matches newest first. Profile-only posts are not searched.
 
-No authentication required. Uses the search rate limit (20 per minute, 60 when authenticated).
+**Auth:** None. Uses the search rate limit.
 
-## Parameters
+### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| q | Yes | The text to search for |
-| limit | No | How many posts to return. Default 20, max 20 |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `q` | query | string | Yes | Text to search for |
+| `limit` | query | integer | No | Number of posts to return, 1–20. Default 20 |
 
-## Example
+### Example
 
-```bash
-curl "https://api.rotur.dev/search_posts?q=mist&limit=10"
+```http
+GET /search_posts?q=mist&limit=10
 ```
 
-## Response
+**Response `200`:** an array of [post objects](feed.md#post-object).
 
-Returns an array of matching post objects, newest first. Same shape as [/feed](feed.md).
+### Errors
 
-## Common errors
-
-| Status | Error | Cause |
-| --- | --- | --- |
-| 400 | `Search query is required` | Missing `q` parameter |
+| Status | When |
+| --- | --- |
+| `400` | `Search query is required` |

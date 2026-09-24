@@ -1,20 +1,23 @@
-# Products & Subscriptions
+# Products and subscriptions
 
-Groups can sell **role products**: pay credits, get a role (and its benefits). Products can be one-time purchases or recurring subscriptions billed automatically.
+Groups can sell **role products**: a member pays credits and gets a role, along with that role's benefits. A product is either a one-time purchase or a subscription that renews automatically. Sales go into the group's `credits_balance`.
 
-## List Products
+Timestamps on subscriptions (`started_at`, `next_billing`, `cancel_at`) are in Unix milliseconds.
 
-### GET `/v2/groups/{tag}/products`
+## GET `/v2/groups/{tag}/products`
 
-**Auth:** required. Token permission: `groups:view`.
+List a group's products, in no particular order.
 
-**Example request:**
+**Auth:** Required. Sub-tokens need `groups:view`.
 
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/products"
+### Example
+
+```http
+GET /v2/groups/mygroup/products
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** an array of products, or `[]` if there are none. `role_granted_id`, `role_name`, `benefit_granted`, `frequency`, and `period` are left out when empty.
 
 ```json
 [
@@ -33,69 +36,66 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygr
 ]
 ```
 
-`role_granted_id`, `role_name`, `benefit_granted`, `frequency`, and `period` are omitted when empty.
+## POST `/v2/groups/{tag}/products`
 
-**Common errors:**
+Create a product that grants a role.
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `Group not found` | Group doesn't exist |
+**Auth:** Required. Sub-tokens need `groups:manage`. You need `groups.roles.manage`.
 
-***
+### Parameters
 
-## Create a Product
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | query | string | Yes | Up to 50 characters |
+| `description` | query | string | No | Up to 200 characters |
+| `price_credits` | query | number | Yes | Price in credits. Must be positive |
+| `role_id` | query | string | Yes | The role to grant. Can't be the Owner role |
+| `subscription` | query | string | No | `true` for a subscription. Default `false` |
+| `frequency` | query | integer | No | Bill every N periods. Default `1`. Subscriptions only |
+| `period` | query | string | No | `day`, `week`, `month`, or `year`. Default `month`. Subscriptions only |
 
-### POST `/v2/groups/{tag}/products`
+### Example
 
-**Auth:** required. Token permission: `groups:manage`. Requires the `groups.roles.manage` group permission.
-
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `name` | string | Yes | Product name (max 50 chars) |
-| `description` | string | No | Product description (max 200 chars) |
-| `price_credits` | float | Yes | Price in credits (must be positive) |
-| `role_id` | string | Yes | Role granted on purchase (not the Owner role) |
-| `subscription` | string | No | `"true"` for a recurring subscription (default: `"false"`) |
-| `frequency` | int | No | Billing every N periods (default: 1, subscriptions only) |
-| `period` | string | No | `"day"`, `"week"`, `"month"`, or `"year"` (default: `"month"`, subscriptions only) |
-
-**Example request:**
-
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/products?name=VIP&price_credits=100&role_id=role-3&subscription=true&period=month"
+```http
+POST /v2/groups/mygroup/products?name=VIP&price_credits=100&role_id=role-3&subscription=true&period=month
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (201):** the created product object, as in the list response.
+**Response `201`:** the new product, in the same shape as the list response.
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Name is required` | No name provided |
-| 400 | `Invalid price` | Price missing or not positive |
-| 400 | `Invalid frequency` / `Invalid period` | Bad subscription settings |
-| 400 | `Owner role cannot be sold` | `role_id` is the Owner role |
-| 403 | `You don't have permission to manage role products` | Missing `groups.roles.manage` |
-| 404 | `Role not found` | `role_id` doesn't exist in this group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | `name` is missing (`Name is required`) or over 50 characters (`Name length exceeded`) |
+| `400` | `description` is over 200 characters (`Description length exceeded`) |
+| `400` | `price_credits` is missing, not a number, or not positive (`Invalid price`) |
+| `400` | `frequency` isn't a positive integer (`Invalid frequency`) or `period` isn't an allowed value (`Invalid period`) |
+| `400` | `role_id` is missing (`Role ID is required`) |
+| `400` | `role_id` is the Owner role (`Owner role cannot be sold`) |
+| `403` | You lack `groups.roles.manage` (`You don't have permission to manage role products`) |
+| `404` | No role has that ID in this group (`Role not found`) |
 
-***
+## DELETE `/v2/groups/{tag}/products/{productid}`
 
-## Delete a Product
+Delete a product. Members who bought it keep the role. Active subscriptions to it stop at their next billing date without charging again.
 
-### DELETE `/v2/groups/{tag}/products/{productid}`
+**Auth:** Required. Sub-tokens need `groups:manage`. You need `groups.roles.manage`.
 
-**Auth:** required. Token permission: `groups:manage`. Requires the `groups.roles.manage` group permission.
+### Parameters
 
-**Example request:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `productid` | path | string | Yes | The product's `id` |
 
-```bash
-curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/products/prod-1"
+### Example
+
+```http
+DELETE /v2/groups/mygroup/products/prod-1
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -103,31 +103,35 @@ curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/g
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 403 | `You don't have permission to manage role products` | Missing `groups.roles.manage` |
-| 404 | `Product not found` | Product ID doesn't exist |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `403` | You lack `groups.roles.manage` (`You don't have permission to manage role products`) |
+| `404` | No product has that ID in this group (`Product not found`) |
 
-***
+## POST `/v2/groups/{tag}/products/{productid}/purchase`
 
-## Purchase a Product
+Buy a product. The price is charged to you as a `group_role_purchase` transaction, you get the role, and the credits go to the group.
 
-### POST `/v2/groups/{tag}/products/{productid}/purchase`
+For a subscription, you're charged again each period as a `group_role_subscription` transaction. If you can't afford a renewal, the subscription ends and the role is removed.
 
-**Auth:** required. Token permission: `credits:manage`. You must be a member of the group.
+**Auth:** Required. Sub-tokens need `credits:manage`. You must be a member of the group.
 
-Charges the price to your account (a `group_role_purchase` transaction), grants you the role, and adds the credits to the group's balance. For subscription products, an active subscription is created and billed automatically each period. If a renewal fails (not enough credits), the subscription is deactivated and the role is removed.
+### Parameters
 
-**Example request:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `productid` | path | string | Yes | The product's `id` |
 
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/products/prod-1/purchase"
+### Example
+
+```http
+POST /v2/groups/mygroup/products/prod-1/purchase
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** `subscription` is `null` for one-time products. `group` is the full updated [group object](README.md#group), shortened here.
 
 ```json
 {
@@ -136,6 +140,7 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
     "id": "prod-1",
     "group_tag": "mygroup",
     "name": "VIP",
+    "description": "VIP role with perks",
     "price_credits": 100.0,
     "role_granted_id": "role-3",
     "role_name": "VIP",
@@ -159,37 +164,37 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-`subscription` is `null` for one-time products. The `group` field is the full updated group object (shortened here).
+### Errors
 
-**Common errors:**
+| Status | When |
+| --- | --- |
+| `400` | You already have the role (`You already have this role`) |
+| `400` | You already have an active subscription to this product (`You already have this subscription`) |
+| `400` | The product has no role (`Product does not grant a role`) |
+| `400` | You don't have enough credits (`Insufficient funds`). The body also has `required` and `available` |
+| `403` | You aren't a member (`You must be a member to purchase this role`) |
+| `404` | No product has that ID (`Product not found`), or its role was deleted (`Role no longer exists`) |
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `You already have this role` | Role already assigned |
-| 400 | `You already have this subscription` | Active subscription exists |
-| 400 | `Product does not grant a role` | Product misconfigured |
-| 400 | `Insufficient funds` | Not enough credits (response includes `required` and `available`) |
-| 403 | `You must be a member to purchase this role` | Not a member |
-| 404 | `Product not found` / `Role no longer exists` | Bad product or deleted role |
-| 404 | `Group not found` | Group doesn't exist |
+## POST `/v2/groups/{tag}/products/{productid}/cancel`
 
-***
+Cancel your subscription to a product. It ends at the next billing date instead of renewing, and you keep the role until then.
 
-## Cancel a Subscription
+**Auth:** Required. Sub-tokens need `credits:manage`.
 
-### POST `/v2/groups/{tag}/products/{productid}/cancel`
+### Parameters
 
-**Auth:** required. Token permission: `credits:manage`.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `productid` | path | string | Yes | The product's `id` |
 
-Schedules your active subscription to end at the next billing date. You keep the role until then.
+### Example
 
-**Example request:**
-
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/products/prod-1/cancel"
+```http
+POST /v2/groups/mygroup/products/prod-1/cancel
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -211,28 +216,32 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `Active subscription not found` | No active subscription for this product |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `404` | You have no active subscription to this product (`Active subscription not found`) |
 
-***
+## GET `/v2/groups/{tag}/products/{productid}/owners/{username}`
 
-## Check Product Ownership
+Check whether a user has the role a product grants, however they got it.
 
-### GET `/v2/groups/{tag}/products/{productid}/owners/{username}`
+**Auth:** None.
 
-No authentication needed. Checks whether a user owns the product's role. `{username}` accepts a username or user ID.
+### Parameters
 
-**Example request:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `productid` | path | string | Yes | The product's `id` |
+| `username` | path | string | Yes | A username or user ID. It's echoed back as `username` |
 
-```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/products/prod-1/owners/bob"
+### Example
+
+```http
+GET /v2/groups/mygroup/products/prod-1/owners/bob
 ```
 
-**Example response (200):**
+**Response `200`:** `product` is the full product object, shortened here. `subscription` is the user's active subscription to this product, or `null`.
 
 ```json
 {
@@ -244,29 +253,23 @@ curl "https://api.rotur.dev/v2/groups/mygroup/products/prod-1/owners/bob"
 }
 ```
 
-`subscription` is the user's active subscription for this product, or `null`.
+### Errors
 
-**Common errors:**
+| Status | When |
+| --- | --- |
+| `404` | No product has that ID in this group (`Product not found`) |
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `Product not found` | Product ID doesn't exist |
-| 404 | `Group not found` | Group doesn't exist |
+## GET `/v2/groups/products/subscriptions/mine`
 
-***
+List your active subscriptions across all groups.
 
-## List My Subscriptions
+**Auth:** Required. Sub-tokens need `groups:view`.
 
-### GET `/v2/groups/products/subscriptions/mine`
+### Example
 
-**Auth:** required. Token permission: `groups:view`.
-
-Returns your active subscriptions across all groups.
-
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/products/subscriptions/mine"
+```http
+GET /v2/groups/products/subscriptions/mine
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):** an array of subscription objects, as shown above. Empty array if you have none.
+**Response `200`:** an array of subscription objects, in the same shape as in the purchase response, or `[]` if you have none.

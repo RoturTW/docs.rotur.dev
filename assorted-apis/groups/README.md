@@ -1,119 +1,115 @@
 # Groups
 
-Groups let Rotur users create and manage communities. Each group has its own roles, permissions, announcements, events, products, invites, and a shared credits balance.
+Groups are Rotur communities with their own roles, announcements, events, role products, invites, and a shared credits balance. Use these endpoints to find, create, join, and run groups.
 
 > **Base URL:** `https://api.rotur.dev/v2/groups`
 >
-> **Authentication:** Send your Rotur token as an `Authorization: Bearer` header (preferred). `auth` query auth is still accepted as a legacy fallback. Endpoints below that say "Auth: required" reject requests without a valid token.
+> **Auth:** Send your Rotur token in an `Authorization: Bearer <token>` header. The legacy `auth` query parameter is still accepted. Endpoints marked "Auth: None" work without a token.
 
-{% hint style="info" %}
-Two kinds of permissions apply to groups:
+`{tag}` in every path is the group's tag. Every endpoint with `{tag}` in its path returns `404` with `{"error": "Group not found"}` when no group has that tag, and every endpoint that needs auth returns `403` when the token is missing or invalid. Those errors aren't repeated on each page.
 
-* **Token permissions** (like `groups:view` or `groups:manage`) only matter for scoped sub-tokens. A normal account token passes every token permission check automatically.
-* **Group permissions** (like `groups.roles.manage`) come from the roles you hold inside a group. These are checked for everyone.
-{% endhint %}
+## Concepts
 
-***
+### Tags
 
-## Core Concepts
+Each group has a unique tag of up to 10 letters and digits (`A-Z`, `a-z`, `0-9`). Paths use the tag, not the group ID. The owner can [change the tag](update.md).
 
-### Group Tags
+### Token permissions and group permissions
 
-Every group has a unique **tag**: a short alphanumeric identifier, up to 10 characters. Tags are used in API paths instead of group IDs.
+Two separate permission checks apply:
 
-### Join Policies
+- **Token permissions** (such as `groups:view` or `groups:manage`) only restrict [sub-tokens](../tokens/permissions.md). A main account token passes every token permission check.
+- **Group permissions** (such as `groups.roles.manage`) come from the roles you hold in the group. They apply to everyone, whatever token you use.
 
-| Policy | Description |
-|--------|-------------|
-| `OPEN` | Anyone can join a public group directly |
-| `REQUEST` | Users must send a [join request](join-requests.md) and be accepted |
-| `INVITE` | Users can only join with a pending [invite](invites.md) |
+Each endpoint's **Auth** line lists both.
+
+### Join policies
+
+| Policy | How people join |
+| --- | --- |
+| `OPEN` | [Join](join.md) directly |
+| `REQUEST` | Send a [join request](join-requests.md) that a member with invite permission accepts |
+| `INVITE` | Accept an [invite](invites.md) |
 
 ### Visibility
 
-Groups are **public** or **private**. Only public groups appear in search results and the top-groups list, and only public groups can be joined or tipped by non-members. Anyone can still fetch a group's info by tag.
+Groups are public or private. Only public groups appear in [search](search.md) and [top groups](top.md), and only public groups accept direct joins and join requests. A private group can only be joined by accepting an invite, and only its members can tip it. Anyone can [fetch a group](get.md) by tag.
 
-### Roles and Group Permissions
+### Roles and group permissions
 
-Each group starts with an **Owner** role and a **Member** role. The Owner role always grants every group permission. You can create custom roles with any mix of permissions and benefits.
+A new group has two roles: **Owner** and **Member**. The Owner role grants every group permission, whatever its stored permission list says. The Member role is given to new members. You can [create more roles](roles.md) with any mix of permissions and benefits.
 
-| Permission | Description |
-|------------|-------------|
-| `groups.manage` | Full group management |
-| `groups.members.invite` | Invite members, handle invites and join requests |
-| `groups.members.remove` | Kick members |
-| `groups.members.ban` | Ban and unban members, view bans |
-| `groups.members.view` | View the member list |
-| `groups.roles.manage` | Create, update, and delete roles and products |
-| `groups.roles.assign` | Assign and remove roles from members |
-| `groups.announcements.send` | Create and delete announcements |
-| `groups.events.manage` | Create, update, and delete events |
-| `groups.events.publish` | Publish events |
-| `groups.tips.manage` | Manage tips |
-| `groups.tips.withdraw` | Withdraw from the group tip jar, view withdrawals |
-| `groups.tips.deposit` | Deposit into the group tip jar |
-| `groups.group.edit` | Edit group settings, icon, and banner |
+| Permission | Allows |
+| --- | --- |
+| `groups.manage` | Editing group settings, icon, and banner (same as `groups.group.edit`) |
+| `groups.group.edit` | Editing group settings, icon, and banner |
+| `groups.members.view` | Listing members |
+| `groups.members.invite` | Sending, listing, and revoking invites; listing, accepting, and declining join requests |
+| `groups.members.remove` | Kicking members |
+| `groups.members.ban` | Banning, unbanning, and listing bans |
+| `groups.roles.manage` | Creating, updating, and deleting roles and role products |
+| `groups.roles.assign` | Assigning roles to members and removing them |
+| `groups.announcements.send` | Posting and deleting announcements |
+| `groups.events.manage` | Creating, updating, and deleting events |
+| `groups.events.publish` | Publishing events |
+| `groups.tips.manage` | Creating and updating fundraising campaigns |
+| `groups.tips.withdraw` | Withdrawing from the group balance and viewing withdrawals |
+| `groups.tips.deposit` | Nothing yet; no endpoint checks it |
 
-### Readme and Rules
+### Readme, rules, and entry fee
 
-Groups can have a **readme** (long-form description, max 10,000 characters) and **rules** (max 5,000 characters). The readme is typically rendered as markdown on the group page. Clients should show the rules before a user joins.
+A group can have a **readme** (up to 10,000 characters) and **rules** (up to 5,000 characters). Clients typically render the readme as Markdown and show the rules before someone joins. Length limits on this API count bytes, so non-ASCII text uses up the limit faster.
 
-### Entry Fee
-
-Groups can charge an **entry fee** in credits. When you join a group with an entry fee, the fee is deducted from your balance, added to the group's `credits_balance`, and recorded as a `group_entry_fee` transaction. If you can't afford it, the join fails.
+A group can charge an **entry fee** in credits. The fee is taken from the joining user when they join, accept an invite, or have their join request accepted. It's recorded as a `group_entry_fee` transaction and added to the group's `credits_balance`. If they can't afford it, the join fails.
 
 ### Credits
 
-* Creating a group costs **50 credits**.
-* Tips, entry fees, and product purchases all flow into the group's `credits_balance`.
-* Members with `groups.tips.withdraw` can withdraw from the balance.
-
-***
+Creating a group costs **15 credits**. Tips, entry fees, and role product sales all go into the group's `credits_balance`. Members with `groups.tips.withdraw` can [withdraw](tips.md) from it.
 
 ## Endpoints
 
-| Endpoint | Method | Auth | Description |
-|----------|--------|------|-------------|
-| [`/v2/groups/mine`](mine.md) | GET | Yes | List groups you're a member of |
-| [`/v2/groups/search`](search.md) | GET | Yes | Search public groups |
-| [`/v2/groups/top`](top.md) | GET | No | Top 10 groups by member count |
-| [`/v2/groups`](create.md) | POST | Yes | Create a group (50 credits) |
-| [`/v2/groups/{tag}`](get.md) | GET | No | Get a group's info |
-| [`/v2/groups/{tag}`](update.md) | PATCH | Yes | Update group settings |
-| [`/v2/groups/{tag}`](delete.md) | DELETE | Yes | Delete a group (owner only) |
-| [`/v2/groups/{tag}/join`](join.md) | POST | Yes | Join a public group |
-| [`/v2/groups/{tag}/leave`](leave.md) | POST | Yes | Leave a group |
-| [`/v2/groups/{tag}/represent`](represent.md) | PUT / DELETE | Yes | Represent or stop representing a group |
-| [`/v2/groups/{tag}/report`](report.md) | POST | Yes | Report a group |
-| [`/v2/groups/{tag}/icon`](icon.md) | POST / GET | Mixed | Upload or fetch the group icon |
-| [`/v2/groups/{tag}/banner`](banner.md) | POST / GET | Mixed | Upload or fetch the group banner |
-| [`/v2/groups/{tag}/announcements`](announcements.md) | GET / POST / DELETE | Mixed | Announcements |
-| [`/v2/groups/{tag}/events`](events.md) | GET / POST / PATCH / DELETE | Yes | Events |
-| [`/v2/groups/{tag}/tips`](tips.md) | GET / POST | Yes | Tips and withdrawals |
-| [`/v2/groups/{tag}/products`](products.md) | GET / POST / DELETE | Mixed | Purchasable role products and subscriptions |
-| [`/v2/groups/{tag}/roles`](roles.md) | GET / POST / PATCH / DELETE | Yes | Roles |
-| [`/v2/groups/{tag}/members`](members.md) | GET / DELETE | Yes | Member list, member info, kicking |
-| [`/v2/groups/{tag}/members/{user}/roles`](member-roles.md) | GET / PUT / DELETE | Yes | Member roles, permissions, and benefits |
-| [`/v2/groups/{tag}/bans`](bans.md) | GET / PUT / DELETE | Yes | Bans |
-| [`/v2/groups/{tag}/invites`](invites.md) | GET / POST / DELETE | Yes | Invites |
-| [`/v2/groups/{tag}/join-requests`](join-requests.md) | GET / POST | Yes | Join requests |
-| [`/v2/groups/{tag}/transfer/{userid}`](transfer.md) | POST | Yes | Transfer ownership |
+| Method | Path | Auth | Description |
+| --- | --- | --- | --- |
+| GET | [`/v2/groups/mine`](mine.md) | Required | List groups you're in |
+| GET | [`/v2/groups/search`](search.md) | None | Search public groups |
+| GET | [`/v2/groups/top`](top.md) | None | The 10 largest public groups |
+| POST | [`/v2/groups`](create.md) | Required | Create a group |
+| GET | [`/v2/groups/{tag}`](get.md) | None | Get a group |
+| PATCH | [`/v2/groups/{tag}`](update.md) | Required | Update a group |
+| DELETE | [`/v2/groups/{tag}`](delete.md) | Required | Delete a group |
+| POST | [`/v2/groups/{tag}/join`](join.md) | Required | Join a group |
+| POST | [`/v2/groups/{tag}/leave`](leave.md) | Required | Leave a group |
+| PUT, DELETE | [`/v2/groups/{tag}/represent`](represent.md) | Required | Show or hide a group on your profile |
+| POST | [`/v2/groups/{tag}/report`](report.md) | Required | Report a group |
+| POST, GET | [`/v2/groups/{tag}/icon`](icon.md) | Upload only | Upload or fetch the icon |
+| POST, GET | [`/v2/groups/{tag}/banner`](banner.md) | Upload only | Upload or fetch the banner |
+| GET, POST, DELETE | [`/v2/groups/{tag}/announcements`](announcements.md) | Except listing | Announcements |
+| GET, POST, PATCH, DELETE | [`/v2/groups/{tag}/events`](events.md) | Required | Events |
+| GET, POST | [`/v2/groups/{tag}/tips`](tips.md) | Required | Tips and withdrawals |
+| GET, POST, DELETE | [`/v2/groups/{tag}/products`](products.md) | Except ownership check | Role products and subscriptions |
+| GET, POST, PATCH, DELETE | [`/v2/groups/{tag}/roles`](roles.md) | Required | Roles |
+| GET, DELETE | [`/v2/groups/{tag}/members`](members.md) | Required | List, look up, and kick members |
+| GET, PUT, DELETE | [`/v2/groups/{tag}/members/{userid}/roles`](member-roles.md) | Required | A member's roles, permissions, and benefits |
+| GET, PUT, DELETE | [`/v2/groups/{tag}/bans`](bans.md) | Required | Bans |
+| GET, POST, DELETE | [`/v2/groups/{tag}/invites`](invites.md) | Required | Invites |
+| GET, POST | [`/v2/groups/{tag}/join-requests`](join-requests.md) | Required | Join requests |
+| POST | [`/v2/groups/{tag}/transfer/{userid}`](transfer.md) | Required | Transfer ownership |
 
-***
+The API also serves a group activity feed (`GET /v2/groups/{tag}/activity`) and fundraising campaigns (`/v2/groups/{tag}/campaigns`). They aren't documented here yet.
 
-## Data Models
+## Data models
 
 ### Group
 
-Group responses resolve `owner_user_id` to a username and include `member_count`:
+Returned by most group endpoints. `owner_user_id` holds the owner's **username**, not their ID. `created_at` is in Unix seconds.
 
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "tag": "mygroup",
   "name": "My Group",
-  "description": "A cool group",
-  "readme": "# Welcome\nThis is the group readme...",
+  "description": "A group for testing",
+  "readme": "# About\nWelcome to the group.",
   "rules": "1. Be respectful\n2. No spam",
   "icon_url": "https://api.rotur.dev/groups/mygroup/icon.jpg",
   "banner_url": "https://api.rotur.dev/groups/mygroup/banner",
@@ -148,7 +144,7 @@ Group responses resolve `owner_user_id` to a username and include `member_count`
   "id": "role-1",
   "group_tag": "mygroup",
   "name": "Moderator",
-  "description": "Can manage announcements",
+  "description": "Can post announcements",
   "assign_on_join": false,
   "self_assignable": true,
   "benefits": ["custom_color"],
@@ -162,7 +158,7 @@ Group responses resolve `owner_user_id` to a username and include `member_count`
 {
   "id": "ann-1",
   "group_tag": "mygroup",
-  "title": "Welcome!",
+  "title": "Welcome",
   "body": "Glad to have you here.",
   "author_username": "alice",
   "created_at": 1717000000,
@@ -171,6 +167,8 @@ Group responses resolve `owner_user_id` to a username and include `member_count`
 ```
 
 ### Event
+
+`start_time` and `end_time` are in Unix seconds. `created_by` is a username.
 
 ```json
 {
@@ -189,13 +187,15 @@ Group responses resolve `owner_user_id` to a username and include `member_count`
 
 ### Tip
 
+`campaign_id` only appears on tips that were contributions to a fundraising campaign.
+
 ```json
 {
   "id": "tip-1",
   "group_tag": "mygroup",
   "from_username": "bob",
   "amount_credits": 25.0,
-  "note": "keep it up!",
+  "note": "keep it up",
   "created_at": 1717000000
 }
 ```

@@ -1,27 +1,29 @@
 # GET `/cosmetics/shop`
 
-Browse the cosmetics shop. Returns a paginated, filterable list of available cosmetics.
+Browse the cosmetics catalog, with filtering, search, sorting and pagination.
 
-**Authentication:** Not required.
+**Auth:** None.
 
-**Query Parameters:**
+### Parameters
 
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `type` | string | (none) | Filter by cosmetic type (e.g. `overlay`) |
-| `featured` | string | (none) | Set to `true` to only return featured items |
-| `search` | string | (none) | Search by name or description (case-insensitive) |
-| `sort` | string | `newest` | Sort order: `newest`, `price_low`, `price_high`, `popular` |
-| `limit` | int | `50` | Results per page (max 100) |
-| `offset` | int | `0` | Pagination offset |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `type` | query | string | No | Only return this cosmetic type: `overlay` or `background` |
+| `featured` | query | string | No | `true` returns only featured items |
+| `search` | query | string | No | Case-insensitive match against name and description |
+| `sort` | query | string | No | `newest` (default), `price_low`, `price_high` or `popular` (most purchases first) |
+| `limit` | query | integer | No | Results per page. Default `50`, maximum `100` |
+| `offset` | query | integer | No | Number of results to skip. Default `0` |
 
-**Example request:**
+An invalid or non-positive `limit` falls back to `50`, and a `limit` above `100` is capped at `100`.
+
+### Example
 
 ```http
 GET /cosmetics/shop?type=overlay&sort=price_low&limit=10
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -46,3 +48,5 @@ GET /cosmetics/shop?type=overlay&sort=price_low&limit=10
   "limit": 10
 }
 ```
+
+`total` is the number of items that match your filters, before pagination. `created_at` is a Unix timestamp in milliseconds.

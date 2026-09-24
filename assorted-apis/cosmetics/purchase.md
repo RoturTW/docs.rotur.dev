@@ -1,28 +1,25 @@
 # POST `/cosmetics/purchase/:id`
 
-Purchase or acquire a cosmetic. Free cosmetics are instantly added to your inventory. Paid cosmetics deduct credits from your balance and split revenue between the creator and the platform.
+Buy a paid cosmetic or claim a free one. Free cosmetics are added to your inventory at no cost. Paid cosmetics are charged to your credit balance and the price is split between the creator and the platform.
 
-**Authentication:** Required. **Permission:** `cosmetics:buy`.
+**Auth:** Required. Sub-tokens need `cosmetics:buy`. Your account standing must be `warning` or better.
 
-**Standing:** `warning` or above required.
+If you have an active subscription you pay 20% less, and the whole discounted price goes to the creator. See [Subscriber discount](README.md#subscriber-discount).
 
-{% hint style="info" %}
-If you have any active subscription tier, the price is discounted by 20%. The discounted price goes entirely to the creator.
-{% endhint %}
+### Parameters
 
-**Path Parameter:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | string | Yes | The cosmetic ID |
 
-| Parameter | Description |
-|---|---|
-| `:id` | The cosmetic's unique ID |
-
-**Example request:**
+### Example
 
 ```http
 POST /cosmetics/purchase/maga
+Authorization: Bearer <token>
 ```
 
-**Example response (200), paid cosmetic:**
+**Response `200` (paid cosmetic):**
 
 ```json
 {
@@ -49,9 +46,14 @@ POST /cosmetics/purchase/maga
 }
 ```
 
-`price` is what you actually paid, and `discount` is how much you saved off the list price. `new_total` is your credit balance after the purchase.
+| Field | Description |
+| --- | --- |
+| `price` | What you paid, after any subscriber discount |
+| `discount` | How much the subscriber discount saved you |
+| `creator_share` / `platform_share` | How the price was split |
+| `new_total` | Your credit balance after the purchase |
 
-**Example response (200), free cosmetic:**
+**Response `200` (free cosmetic):**
 
 ```json
 {
@@ -75,15 +77,16 @@ POST /cosmetics/purchase/maga
 }
 ```
 
-For free cosmetics `new_total` is simply your current balance (nothing is deducted) and no `discount` field is included.
+For free cosmetics nothing is deducted, `new_total` is your current balance, and there are no `discount`, `creator_share` or `platform_share` fields.
 
-**Common errors:**
+### Errors
 
-| Status | Error |
-|---|---|
+| Status | When |
+| --- | --- |
 | `400` | `Invalid cosmetic id` |
 | `400` | `You already own this cosmetic` |
-| `400` | `You have reached the maximum number of owned cosmetics` |
-| `400` | `Insufficient credits` (includes `required` and `available`) |
+| `400` | `You have reached the maximum number of owned cosmetics` (200) |
+| `400` | `Insufficient credits`. The body also has `required` and `available` |
+| `403` | Your account standing is below `warning` |
 | `404` | `Cosmetic not found` |
 | `500` | `Invalid creator percentage in catalog` |

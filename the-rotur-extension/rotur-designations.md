@@ -1,40 +1,36 @@
-# Rotur Designations
+# Designations
 
-Find all users connected on a specific designation
+A designation is a short name for your app, such as `rtr` or `ori`. You set it in `connect to server with designation: [rtr] ...` (see [Connect to Rotur](connecting-to-rotur.md)), and your client joins a room with that name when it connects. Users who share a designation can see each other, and mail and synced variables are sent on it.
 
-![block\_15\_08\_2024-02\_49\_53](https://github.com/user-attachments/assets/6f394c01-b463-4b68-9cbe-b9f6e2151c07)
+The extension only tracks the members of your own designation. Blocks that take a `DESIGNATION` input return an empty result for any other designation.
 
-***
+## Who is connected
 
-Find if a user is connected with a specific designation
+| Block | Type | Returns |
+| --- | --- | --- |
+| `(connected users)` | Reporter | JSON array of usernames connected on your designation |
+| `(get all users on designation: [rtr])` | Reporter | JSON array of usernames on that designation. `[]` if it isn't your designation. |
+| `<user [user] connected on designation: [rtr]>` | Boolean | `true` if the user is connected on that designation. `false` if it isn't your designation. |
+| `<username [user] connected on any designation>` | Boolean | `true` if the user is connected on your designation |
+| `(find all connections of username: [user])` | Reporter | JSON array of the member entries for that username on your designation, including their `username` and `user_id` |
 
-![block\_15\_08\_2024-02\_58\_50](https://github.com/user-attachments/assets/09350004-cb6b-4140-af8d-7cc8650f66a5)
+{% hint style="info" %}
+Despite its name, `username [user] connected on any designation` only checks your own designation.
+{% endhint %}
 
-***
+## Joins and leaves
 
-Find if a user is connected without needing a designation
+| Block | Type | Description |
+| --- | --- | --- |
+| `when a user connects` | Hat | Fires when someone joins your designation |
+| `when a user disconnects` | Hat | Fires when someone leaves your designation |
+| `(last user to join)` | Reporter | Username of the last user who joined |
+| `(last user to leave)` | Reporter | Username of the last user who left |
 
-![block\_15\_08\_2024-03\_01\_20](https://github.com/user-attachments/assets/fff82e49-81b6-4dd9-9c51-fc542973fbff)
+## Your client
 
-***
-
-Find all connections that are logged into a specific username
-
-![block\_15\_08\_2024-02\_50\_15](https://github.com/user-attachments/assets/e8a0894f-ce47-4f63-8a08-ef31e84ad3c1)
-
-***
-
-### What is the format for a username?
-
-\[designation]-\[username]
-
-Example:
-
-if you logged into originOS with the username Mist you might end up with the connection id of:
-
-```
-ori-Mist§afRs36sew
-```
-
-This is because the rotur username system gives each client a unique string after their name, so that multiple logins of the same user can all be handled individually. Rotur will handle this for you. to send a message to someone, get all clients on that username and to get the oldest (the standard for who to message) get the first item in the array.
-
+| Block | Type | Returns |
+| --- | --- | --- |
+| `(client username)` | Reporter | Your username |
+| `(my client object)` | Reporter | JSON object with your `username`, `user_id`, `system` and `version` |
+| `(client IP)` | Reporter | Always `Unavailable in the SDK build` in the current version |

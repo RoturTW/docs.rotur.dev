@@ -2,31 +2,36 @@
 description: A list of alignments
 ---
 
-# Alignments and Anchors
+# Alignments and anchors
 
-Alignments and Anchors in RWL display where an element should be in a frame or where the element's text should start from within the element respectively.
+[Text](attributes/text.md) uses two position attributes:
+
+* `anchor` sets where in the frame the text is placed.
+* `alignment` sets which point of the text sits at that position.
+
+Both take the same names, in full or short form. Both default to `center`.
 
 {% tabs %}
-{% tab title="Full Name" %}
+{% tab title="Full name" %}
 | Position | Left        | Middle | Right        |
 | -------- | ----------- | ------ | ------------ |
 | Top      | top left    | top    | top right    |
 | Middle   | left        | center | right        |
-| Right    | bottom left | bottom | bottom right |
+| Bottom   | bottom left | bottom | bottom right |
 {% endtab %}
 
-{% tab title="Short Name" %}
+{% tab title="Short name" %}
 | Position | Left | Middle | Right |
 | -------- | ---- | ------ | ----- |
 | Top      | tl   | t      | tr    |
 | Middle   | l    | c      | r     |
-| Right    | bl   | b      | br    |
+| Bottom   | bl   | b      | br    |
 {% endtab %}
 {% endtabs %}
 
-Both the full names and short names can be used:
+Any other name is an error.
 
 ```javascript
-"Hi im in the top right" [anchor="tr"],
-"I start from the right" [anchor="right"]
+"I'm in the top right" [anchor="tr"],
+"I start from the right" [alignment="right"]
 ```

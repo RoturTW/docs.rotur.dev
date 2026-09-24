@@ -1,25 +1,31 @@
-# /notifications
+# Notifications
 
-Returns your recent notification events: follows, replies, likes, mentions, reposts, item sales, and more.
+Your in-app notification feed. Rotur adds a notification when someone follows you, replies to, likes, mentions or reposts you, buys your item and so on. Notifications that apps send you with [send notification](../../assorted-apis/notifications/send-notification.md) are added here too, with `type` `notification`.
 
-Requires authentication and the `notifications:view` permission.
+> **Auth:** Every endpoint requires a token. Sub-tokens need `notifications:view`, including for marking notifications read and deleting them.
 
-## Parameters
+The server keeps your 100 most recent notifications; older ones are dropped. New notifications are also pushed live over the status and Claw WebSockets.
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| after | No | How many days to look back. Must be a whole number of 1 or more. Default 1 |
+## GET `/notifications`
 
-## Example
+Returns your notifications from the last `after` days, newest first.
 
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/notifications?after=7"
+**Auth:** Required. Sub-tokens need `notifications:view`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `after` | query | integer | No | How many days back to look, 1 or more. Default 30 |
+
+### Example
+
+```http
+GET /notifications?after=7
+Authorization: Bearer <token>
 ```
 
-## Response
-
-Every event has `type`, `id`, and `timestamp`, plus fields specific to its type:
+**Response `200`:**
 
 ```json
 [
@@ -27,31 +33,166 @@ Every event has `type`, `id`, and `timestamp`, plus fields specific to its type:
     "type": "reply",
     "id": "e5f6a7b8",
     "timestamp": 1715054400000,
+    "created": 1715054400000,
+    "read": false,
     "post_id": "abc123",
     "reply_id": "def456",
-    "user": "user_id",
+    "user": "rm",
     "content": "Nice post"
   },
   {
     "type": "follow",
     "id": "a1b2c3d4",
     "timestamp": 1715054321000,
-    "follower": "user_id"
+    "created": 1715054321000,
+    "read": true,
+    "follower": "rm"
   },
   {
-    "type": "like",
-    "id": "c9d0e1f2",
+    "type": "notification",
+    "id": "f1e2d3c4",
     "timestamp": 1715054300000,
-    "post_id": "abc123",
-    "user": "user_id"
+    "created": 1715054300000,
+    "read": false,
+    "from": "rm",
+    "source": "originChats",
+    "title": "New message",
+    "body": "rm: hello",
+    "actor": "rm",
+    "platform": "originChats"
   }
 ]
 ```
 
-Events are sorted newest first. The server keeps at most 100 events per user.
+Every notification has `type`, `id`, `timestamp`, `created` (same as `timestamp`) and `read`, plus fields for its type. Fields that name a user, such as `user`, `follower` and `from`, hold usernames, not user IDs. Notifications sent by apps have `from`, `source`, `title` and, if set, `body`, plus `actor` (the sender), `platform` (the source) and `platform_data` (the data the app attached).
 
-## Common errors
+### Errors
 
-| Status | Error | Cause |
-| --- | --- | --- |
-| 400 | `Invalid time period` | `after` is not a whole number of 1 or more |
+| Status | When |
+| --- | --- |
+| `400` | `Invalid time period` (`after` is not a whole number of 1 or more) |
+
+## POST `/notifications/read`
+
+Marks notifications as read: the ones you list, or all of them if you send no IDs.
+
+**Auth:** Required. Sub-tokens need `notifications:view`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `ids` | body | string[] | No | IDs of the notifications to mark read. Leave it out, or send an empty array or no body, to mark all of them read |
+
+### Example
+
+```http
+POST /notifications/read
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{ "ids": ["e5f6a7b8", "f1e2d3c4"] }
+```
+
+**Response `200`:**
+
+```json
+{
+  "success": true,
+  "updated": 2
+}
+```
+
+`updated` counts only notifications that were unread before. Unknown IDs are ignored.
+
+## PUT `/notifications/:id/read`
+
+Marks one notification as read.
+
+**Auth:** Required. Sub-tokens need `notifications:view`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | string | Yes | ID of the notification |
+
+### Example
+
+```http
+PUT /notifications/e5f6a7b8/read
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
+
+```json
+{
+  "success": true
+}
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `404` | `notification not found`. This is also returned if the notification is already read |
+
+## DELETE `/notifications/:id`
+
+Deletes one notification.
+
+**Auth:** Required. Sub-tokens need `notifications:view`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | string | Yes | ID of the notification |
+
+### Example
+
+```http
+DELETE /notifications/e5f6a7b8
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
+
+```json
+{
+  "success": true
+}
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `404` | `notification not found` |
+
+## DELETE `/notifications`
+
+Deletes all of your notifications.
+
+**Auth:** Required. Sub-tokens need `notifications:view`.
+
+{% hint style="warning" %}
+This clears your whole notification feed and cannot be undone.
+{% endhint %}
+
+### Example
+
+```http
+DELETE /notifications
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
+
+```json
+{
+  "success": true,
+  "removed": 12
+}
+```

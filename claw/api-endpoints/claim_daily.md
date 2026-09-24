@@ -1,22 +1,19 @@
-# /claim\_daily
+# GET `/claim_daily`
 
 Claims your daily credit reward. You can claim once every 24 hours.
 
-Requires authentication, the `credits:daily` permission, and `good` account standing. The amount you receive depends on your subscription tier's daily credit multiplier.
+**Auth:** Required. Sub-tokens need `credits:daily`. Your account needs `good` standing.
 
-## Parameters
+You receive 1 credit on Free and Lite, 2 on Plus, and 3 on Pro and Max.
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
+### Example
 
-## Example
-
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/claim_daily"
+```http
+GET /claim_daily
+Authorization: Bearer <token>
 ```
 
-## Response
+**Response `200`:**
 
 ```json
 {
@@ -24,9 +21,12 @@ curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/claim_daily
 }
 ```
 
-## Common errors
+### Errors
 
-If you have already claimed within the last 24 hours you get a `429`:
+| Status | When |
+| --- | --- |
+| `429` | `Daily claim already made`. The body also has `wait_time` (seconds until you can claim) and `wait_hours` (the same in hours, as a string) |
+| `500` | `Could not record daily claim` |
 
 ```json
 {
@@ -35,5 +35,3 @@ If you have already claimed within the last 24 hours you get a `429`:
   "wait_hours": "12"
 }
 ```
-
-`wait_time` is in seconds.

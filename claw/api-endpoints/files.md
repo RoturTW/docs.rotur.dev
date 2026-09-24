@@ -1,87 +1,301 @@
-# /files
+# Files
 
-The files API manages user file storage via the OFSF (Origin File System Format). All endpoints require authentication. Sub-tokens need `files:view` to read, `files:manage` to write, and `files:delete` to wipe.
+Read and write your file storage, which uses the OFSF (Origin File System Format). Every file is an entry identified by a UUID, and the server also keeps an index from file paths to UUIDs.
 
-**Base URL:** `https://api.rotur.dev`
+> **Auth:** Every endpoint requires a token and works on your own files only. Sub-tokens need `files:view` to read, `files:manage` to write, and `files:delete` to delete everything.
 
 {% hint style="info" %}
-The read endpoints (`GET /files`, `/files/index`, `/files/entries`, `/files/by-path/...`, `GET /files/by-uuid`) return their JSON payload as an `application/octet-stream` body rather than with a JSON content type.
+`GET /files`, `/files/by-uuid`, `/files/index`, `/files/entries` and `/files/by-path/...` send their JSON with an `application/octet-stream` content type. Parse the body as JSON yourself.
 {% endhint %}
 
-## Update Files
+### File entries
 
-### POST `/files`
+A file entry is an array of 14 values. The ones the server reads are:
 
-Applies a batch of file operations (add, replace, delete) to the authenticated user's file system.
+| Position (1-based) | Value |
+| --- | --- |
+| 1 | Type, such as `.txt` or `.folder` |
+| 2 | Name, without the type |
+| 3 | Location, such as `origin/(c) users/mist` |
+| 4 | Data. For a folder, the UUIDs of its children |
+| 8 | Created time, in Unix milliseconds (set by the server) |
+| 9 | Edited time, in Unix milliseconds (set by the server) |
 
-**Body (JSON):**
+A file's path is its location, a `/`, then its name and type, all lowercase: `origin/(c) users/mist/document.txt`. File UUIDs are 32 hexadecimal characters.
 
-```json
+### Storage limits
+
+The total size of your files is capped by your subscription tier: 5 MB (Free), 25 MB (Lite), 100 MB (Plus), 1 GB (Pro) or 10 GB (Max).
+
+## POST `/files`
+
+Applies a batch of changes to your files. If any change is invalid or the result would go over your storage limit, nothing is saved.
+
+**Auth:** Required. Sub-tokens need `files:manage`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `updates` | body | array | Yes | The changes to apply, in order |
+
+Each change has a `command` and a `uuid`:
+
+| Command | Other fields | Effect |
+| --- | --- | --- |
+| `UUIDa` | `dta`: a full 14-value entry | Adds a file. If a file already has that UUID, the change is skipped. If a file already has the same path, it is replaced |
+| `UUIDr` | `idx`: position 1–14, `dta`: the new value | Replaces one value in an existing entry |
+| `UUIDd` | none | Deletes a file |
+
+### Example
+
+```http
+POST /files
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
   "updates": [
     {
       "command": "UUIDa",
       "uuid": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
-      "dta": ["type", "name", "location", "data", null, 0, 0, 1715054321000, 1715054321000, "", "", 1024, [], "uuid"]
+      "dta": [".txt", "document", "origin/(c) users/mist", "hello", null, 0, 0, 0, 0, "", "", 1024, [], "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"]
     },
     {
       "command": "UUIDr",
-      "uuid": "existing-file-uuid",
-      "idx": 3,
+      "uuid": "b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2",
+      "idx": 4,
       "dta": "new file data"
     },
     {
       "command": "UUIDd",
-      "uuid": "file-to-delete-uuid"
+      "uuid": "c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8"
     }
   ]
 }
 ```
 
-The maximum file system size depends on your subscription tier. If you exceed it you get a `413` with the payload `Max Upload Size Exceeded`.
-
-## Get File by UUID
-
-### GET `/files?uuid=FILE_UUID`
-
-Returns a single file's data by its UUID. Returns `400` if `uuid` is missing.
-
-## Get Files Index
-
-### GET `/files/index`
-
-Returns a lightweight index of all files. File data is stripped for files over 50KB.
-
-## Get All Files
-
-### GET `/files/entries`
-
-Returns all files with full data included.
-
-## Get Files by UUIDs
-
-### POST `/files/by-uuid`
-
-Returns multiple files at once.
-
-**Body (JSON):**
+**Response `200`:**
 
 ```json
 {
-  "username": "mist",
-  "uuids": ["a1b2c3d4e5f6", "b7c8d9e0f1a2"]
+  "payload": "Successfully Updated Origin Files",
+  "used_size": 15970000,
+  "available_size": 84030000
 }
 ```
 
-Both fields are required. **Response:** `{ "files": [...] }`
+`used_size` and `available_size` are in bytes.
 
-## File Usage
+### Errors
 
-### GET `/files/usage`
+| Status | When |
+| --- | --- |
+| `400` | The body is not valid JSON or has no `updates` |
+| `400` | `payload` is `Invalid file update` (unknown command, bad UUID, bad entry, or `idx` out of range), or the server could not load or save your files |
+| `413` | `payload` is `Max Upload Size Exceeded`. `used_size` is what the total would have been and `available_size` is negative |
 
-Returns the total storage used by the authenticated user.
+## GET `/files`
 
-**Response:**
+Returns one file entry by UUID. `GET /files/by-uuid?uuid=...` does the same.
+
+**Auth:** Required. Sub-tokens need `files:view`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `uuid` | query | string | Yes | The file's UUID |
+
+### Example
+
+```http
+GET /files?uuid=a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
+Authorization: Bearer <token>
+```
+
+**Response `200`:** the file entry.
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `UUID is required` |
+| `500` | The file could not be read, for example because the UUID does not exist |
+
+## GET `/files/index`
+
+Returns all your file entries, with the data left out of files larger than 50 KB. Use it to list files without downloading everything.
+
+**Auth:** Required. Sub-tokens need `files:view`.
+
+### Example
+
+```http
+GET /files/index
+Authorization: Bearer <token>
+```
+
+**Response `200`:** an array of file entries.
+
+## GET `/files/entries`
+
+Returns all your file entries with their full data.
+
+**Auth:** Required. Sub-tokens need `files:view`.
+
+### Example
+
+```http
+GET /files/entries
+Authorization: Bearer <token>
+```
+
+**Response `200`:** an array of file entries.
+
+## POST `/files/by-uuid`
+
+Returns several file entries at once.
+
+**Auth:** Required. Sub-tokens need `files:view`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `username` | body | string | Yes | Must be present, but files always come from your own account |
+| `uuids` | body | string[] | Yes | UUIDs of the files to return |
+
+### Example
+
+```http
+POST /files/by-uuid
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{ "username": "mist", "uuids": ["a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"] }
+```
+
+**Response `200`:**
+
+```json
+{
+  "files": [...]
+}
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `username` or `uuids` is missing |
+
+## GET `/files/by-path/*path`
+
+Returns a file entry by its path. Matching ignores case.
+
+**Auth:** Required. Sub-tokens need `files:view`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `path` | path | string | Yes | The file's path, URL-encoded |
+
+### Example
+
+```http
+GET /files/by-path/origin/(c)%20users/mist/document.txt
+Authorization: Bearer <token>
+```
+
+**Response `200`:** the file entry.
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `404` | `File not found` (the path is not in your index) |
+
+## GET `/files/path-index`
+
+Returns the map of your file paths to UUIDs.
+
+**Auth:** Required. Sub-tokens need `files:view`.
+
+### Example
+
+```http
+GET /files/path-index
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
+
+```json
+{
+  "index": {
+    "origin/(c) users/mist/document.txt": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"
+  },
+  "username": "mist"
+}
+```
+
+## POST `/files/stats`
+
+Returns the size and last-modified time of the files you list.
+
+**Auth:** Required. Sub-tokens need `files:view`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `uuids` | body | string[] | Yes | UUIDs of the files |
+
+### Example
+
+```http
+POST /files/stats
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{ "uuids": ["a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6", "not-a-file"] }
+```
+
+**Response `200`:**
+
+```json
+{
+  "stats": [
+    { "uuid": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6", "size": 412, "mtime": "2024-05-07T04:12:01Z", "ok": true },
+    { "uuid": "not-a-file", "mtime": "0001-01-01T00:00:00Z", "ok": false }
+  ]
+}
+```
+
+`size` is the stored size in bytes. `ok` is `false` for UUIDs that are invalid or do not exist.
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `uuids` is missing |
+
+## GET `/files/usage`
+
+Returns how much storage your files use.
+
+**Auth:** Required. Sub-tokens need `files:view`.
+
+### Example
+
+```http
+GET /files/usage
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
 
 ```json
 {
@@ -90,13 +304,26 @@ Returns the total storage used by the authenticated user.
 }
 ```
 
-## Delete All Files
+`size` is a readable string in bytes, KB, MB or GB.
 
-### DELETE `/files`
+## DELETE `/files`
 
-Deletes the authenticated user's entire file system.
+Deletes all of your files.
 
-**Response:**
+**Auth:** Required. Sub-tokens need `files:delete`.
+
+{% hint style="danger" %}
+This removes your entire file system and cannot be undone.
+{% endhint %}
+
+### Example
+
+```http
+DELETE /files
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
 
 ```json
 {
@@ -105,57 +332,12 @@ Deletes the authenticated user's entire file system.
 }
 ```
 
-## Get File by Path
+## Legacy endpoints
 
-### GET `/files/by-path/*path`
+These older paths still work and behave like their replacements.
 
-Retrieves a file by its originFS path (case-insensitive). Returns `404` if the path is not in the index.
-
-**Example:**
-
-```
-GET /files/by-path/origin/(c) users/mist/document.txt
-```
-
-## Path Index
-
-### GET `/files/path-index`
-
-Returns a map of all file paths to their UUIDs.
-
-**Response:**
-
-```json
-{
-  "index": {
-    "origin/(c) users/mist/document.txt": "a1b2c3d4e5f6"
-  },
-  "username": "mist"
-}
-```
-
-## File Stats
-
-### POST `/files/stats`
-
-Returns size and modification stats for a list of file UUIDs.
-
-**Body (JSON):**
-
-```json
-{
-  "uuids": ["a1b2c3d4e5f6", "b7c8d9e0f1a2"]
-}
-```
-
-**Response:** `{ "stats": [...] }`
-
-## Legacy Endpoints
-
-These endpoints are maintained for backwards compatibility:
-
-| Endpoint | Equivalent |
+| Endpoint | Same as |
 | --- | --- |
-| `GET /read-files` | `GET /files/entries` |
-| `GET /read-file?uuid=...` | `GET /files?uuid=...` |
-| `GET /read-index` | `GET /files/index` |
+| GET `/read-files` | GET `/files/entries` |
+| GET `/read-file?uuid=...` | GET `/files?uuid=...` |
+| GET `/read-index` | GET `/files/index` |

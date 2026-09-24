@@ -1,13 +1,13 @@
-# Basic Structure
+# Basic structure
 
-The structure of extensions should follow this:
+An extension is an object with two keys: `metadata`, which describes the extension, and `events`, which maps event names to handlers.
 
 ```json5
 {
     "metadata": {
         "id": "myext",
-        "name": "my Extension",
-        "description": "a funny extension :3", // optional
+        "name": "My Extension",
+        "description": "A short description", // optional
         "author": "flufi",
         "language": "osl"
     },
@@ -17,3 +17,17 @@ The structure of extensions should follow this:
     }
 }
 ```
+
+## Metadata
+
+| Key | Required | Description |
+| --- | --- | --- |
+| `id` | Yes | Unique identifier for the extension |
+| `name` | Yes | Display name |
+| `description` | No | Short description |
+| `author` | Yes | Author's name |
+| `language` | Yes | Language the handlers are written in, for example `osl` |
+
+## Events
+
+Each key in `events` is an event name and each value is the handler to run. See [Events](events/README.md) for the events a browser sends.

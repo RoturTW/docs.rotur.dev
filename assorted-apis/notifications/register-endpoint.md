@@ -1,22 +1,28 @@
-# Register an Endpoint
+# Register an endpoint
 
-### POST `/notify/register`
+## POST `/notify/register`
 
-Registers a push notification endpoint for your account. If the device (identified by the fingerprint + source combination) already exists, its endpoint and keys are updated instead of creating a duplicate.
+Register a Web Push subscription for your account under a source. If the same device (fingerprint and source) is already registered, its endpoint and keys are replaced instead of adding a duplicate.
 
-**Body (JSON):**
+**Auth:** Required. Sub-tokens need `account:settings`.
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `endpoint` | string | Yes | The push URL to deliver notifications to (`http://` or `https://`, max 2048 chars) |
-| `p256dh` | string | Yes | Base64url-encoded uncompressed P-256 public key for the push subscription (65 bytes, starting with `0x04`) |
-| `auth` | string | Yes | Base64url-encoded authentication secret for the push subscription (16 bytes) |
-| `source` | string | Yes | The application/site name (max 64 chars, e.g. `originChats`) |
-| `fingerprint` | string | Yes | A stable device fingerprint (e.g. hash of user-agent + screen + timezone) |
+### Parameters
 
-**Request:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `endpoint` | body | string | Yes | The push service URL from the subscription. Must start with `http://` or `https://`, up to 2048 characters |
+| `p256dh` | body | string | Yes | The subscription's P-256 public key, base64url without padding. Must decode to 65 bytes starting with `0x04` |
+| `auth` | body | string | Yes | The subscription's auth secret, base64url without padding. Must decode to 16 bytes |
+| `source` | body | string | Yes | Your app or site name, up to 64 characters, for example `originChats` |
+| `fingerprint` | body | string | Yes | A stable device fingerprint, for example a hash of user agent, screen and timezone |
 
-```json
+### Example
+
+```http
+POST /notify/register
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
   "endpoint": "https://push.example.com/deliver/abc123",
   "p256dh": "BASE64URL_P256DH_KEY",
@@ -26,32 +32,35 @@ Registers a push notification endpoint for your account. If the device (identifi
 }
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
   "message": "endpoint registered",
-  "device_id": "a4f8b2c1d3e5f7a9b0c2d4e6",
+  "device_id": "a4f8b2c1d3e5f7a9b0c2d4e6f8a0b2c4",
   "source": "originChats",
   "updated": false
 }
 ```
 
-The `device_id` is server-generated and deterministic. Persist it client-side so you can check registration status or delete the device later. `updated` is `true` when an existing endpoint was updated rather than newly created.
+`device_id` is a 32-character hex string derived from your username, the source and the fingerprint. Store it if you want to delete the device later. `updated` is `true` when an existing registration was replaced.
 
-**Common Errors:**
+### Errors
 
-| Status | Body | Condition |
-| --- | --- | --- |
-| 400 | `{"error": "endpoint, p256dh, auth, source, and fingerprint are required"}` | Missing fields |
-| 400 | `{"error": "endpoint must be a valid HTTP(S) URL"}` | Bad endpoint URL |
-| 400 | `{"error": "invalid p256dh key"}` | Key does not decode to a 65-byte uncompressed P-256 point |
-| 400 | `{"error": "invalid auth key"}` | Secret does not decode to 16 bytes |
-| 400 | `{"error": "maximum number of notification endpoints reached (20)"}` | You already have 20 endpoints |
+| Status | When |
+| --- | --- |
+| `400` | `endpoint, p256dh, auth, source, and fingerprint are required` |
+| `400` | `source too long (max 64 chars)` |
+| `400` | `endpoint URL too long (max 2048 chars)` |
+| `400` | `endpoint must be a valid HTTP(S) URL` |
+| `400` | `invalid p256dh key` |
+| `400` | `invalid auth key` |
+| `400` | `maximum number of notification endpoints reached (20)`: you already have 20 devices registered across all sources |
+| `500` | `failed to save notification endpoint` |
 
-## Example: Subscribe & Register from JavaScript
+## Example: subscribe and register from JavaScript
 
-This example covers the full lifecycle: permission handling, duplicate subscription detection, broken subscription recovery, and API error handling.
+This covers asking for permission, reusing an existing subscription, re-subscribing when the VAPID key changed, and handling API errors.
 
 ```js
 // --- Helpers ---
@@ -103,7 +112,7 @@ async function registerForNotifications(authToken, source) {
 
   const registration = await navigator.serviceWorker.ready;
 
-  // 2. Fetch VAPID key & build a fresh subscription
+  // 2. Fetch the VAPID key and get a subscription
   const { public_key } = await api("/notify/vapid", authToken);
   const appKey = urlBase64ToUint8Array(public_key);
 
@@ -143,7 +152,7 @@ async function registerForNotifications(authToken, source) {
 
 // Usage
 try {
-  const { device_id, updated } = await registerForNotifications("your_auth_token", "source (eg. originChats)");
+  const { device_id, updated } = await registerForNotifications("YOUR_TOKEN", "originChats");
   console.log(updated ? "Updated" : "Registered", device_id);
 } catch (e) {
   console.error("Push registration failed:", e.message);

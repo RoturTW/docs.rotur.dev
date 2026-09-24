@@ -1,5 +1,3 @@
 # onload
 
-## Info
-
-called when the extension first loads.
+Fires once, when the extension first loads. It has no parameters.

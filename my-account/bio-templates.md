@@ -1,64 +1,69 @@
 # Rotur Bio Templates
 
-Bio Templates let you show live information from your Rotur account directly in your bio. Show your credits, your local time, or even content fetched from a URL, without ever editing your bio by hand.
+Bio templates show live values in your bio, such as your credit balance or your local time. Write a template in your `bio` key and the server fills it in each time someone loads your profile.
 
-This is a paid feature. Subscribing to [Ko-fi](https://ko-fi.com/mistium/tiers) at any tier unlocks it. Write `{{ user key_name }}` anywhere in your bio and the server replaces it with the value of that key whenever someone views your profile.
+Bio templates need a paid [subscription](subscriptions.md) (Lite or higher). On the Free tier, templates are shown as plain text.
 
-Some examples:
+## Syntax
 
-* `{{ user username }}` shows your account username.
-* `{{ user sys.currency }}` shows how many credits you have.
-* `{{ user followers }}` shows your follower count.
-
-Only safe primitive values (strings, numbers, booleans) are shown. Objects and nested data are skipped. Sensitive keys are always filtered out: your token, password, email, and anything containing "token", "password" or "secret" will never render.
-
-## Setup
-
-Once you have a subscription, just edit your bio. For example, a bio like:
+A template is `{{ type argument }}`. For example, this bio:
 
 ```
-Hi, I'm {{ user username }} and I currently have {{ user sys.currency }} credits!
+Hi, I'm {{ user username }} and I have {{ user sys.currency }} credits.
 ```
 
 might render as:
 
 ```
-Hi, I'm Sophie and I currently have 1234 credits!
+Hi, I'm sophie and I have 1234 credits.
 ```
 
-## Template Types and Tiers
+| Template | Shows |
+| --- | --- |
+| `{{ user key }}` | The value of a key on your account, such as `{{ user username }}` or `{{ user sys.currency }}` |
+| `{{ time format }}` | Your current local time, such as `{{ time 15:04 }}` |
+| `{{ url address }}` | Text fetched from an external URL |
+| `{{ flex economy% }}` | Your share of all credits in the economy, as a percentage, such as `0.42%` |
 
-Templates use the `{{ ... }}` syntax. Higher tiers unlock more template types.
+Templates with an unknown type, or a `user` key that doesn't exist, render as an empty string.
 
-| Template | Minimum Tier | Description |
-|---|---|---|
-| `{{ user key }}` | Lite | Display a field from your profile (e.g. `{{ user username }}`) |
-| `{{ flex economy% }}` | Lite | Display your share of all credits in the economy, as a percentage |
-| `{{ time format }}` | Plus | Display your current local time (e.g. `{{ time 15:04 }}`) |
-| `{{ url address }}` | Pro | Fetch and render content from an external URL |
+## `user`
 
-### Notes on each type
+Shows a top-level key from your [account object](rotur-account-objects/README.md). Besides account keys, `followers` and `following` show your follower counts.
 
-* `{{ user key }}` also works with `followers`, `following` and `bio`.
-* `{{ time }}` defaults to `15:04` if you give no format. It uses the `timezone` key on your account (a UTC offset like `UTC+1`) to work out your local time.
-* `{{ url }}` fetches through a proxy with a 3 second timeout and renders at most the first 1,000 bytes of the response. You can point it at a counter service to track profile visits.
+* Only strings, numbers and booleans are shown. Arrays and objects, such as `sys.friends` or `theme`, render as an empty string.
+* You cannot read nested values. `theme.text` does not work. Keys like `sys.currency` work because they are top-level keys whose names contain a dot.
+* Sensitive keys never render: `key`, `password`, `email`, and any key whose name contains `token`, `password` or `secret`.
 
-### Key points
+## `time`
 
-* Only safe keys are processed; unknown keys are replaced with an empty string.
-* You cannot chain keys like `theme.text` to access nested data. (`sys.*` keys are top-level keys, not nested.)
-* Everything is rendered server-side. No client work is needed.
+Shows the current time in the timezone set in your account's `timezone` key (a whole-hour offset such as `UTC+1`). If `timezone` is missing or invalid, UTC is used. With no format, it uses `15:04`.
 
-## Who can see these values?
+The format can be a [Go time layout](https://pkg.go.dev/time#pkg-constants) such as `15:04` or `02/01/2006`, or a shorthand:
 
-Anyone who can view your profile sees the rendered values. Sensitive fields are filtered automatically, so only safe information is ever displayed.
+| Shorthand | Meaning | Example |
+| --- | --- | --- |
+| `h` | Hour (24-hour) | `{{ time h:m }}` → `14:05` |
+| `m` | Minute in a time, month in a date | `{{ time d/m/y }}` → `24/09/2026` |
+| `s` | Second | `{{ time h:m:s }}` → `14:05:09` |
+| `d`, `y` | Day, year | `{{ time d/m/y h:m }}` → `24/09/2026 14:05` |
+| `a` at the end | 12-hour clock with AM/PM | `{{ time h:m a }}` → `02:05 PM` |
+
+Use each letter once. `HH:MM` does not work.
+
+## `url`
+
+Fetches the address through a proxy and shows the start of the response. The request times out after 3 seconds, and at most the first 1,000 bytes are shown. If the request fails, the template renders as an empty string. You can point it at a visit counter to show how many times your profile has been viewed.
 
 ## Limits
 
-There is no hard limit on how many templates you can use. Your bio itself is limited by your tier's bio length (200 characters on Free, 500 on Plus, 1,000 on Pro), and the rendered result is cut to that length too.
+There is no limit on the number of templates. Your bio, including the templates, must fit your tier's bio length, and the rendered result is cut to the same length.
 
-## What tiers get Bio Templates?
+| Tier | Bio length |
+| --- | --- |
+| Free | 200 characters |
+| Lite | 300 characters |
+| Plus | 500 characters |
+| Pro | 1,000 characters |
 
-Any paid tier (Lite and above) includes Bio Templates. Free accounts do not have them.
-
-Subscribe [here](https://ko-fi.com/mistium/tiers) to unlock this feature.
+Templates are rendered by the server when your profile is fetched with [`GET /profile`](../claw/api-endpoints/profile.md). Anyone who can see your profile sees the rendered values. Your own `bio` key, as returned by `GET /me`, keeps the raw template text.

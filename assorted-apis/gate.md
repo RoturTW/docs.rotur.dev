@@ -1,40 +1,69 @@
 # Gate
 
-Gate is a link shortener integrated with rotur. It lets a logged-in rotur user
-create, rename and delete short links, and redirects visitors from a short slug
-to the destination URL.
+Gate is a link shortener tied to Rotur accounts. A signed-in Rotur user can create, rename and delete short links, and visitors to a short link are redirected to its destination. This page covers calling the Gate API from your own web app.
 
-The API can be used same-origin (from the gate dashboard, via a session cookie)
-or **across site boundaries** from any other web app using an `Authorization`
-header. This page focuses on the cross-site flow.
+> **Base URL:** your Gate deployment, for example `https://gate.rotur.dev`
+>
+> **Auth:** A Gate session ID in the `Authorization: Bearer <session_id>` header. You get a session by exchanging a Rotur token with `GET /api/auth`. The Gate dashboard itself uses a `session_id` cookie instead.
 
-## Base URL
+## Concepts
 
-All endpoints below are relative to the gate deployment, e.g.
-`https://gate.rotur.dev`. Replace this with your actual gate host.
+### Sessions
 
-## Authentication
-
-Gate sessions are created from a standard rotur token. A session is identified
-by a `session_id`, which you can supply in one of two ways:
+Gate sessions are created from a Rotur token and identified by a `session_id`.
 
 | Context | How the session is sent |
 | --- | --- |
-| Same-origin (dashboard) | `session_id` cookie (HttpOnly), set automatically |
-| Cross-origin (other sites) | `Authorization: Bearer <session_id>` header |
+| Same origin (the Gate dashboard) | The `session_id` cookie (HttpOnly), set automatically |
+| Other origins (your app) | `Authorization: Bearer <session_id>` |
 
-Browsers do not send gate's cookie to other origins, so cross-site callers must
-use the `Authorization` header.
+Browsers do not send Gate's cookie to other origins, so apps on other sites must use the header. The `Bearer ` prefix is optional; Gate also accepts the bare `session_id`.
 
-### Getting a session
+To get a session:
 
-1. Obtain a rotur token using the standard [rotur.dev/auth](rotur.dev-auth.md)
-   flow.
-2. Exchange the token for a gate session:
+1. Get a Rotur token through [rotur.dev/auth](rotur.dev-auth.md).
+2. Exchange it with `GET /api/auth` and store the returned `session_id`.
+3. Send the `session_id` on every authenticated request.
+
+### CORS
+
+Gate answers cross-origin requests with:
+
+```
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD
+Access-Control-Allow-Headers: Authorization, Content-Type
+```
+
+`Authorization` is listed explicitly because the `*` wildcard does not cover it under the Fetch standard. Preflight (`OPTIONS`) requests to `/api/*` return `204 No Content` with these headers. Because authentication uses a header rather than cookies, you do not need `credentials: "include"` in `fetch`.
+
+### Errors
+
+Authenticated `/api/*` endpoints return `401` when the session is missing or invalid:
+
+```json
+{ "ok": false, "error": "not authenticated" }
+```
+
+## GET `/api/auth`
+
+Exchanges a Rotur token for a Gate session.
+
+**Auth:** None. The Rotur token goes in `v`.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `v` | query | string | Yes | A valid Rotur token |
+
+### Example
 
 ```http
 GET /api/auth?v=<rotur-token>
 ```
+
+**Response `200`:**
 
 ```json
 {
@@ -44,55 +73,20 @@ GET /api/auth?v=<rotur-token>
 }
 ```
 
-Store `session_id` and send it on every authenticated request:
+## GET `/api/me`
+
+Returns the signed-in user and their link allowance.
+
+**Auth:** Required. Gate session.
+
+### Example
 
 ```http
 GET /api/me
 Authorization: Bearer <session-id>
 ```
 
-> The `Bearer ` prefix is optional — gate also accepts the raw `session_id` as
-> the `Authorization` value.
-
-### CORS
-
-Gate responds to cross-origin requests with:
-
-```
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD
-Access-Control-Allow-Headers: Authorization, Content-Type
-```
-
-`Authorization` is listed explicitly because the `*` wildcard does **not** cover
-it per the Fetch standard. Preflight (`OPTIONS`) requests to `/api/*` return
-`204 No Content` with these headers.
-
-Because authentication uses the `Authorization` header (not cookies), you do not
-need `credentials: "include"` in `fetch`.
-
-### Errors
-
-Authenticated `/api/*` endpoints return `401` with a JSON body when the session
-is missing or invalid:
-
-```json
-{ "ok": false, "error": "not authenticated" }
-```
-
-## Endpoints
-
-### `GET /api/auth`
-
-Exchange a rotur token for a gate session. See [Getting a session](#getting-a-session).
-
-| Query | Description |
-| --- | --- |
-| `v` | A valid rotur token |
-
-### `GET /api/me`
-
-Returns the authenticated user.
+**Response `200`:**
 
 ```json
 {
@@ -104,9 +98,20 @@ Returns the authenticated user.
 }
 ```
 
-### `GET /api/links`
+## GET `/api/links`
 
-Returns the authenticated user's links as an array of link objects.
+Returns your links.
+
+**Auth:** Required. Gate session.
+
+### Example
+
+```http
+GET /api/links
+Authorization: Bearer <session-id>
+```
+
+**Response `200`:**
 
 ```json
 [
@@ -121,65 +126,130 @@ Returns the authenticated user's links as an array of link objects.
 ]
 ```
 
-### `POST /api/link`
+## POST `/api/link`
 
 Creates a short link.
 
-| Query | Description |
+**Auth:** Required. Gate session.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `to` | query | string | Yes | Destination URL, `http` or `https` only, up to 2000 characters |
+
+### Example
+
+```http
+POST /api/link?to=https%3A%2F%2Fexample.com
+Authorization: Bearer <session-id>
+```
+
+**Response:** the new link, in the same shape as the items from `GET /api/links`.
+
+### Errors
+
+| Status | When |
 | --- | --- |
-| `to` | Destination URL (max 2000 chars, `http`/`https` only) |
+| `400` | The destination is invalid |
+| `400` | You have reached your link limit |
 
-Returns the created link object. Errors: `400` for an invalid destination or
-when the user's link limit is reached.
+## POST `/api/link/rename`
 
-### `POST /api/link/rename`
+Changes the slug of a link you own.
 
-Renames a link the caller owns.
+**Auth:** Required. Gate session.
 
-| Query | Description |
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | query | string | Yes | The current slug |
+| `newName` | query | string | Yes | The new slug, up to 100 characters |
+
+### Example
+
+```http
+POST /api/link/rename?id=abc123&newName=my-link
+Authorization: Bearer <session-id>
+```
+
+**Response:**
+
+```json
+{ "ok": true }
+```
+
+### Errors
+
+| Status | When |
 | --- | --- |
-| `id` | The link slug |
-| `newName` | The new slug (max 100 chars) |
+| `403` | You do not own the link |
+| `404` | The link does not exist |
 
-Returns `{ "ok": true }`. Errors: `404` if not found, `403` if not the owner.
+## DELETE `/api/link`
 
-### `DELETE /api/link`
+Deletes a link you own.
 
-Deletes a link the caller owns.
+**Auth:** Required. Gate session.
 
-| Query | Description |
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | query | string | Yes | The slug |
+
+### Example
+
+```http
+DELETE /api/link?id=abc123
+Authorization: Bearer <session-id>
+```
+
+**Response:**
+
+```json
+{ "ok": true }
+```
+
+### Errors
+
+| Status | When |
 | --- | --- |
-| `id` | The link slug |
+| `403` | You do not own the link |
+| `404` | The link does not exist |
 
-Returns `{ "ok": true }`. Errors: `404` if not found, `403` if not the owner.
+## POST `/api/logout`
 
-### `POST /api/logout`
+Ends the current session.
 
-Ends the current session. Send the session via cookie or `Authorization`.
+**Auth:** Required. Gate session, sent as the cookie or the `Authorization` header.
 
-### `GET /:id`
+## GET `/:id`
 
-Public redirect. Visiting `https://gate.rotur.dev/<slug>` issues a `302` to the
-link's destination and increments its view count. Appending `.json`
-(`/<slug>.json`) returns the link object instead of redirecting.
+Redirects a visitor to the link's destination.
+
+**Auth:** None.
+
+Visiting `https://gate.rotur.dev/<slug>` returns a `302` to the destination and adds one to the link's view count. Adding `.json` (`/<slug>.json`) returns the link object instead of redirecting.
 
 ## Example
 
 ```javascript
 const GATE = "https://gate.rotur.dev";
 
-// 1. exchange a rotur token for a gate session
-const auth = await fetch(`${GATE}/api/auth?v=${roturToken}`).then(r => r.json());
+// 1. Exchange a Rotur token for a Gate session
+const auth = await fetch(`${GATE}/api/auth?v=${roturToken}`).then((r) => r.json());
 const session = auth.session_id;
 
-// 2. call the API from any origin using the Authorization header
+// 2. Call the API from any origin with the Authorization header
 const me = await fetch(`${GATE}/api/me`, {
   headers: { Authorization: `Bearer ${session}` },
-}).then(r => r.json());
+}).then((r) => r.json());
 
-// 3. create a link
+// 3. Create a link
 const link = await fetch(`${GATE}/api/link?to=${encodeURIComponent("https://example.com")}`, {
   method: "POST",
   headers: { Authorization: `Bearer ${session}` },
-}).then(r => r.json());
+}).then((r) => r.json());
 ```

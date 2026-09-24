@@ -1,20 +1,21 @@
-# Allowed Senders
+# Allowed and blocked senders
 
-By default, nobody can send you notifications. You allow senders on a per-source basis, and each allowed entry tracks how many notifications that user has sent you.
+Nobody can push notifications to you until you allow them for a source. Each allowed sender has a count of how many pushes they have delivered to you. Blocking a sender stops their pushes for every source, even if they are allowed.
 
-## List Allowed Senders
+## GET `/notify/allowed`
 
-### GET `/notify/allowed`
+List your allowed senders, grouped by source.
 
-Returns a map of sources to their allowed senders and notification counts.
+**Auth:** Required. Sub-tokens need `notifications:view`.
 
-**Example:**
+### Example
 
-```
+```http
 GET /notify/allowed
+Authorization: Bearer <token>
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -32,39 +33,36 @@ GET /notify/allowed
 }
 ```
 
-Senders are sorted alphabetically by username.
+Senders are sorted by username. `count` only goes up when a push is actually delivered.
 
-## Allow a Sender
+## POST `/notify/allowed/:username`
 
-### POST `/notify/allowed/:username`
+Allow a user to push notifications to you for one source. On v2 use `PUT` or `POST /v2/notify/allowed/:username`.
 
-Grants a user permission to send you notifications from a specific source.
+**Auth:** Required. Sub-tokens need `account:settings`.
 
-{% hint style="info" %}
-On v2 this is `PUT /v2/notify/allowed/:username`.
-{% endhint %}
+Allowing a sender who is already allowed resets their `count` to `0`.
 
-**Path Parameters:**
+### Parameters
 
-| Parameter | Description |
-| --- | --- |
-| `username` | The Rotur username to allow |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `username` | path | string | Yes | The user to allow |
+| `source` | body | string | Yes | The source to allow them for |
 
-**Body (JSON):**
+### Example
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `source` | string | Yes | The source to grant permission for |
+```http
+POST /notify/allowed/mist
+Authorization: Bearer <token>
+Content-Type: application/json
 
-**Request:**
-
-```json
 {
   "source": "originChats"
 }
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -74,38 +72,34 @@ On v2 this is `PUT /v2/notify/allowed/:username`.
 }
 ```
 
-**Common Errors:**
+### Errors
 
-| Status | Body | Condition |
-| --- | --- | --- |
-| 400 | `{"error": "source is required"}` | Missing or invalid body |
-| 404 | `{"error": "user not found"}` | Username does not exist |
-
-## Remove a Sender
-
-### DELETE `/notify/allowed/:username`
-
-Revokes a user's permission to send you notifications from a specific source.
-
-**Path Parameters:**
-
-| Parameter | Description |
+| Status | When |
 | --- | --- |
-| `username` | The Rotur username to revoke |
+| `400` | `source is required`: the body is missing, invalid, or has no `source` |
+| `404` | `user not found` |
 
-**Query Parameters:**
+## DELETE `/notify/allowed/:username`
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| `source` | Yes | The source to revoke permission from |
+Stop allowing a user for one source.
 
-**Example:**
+**Auth:** Required. Sub-tokens need `account:settings`.
 
-```
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `username` | path | string | Yes | The user to remove |
+| `source` | query | string | Yes | The source to remove them from |
+
+### Example
+
+```http
 DELETE /notify/allowed/mist?source=originChats
+Authorization: Bearer <token>
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -115,9 +109,74 @@ DELETE /notify/allowed/mist?source=originChats
 }
 ```
 
-**Common Errors:**
+### Errors
 
-| Status | Body | Condition |
-| --- | --- | --- |
-| 400 | `{"error": "username and source are required"}` | Missing `source` query parameter |
-| 404 | `{"error": "user not found"}` | Username does not exist |
+| Status | When |
+| --- | --- |
+| `400` | `username and source are required` |
+| `404` | `user not found` |
+
+## Blocked senders
+
+A blocked sender's pushes are never delivered to you, whatever source they use and whether or not they are allowed. Their notifications still reach your [notification log](notification-log.md). To reject their notifications entirely, block them as a user instead.
+
+### GET `/notify/blocked`
+
+List the users you blocked from sending you pushes.
+
+**Auth:** Required. Sub-tokens need `notifications:view`.
+
+**Response `200`:**
+
+```json
+{
+  "blocked": ["spammer", "temp"]
+}
+```
+
+Usernames are sorted alphabetically.
+
+### PUT `/notify/blocked/:username`
+
+Block a user from sending you pushes. Blocking someone who is already blocked has no effect.
+
+**Auth:** Required. Sub-tokens need `account:settings`.
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `username` | path | string | Yes | The user to block |
+
+**Response `200`:**
+
+```json
+{
+  "success": true
+}
+```
+
+| Status | When |
+| --- | --- |
+| `400` | `you cannot block yourself` |
+| `404` | `user not found` |
+
+### DELETE `/notify/blocked/:username`
+
+Unblock a user.
+
+**Auth:** Required. Sub-tokens need `account:settings`.
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `username` | path | string | Yes | The user to unblock |
+
+**Response `200`:**
+
+```json
+{
+  "success": true
+}
+```
+
+| Status | When |
+| --- | --- |
+| `404` | `user not found` |

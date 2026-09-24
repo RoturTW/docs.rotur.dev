@@ -1,42 +1,69 @@
 # Friend Notes
 
-Friend Notes let you privately store small bits of information about other users on Rotur, similar to Discord-style notes. Your notes are **visible only to you**, never to the other user. Use them for reminders, context, or anything you want to remember about someone.
+Friend notes are private notes you keep about other Rotur users, like Discord's user notes. Only you can see them. The other user is never notified and notes never appear in public profile data.
 
-This is a paid feature. You need a **Plus** subscription or higher on [Ko-fi](https://ko-fi.com/mistium/tiers).
+Writing notes needs a **Plus** [subscription](subscriptions.md) or higher. You can still read and delete your notes after your subscription ends.
 
-Notes are stored on your account under the `sys.notes` key.
+> **Base URL:** `https://api.rotur.dev`
+> **Auth:** `Authorization: Bearer <token>`. The legacy `auth` query parameter is also accepted. Sub-tokens need `account:profile` for all note endpoints.
 
-> **Authentication:** Required. Send your token in an `Authorization` header as `Authorization: Bearer YOUR_TOKEN` (preferred). `auth` query parameter is still accepted as a legacy fallback.
+Each user can have one note from you, up to 300 characters of plain text. Writing a new note replaces the old one. Notes are stored in `sys.notes` on your account.
 
-## How to Use Friend Notes
+## POST `/me/note/{username}`
 
-### Writing Notes
+Creates or replaces your note about a user. `PUT /v2/me/notes/{username}` does the same.
 
-To set or update your note for a user:
+**Auth:** Required. Plus tier or higher.
 
-```
-POST https://api.rotur.dev/me/note/{username}?note={encoded_note}
-```
+### Parameters
 
-You can also send the note as JSON: `{"note": "your note"}`.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `username` | path | string | Yes | The user the note is about |
+| `note` | body | string | Yes | Note text, up to 300 characters. You can send it as the `note` query parameter instead of a JSON body. |
 
-### Deleting Notes
+### Example
 
-To delete your note for a user:
+```http
+POST /me/note/goober123
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
 
-```
-DELETE https://api.rotur.dev/me/note/{username}
-```
-
-### Reading Notes
-
-To read all your notes:
-
-```
-GET https://api.rotur.dev/me/notes
+{ "note": "Met in Origin chat\nLikes purple themes" }
 ```
 
-The response is a dictionary keyed by username:
+**Response `200`:**
+
+```json
+{ "success": true }
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `note` is missing or longer than 300 characters |
+| `403` | Your tier is below Plus, or the token is missing, invalid, or lacks `account:profile` |
+
+## DELETE `/me/note/{username}`
+
+Deletes your note about a user. `DELETE /v2/me/notes/{username}` does the same.
+
+**Auth:** Required.
+
+**Response `200`:**
+
+```json
+{ "success": true }
+```
+
+## GET `/me/notes`
+
+Returns all your notes, keyed by username. Users you have no note for are left out. `GET /v2/me/notes` does the same.
+
+**Auth:** Required.
+
+**Response `200`:**
 
 ```json
 {
@@ -46,25 +73,3 @@ The response is a dictionary keyed by username:
   }
 }
 ```
-
-If you have no note for a user, they simply won't appear in the response.
-
-## Privacy
-
-Friend Notes are 100% private:
-
-* Only you can view your notes.
-* Other users are never notified that you added, edited, or deleted a note about them.
-* Notes never appear in public profile data.
-
-## Limits
-
-* Maximum note length: 300 characters.
-* Notes are plain text. No formatting or markup is interpreted.
-* Each user gets one note. Writing again replaces the previous text.
-
-## Who Can Use Friend Notes
-
-Plus tier and above include Friend Notes. Free and Lite accounts do not have them.
-
-Subscribe here to unlock this feature: **[https://ko-fi.com/mistium/tiers](https://ko-fi.com/mistium/tiers)**

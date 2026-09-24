@@ -1,20 +1,20 @@
 # Attributes
 
-Attributes in RWL describe specific properties of an element (or block).
-
-Normally inside of \[] after the name / type of an element:
+Attributes set properties of an element or block. They go inside square brackets after the element's value or the block's name:
 
 ```js
 frame [Horizontal] {
-  
+
 }
 ```
 
+Separate several attributes with commas.
+
 ## Types
 
-### Key-Value Pair
+### Key-value pair
 
-Used to assign a key to a value.
+Assigns a value to a key. Spaces around `=` are optional.
 
 ```js
 key = value
@@ -23,9 +23,17 @@ key=value
 
 ### Flag
 
-Used to set a boolean attribute to true, or to describe a specific behaviour:
+A single word that turns on a behavior. Flags contain only letters, digits, and underscores.
 
 ```js
 Horizontal
 Vertical
 ```
+
+## Attribute lists
+
+| Page | Applies to |
+| --- | --- |
+| [Text](text.md) | Text and other non-block elements, such as numbers |
+| [Frame](frame.md) | `frame` blocks |
+| [Section](section.md) | `section` blocks |

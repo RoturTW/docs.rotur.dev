@@ -1,66 +1,71 @@
-# /emojis
+# Emojis
 
-`/emojis` is the Plus+ emoji system for Rotur accounts. It lets users upload custom emoji images, keep them under their account, and add other users' emojis to their collection.
+Custom emojis for Plus and Pro subscribers. You can upload emoji images, keep them on your account and add other users' emojis to your collection.
 
-All endpoint path identifiers use numeric emoji IDs. Emoji binary files are still stored by SHA-256 hash on disk.
-Authentication should be sent using the `Authorization` header whenever it is required.
+> **Base URL:** `https://api.rotur.dev`
+>
+> **Auth:** Send your token in the `Authorization: Bearer <token>` header (the legacy `auth` query parameter is also accepted). Any sub-token works; these endpoints need no specific permission. `GET /emojis/:emojiId` is public.
 
-## Storage model
+Every endpoint is also available under `/v2/emojis` with the same paths.
 
-* Uploaded and added emojis are tracked per user in `emojis.json` under that user's userdata folder.
-* Binary emoji files are stored at `./rotur/emojis/<sha256-hash>`.
-* Each saved emoji has a numeric `id` field in `emojis.json` (derived from the hash).
+## Concepts
 
-Hash is lowercased by the service and must be 64 hex characters.
+### IDs
 
-## Limits
+Emojis are identified by a numeric ID. The image file is stored under the SHA-256 hash of its contents, and the ID is derived from that hash, so the same image always gets the same ID. Your uploaded and added emojis are listed separately on your account.
 
-The `/emojis` collection limit applies to **saved emojis total** (uploaded + added), deduplicated by hash.
+### Limits
 
-* Plus: 50 saved emojis
-* Pro: 500 saved emojis
-* Free/Lite: no access
+The limit counts every emoji you have saved, uploaded and added together, with duplicates of the same image counted once.
 
-If you have no Plus+ subscription, all write endpoints return `403` with:
+| Tier | Saved emojis |
+| --- | --- |
+| Pro | 500 |
+| Plus | 50 |
+| Free and Lite | No access |
 
-```json
-{ "error": "You have no subscription" }
-```
+Without a Plus or higher subscription, every write endpoint returns `403` with `{ "error": "You have no subscription" }`, and `GET /emojis` returns `404`. An emoji whose uploader is no longer Plus or higher returns `404` from `GET /emojis/:emojiId` and cannot be added.
 
-`GET /emojis` returns `404` if your account is not Plus+.
-`GET /emojis/:emojiId` returns `404` if the emoji owner is not Plus+.
+## GET `/emojis/:emojiId`
 
-## Endpoints
+Returns the emoji image. Also accepts `HEAD`. Responses are cached for a day (`Cache-Control: public, max-age=86400`).
 
-### GET `/emojis/:emojiId`
-
-Returns the raw emoji image for an uploaded emoji. This is unauthenticated.
+**Auth:** None.
 
 ### Parameters
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| emojiId | Yes | Numeric emoji id |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `emojiId` | path | integer | Yes | The emoji ID |
 
 ### Example
 
-```bash
-curl "https://api.rotur.dev/emojis/12345"
+```http
+GET /emojis/12345
 ```
 
-### GET `/emojis`
+**Response `200`:** the image bytes, with a `Content-Type` of `image/png`, `image/gif` or `image/jpeg`.
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `404` | The ID is not a positive integer, no emoji has it, or its uploader is not Plus or higher. The body is empty. |
+
+## GET `/emojis`
 
 Lists your saved emojis.
 
-**Auth required.** Returns `404` if your tier is below Plus.
+**Auth:** Required.
 
 ### Example
 
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis"
+```http
+GET /emojis
+Authorization: Bearer <token>
 ```
 
-### Response
+**Response `200`:**
 
 ```json
 {
@@ -73,104 +78,227 @@ curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis"
 }
 ```
 
-### POST `/emojis`
+`owner` is the uploader's user ID.
 
-Uploads a new emoji and adds it to your uploaded list.
+### Errors
+
+| Status | When |
+| --- | --- |
+| `404` | Your account is not Plus or higher. The body is empty. |
+
+## POST `/emojis`
+
+Uploads an emoji and adds it to your uploaded list. Uploading an image you already have updates its name. If the image was in your added list, it moves to your uploaded list.
+
+**Auth:** Required.
 
 ### Parameters
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| Authorization | Yes | `Bearer YOUR_AUTH_KEY` in request header |
-| image | Yes | A data URI containing PNG/GIF/JPEG binary |
-| name | Yes | Display name (max 80 chars) |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `name` | body | string | Yes | Display name, up to 80 characters |
+| `image` | body | string | Yes | A Base64 data URI of a PNG, GIF or JPEG image, up to 5 MB and 50 million pixels |
 
 ### Example
 
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis" \
-  -H "Content-Type: application/json" \
-  -d '{ "name":"sparkles", "image":"data:image/png;base64,..." }'
+```http
+POST /emojis
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "sparkles",
+  "image": "data:image/png;base64,..."
+}
 ```
 
-### Response
+**Response `200`:**
 
 ```json
 {
   "status": "uploaded",
-  "hash": "a3b9...9c1f",
   "id": 12345,
+  "hash": "a3b9...9c1f",
   "name": "sparkles",
   "content_type": "image/png",
   "url": "https://api.rotur.dev/emojis/12345"
 }
 ```
 
-### POST `/emojis/:emojiId/add`
+### Errors
 
-Adds another user's emoji to your own account. This may optionally rename it.
+| Status | When |
+| --- | --- |
+| `400` | The body is not valid JSON |
+| `400` | `name` is missing or longer than 80 characters |
+| `400` | `image` is not a valid Base64 data URI, is empty, is not PNG, GIF or JPEG, or is too large |
+| `400` | You have reached your tier's emoji limit |
+| `403` | You have no Plus or higher subscription |
 
-### Parameters
+## POST `/emojis/:emojiId/add`
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| Authorization | Yes | `Bearer YOUR_AUTH_KEY` in request header |
-| emojiId | Yes | Numeric id of the source emoji |
-| name | No | Optional replacement name (max 80 chars) |
+Adds another user's uploaded emoji to your added list, optionally under a different name.
 
-### Example
-
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis/12345/add" \
-  -H "Content-Type: application/json" \
-  -d '{ "name":"favorite mist emoji" }'
-```
-
-### POST `/emojis/:emojiId/unsave`
-
-Removes an emoji from your **added** list.
-
-Uploaded emojis cannot be unsaved.
-
-### Example
-
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis/12345/unsave"
-```
-
-### DELETE `/emojis/:emojiId`
-
-Deletes an uploaded emoji from your own uploaded list.
-
-It also removes that hash from every user's saved list and deletes the backing file.
-
-Only the uploader can delete.
-
-### Example
-
-```bash
-curl -X DELETE -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/emojis/12345"
-```
-
-### DELETE `/admin/emojis/:id`
-
-Network admins can remove an emoji globally by numeric id.
+**Auth:** Required.
 
 ### Parameters
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| Authorization | Yes | `Bearer YOUR_AUTH_KEY` in request header |
-| id | Yes | Numeric emoji id |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `emojiId` | path | integer | Yes | The emoji ID |
+| `name` | body | string | No | A name to save it under, up to 80 characters. Defaults to the uploader's name. |
 
-### Response
+### Example
+
+```http
+POST /emojis/12345/add
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "favorite mist emoji"
+}
+```
+
+**Response `200`:**
+
+```json
+{
+  "status": "added",
+  "id": 12345,
+  "hash": "a3b9...9c1f",
+  "name": "favorite mist emoji",
+  "url": "https://api.rotur.dev/emojis/12345"
+}
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `emojiId` is not a positive integer |
+| `400` | `name` is longer than 80 characters |
+| `400` | You have reached your tier's emoji limit |
+| `403` | You have no Plus or higher subscription |
+| `404` | No emoji has this ID, or its uploader is not Plus or higher |
+
+## POST `/emojis/:emojiId/unsave`
+
+Removes an emoji from your added list. You cannot unsave an emoji you uploaded; delete it instead.
+
+**Auth:** Required.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `emojiId` | path | integer | Yes | The emoji ID |
+
+### Example
+
+```http
+POST /emojis/12345/unsave
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
+
+```json
+{
+  "status": "unsaved",
+  "id": 12345
+}
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `emojiId` is not a positive integer |
+| `400` | The emoji is one you uploaded |
+| `403` | You have no Plus or higher subscription |
+| `404` | The emoji is not in your added list |
+
+## DELETE `/emojis/:emojiId`
+
+Deletes an emoji you uploaded.
+
+**Auth:** Required. Only the uploader can delete an emoji.
+
+{% hint style="warning" %}
+Deleting an emoji also removes it from every user who added it, and deletes the image file. It cannot be undone.
+{% endhint %}
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `emojiId` | path | integer | Yes | The emoji ID |
+
+### Example
+
+```http
+DELETE /emojis/12345
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
 
 ```json
 {
   "status": "deleted",
+  "id": 12345,
+  "hash": "a3b9...9c1f",
+  "users_updated": 1
+}
+```
+
+`users_updated` is the number of accounts that had uploaded this image. The same image can be uploaded by more than one user, and deleting it removes it from all of them.
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `emojiId` is not a positive integer |
+| `403` | You have no Plus or higher subscription |
+| `403` | Someone else uploaded the emoji |
+| `404` | No emoji has this ID |
+
+## DELETE `/admin/emojis/:id`
+
+Removes an emoji from every account and deletes its image. Also available at `DELETE /v2/admin/emojis/:id`.
+
+**Auth:** Required. Network admins only.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | integer | Yes | The emoji ID |
+
+### Example
+
+```http
+DELETE /admin/emojis/12345
+Authorization: Bearer <token>
+```
+
+**Response `200`:**
+
+```json
+{
+  "status": "deleted",
+  "id": 12345,
   "hash": "a3b9...9c1f",
   "users_updated": 5
 }
 ```
 
-This endpoint is also available under `/v2/admin/emojis/:id` with the same behavior.
+`users_updated` is the number of accounts that had uploaded this image.
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | `id` is not a positive integer |
+| `404` | No emoji has this ID |

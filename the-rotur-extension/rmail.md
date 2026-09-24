@@ -1,82 +1,62 @@
 # Rmail
 
-Rmail allows for any project to have access to a working emails system!
+The rMail blocks send short messages with a subject between logged-in users, and keep the ones you receive in a mailbox in your project.
 
-You could make your own email client, integrate emails into your own os, or just mess around :P
+{% hint style="warning" %}
+In the current extension, mail is delivered over the socket on your designation and kept only in memory. The recipient has to be connected on the same designation when you send it, and their mailbox is empty again after the project reloads. It doesn't read or write the server-side mailbox from the [Rmail API](../assorted-apis/rmail.md).
+{% endhint %}
 
-## When recieved
-
-![block\_15\_08\_2024-02\_14\_09](https://github.com/user-attachments/assets/d4a4d88c-1051-49ed-a89b-f987d2165828)
-
-This Hat will fire whenever your account receives a new email, allowing you to refresh your email client when needed
-
-## Send Mail
-
-![block\_15\_08\_2024-02\_15\_20](https://github.com/user-attachments/assets/9ac3a333-1f6a-49ac-a411-feab96e1331c)
-
-This block allows you to send an Rmail to any user on rotur
-
-### Success
-
-"Mail sent to \[username]"
-
-### Failure
+## Send mail
 
 ```
-Attempted to send more than 100 characters in the title of the Rmail
-"Cannot Send Mail With Title Longer Than 100 Characters"
-
-Attempted to send more than 50,000 characters in the body of the Rmail
-"Cannot Send Mail Thats More Than 50kb"
+(send mail with subject: [Subject] and message: [Message] to: [user])
 ```
 
-## Get Mail
+Reporter. Sends mail to the user named in `TO`.
 
-![block\_15\_08\_2024-02\_19\_13](https://github.com/user-attachments/assets/58fe1ccc-b4e1-49b2-9f18-cd3f62a465c9)
+| Returns | When |
+| --- | --- |
+| `Mail sent` | The mail was handed to the socket |
+| `Not Connected` / `Not Logged In` | There's no connection or no logged-in user |
+| Error message | Sending failed |
 
-This block return an array of mail items
+`Mail sent` doesn't confirm delivery. If the recipient isn't on your designation, the mail is dropped.
 
-Here is an example of some mail:
+## Receive mail
 
-```js
+```
+when mail received
+```
+
+Hat. Fires when mail arrives.
+
+## Read the mailbox
+
+Each mail gets a number when it arrives, starting at `1` and counting up. The `[ID]` input in the blocks below is that number. Deleting mail doesn't renumber the rest.
+
+| Block | Type | Returns |
+| --- | --- | --- |
+| `(get mail list)` | Reporter | JSON array of `{ "id", "subject", "from" }` for every mail |
+| `(get body of mail at index [1])` | Reporter | The full mail as JSON, or `Mail not found` |
+| `delete mail at index [1]` | Command | Removes one mail |
+| `delete all mail` | Command | Empties the mailbox |
+
+Example `get mail list` result:
+
+```json
 [
-  {
-    "title":"Subject",
-    "recipient":"user",
-    "timestamp":1723684583612,
-    "from":"temp"
-  }
+  { "id": "1", "subject": "Subject", "from": "mist" }
 ]
 ```
 
-## Get Body
+Example `get body of mail at index [1]` result:
 
-![block\_15\_08\_2024-02\_21\_16](https://github.com/user-attachments/assets/36d7b6db-9cc5-44d5-ad3b-2659c8b83bcf)
-
-This block is how you actually read the Rmails, it returns the Rmail body at a specific index of the mail list array
-
-An example response for this block is below:
-
-```js
+```json
 {
-  "body":"Message",
-  "info":{
-    "title":"Subject",
-    "recipient":"user",
-    "timestamp":1723684583612,
-    "from":"temp"
-  }
+  "id": "1",
+  "subject": "Subject",
+  "message": "Message",
+  "from": "mist",
+  "timestamp": 1723684583612
 }
 ```
-
-## Delete Mail
-
-![block\_15\_08\_2024-02\_23\_32](https://github.com/user-attachments/assets/5f437444-d002-4a29-8a54-cfb94d0a9f99)
-
-This block works the same as the `get body` reporter, except it will delete an Rmail from your account and shift the rest along
-
-## Delete all Mail
-
-![block\_15\_08\_2024-02\_24\_46](https://github.com/user-attachments/assets/d550801f-4237-4767-8a51-2539240823c2)
-
-This block will entirely clear your account of all Rmails

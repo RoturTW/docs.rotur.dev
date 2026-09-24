@@ -1,26 +1,21 @@
-# Represent a Group
+# Represent a group
 
-Show a group on your Rotur profile. Representing sets `sys.group` on your account, and the group's tag appears as `group_tag` in your profile response.
+Show a group on your Rotur profile. Representing a group sets `sys.group` on your account, and your profile then includes the group's tag as `group_tag`. You can represent one group at a time.
 
-## Represent a Group
+## PUT `/v2/groups/{tag}/represent`
 
-### PUT `/v2/groups/{tag}/represent`
+Start representing a group you're a member of. This replaces any group you were representing.
 
-**Auth:** required. Token permission: `account:settings`. You must be a member of the group.
+**Auth:** Required. Sub-tokens need `account:settings`.
 
-**Path Parameters:**
+### Example
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-
-**Example request:**
-
-```bash
-curl -X PUT -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/represent"
+```http
+PUT /v2/groups/mygroup/represent
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -28,30 +23,26 @@ curl -X PUT -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/grou
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `You are not a member of this group` | Not a member |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | You aren't a member (`You are not a member of this group`) |
 
-***
+## DELETE `/v2/groups/{tag}/represent`
 
-## Stop Representing
+Stop representing whichever group you represent. The route needs a `{tag}`, but its value isn't checked, and this endpoint never returns `404`.
 
-### DELETE `/v2/groups/{tag}/represent`
+**Auth:** Required. Sub-tokens need `account:settings`.
 
-**Auth:** required. Token permission: `account:settings`.
+### Example
 
-Removes your represented group, whichever group it was. The `tag` in the path is required by the route but not checked.
-
-**Example request:**
-
-```bash
-curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/represent"
+```http
+DELETE /v2/groups/mygroup/represent
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {

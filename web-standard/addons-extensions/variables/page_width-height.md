@@ -1,18 +1,18 @@
 # page\_width / height
 
-Lets pages change their containing frame's height and width.
+Pages set these variables to change the width and height of the frame they are drawn in.
 
 {% tabs %}
 {% tab title="OSL" %}
 ```javascript
 page_width = 200
 page_height = 1000
-// the page_len variable can also be used in the same way,
-// if your making a browser, i recommend you also support page_len
-// as it is still used in a large amount of .web pages
+// page_len sets the height the same way
 ```
 {% endtab %}
 {% endtabs %}
+
+`page_len` is an older name for `page_height`, and many `.web` pages still use it. If you are building a browser, support both.
 
 ## Implementations
 

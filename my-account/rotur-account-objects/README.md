@@ -1,130 +1,103 @@
 # Rotur Account Objects
 
-Your Rotur account is a simple JSON object of keys and values. Some keys are managed by the server, and some you can change yourself.
+Your Rotur account is a JSON object of keys and values. The server manages some keys; you can set the rest yourself. Read the whole object with [`GET /me`](../../claw/api-endpoints/me.md).
 
-## Key Limits
+> **Base URL:** `https://api.rotur.dev`
+> **Auth:** `Authorization: Bearer <token>`. Sub-tokens need `account:profile` to update keys. The update endpoint also accepts the token as an `auth` field in the JSON body, but not as a query parameter.
 
-* Key names must be 20 characters or fewer
-* Key values must be 1,000 characters or fewer
-* The whole account object is limited to 25,000 characters of text
+## Update a key
 
-{% hint style="info" %}
-Keys starting with `sys.` are managed by the server. You cannot write to them directly. The keys `last_login`, `max_size`, `key`, `created`, `discord_id`, `sys.id` and `password` are locked and can never be updated by you.
-{% endhint %}
+`POST /me/update` (or `PATCH /v2/me`) sets one key at a time. Send the key and its new value as JSON:
 
-## Read Only Keys
+```http
+POST /me/update
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
 
-```
-key
-- your account token. Keep it secret, it is your login.
-
-created
-- the timestamp of when your account was created, in ms
-  eg. 1712792411288
-
-max_size
-- the maximum size of your cloud file storage in characters of text.
-  Set automatically from your subscription tier.
-  eg. "5000000" (5 MB on the Free tier)
-
-discord_id
-- the id of the discord account linked to this rotur account.
-  Set through roturBOT linking, you cannot edit it directly.
-  eg. "603952506330021898"
-
-sys.currency
-- the number of rotur credits you have
-> your credits cannot go negative and amounts are rounded to 2 decimal places
-  eg. 14.35
-
-sys.friends
-- Array of rotur usernames that are your friends
-  eg. ["throwaway", "rm"]
-
-sys.requests
-- Array of rotur usernames that have asked to be your friend
-  eg. ["temp"]
-
-sys.badges
-- Array of your badges, recalculated every time you log in.
-  Each badge has a name, an icon and a description.
-
-sys.purchases
-- Array of item ids that you own
-  eg. ["c4068074d5ed5bfcae9a91874383dab9"]
-
-sys.total_logins
-- the number of times you have logged into rotur
-  eg. 106
-
-sys.transactions
-- Array of your recent credit transactions. Each entry is an object with
-  a type, amount, note, the other user, a timestamp and your new total.
-  How many are kept depends on your subscription tier.
-
-sys.notes
-- your private notes about other users (Plus tier and above).
-  See the Friend Notes page.
-
-sys.subscription
-- your subscription state: tier, active flag and next billing timestamp
-
-sys.social_links
-- up to 3 social links shown on your profile
+{ "key": "pronouns", "value": "she/her" }
 ```
 
-## Writable Keys
+**Response `200`:**
 
+```json
+{
+  "message": "User key updated successfully",
+  "username": "mist",
+  "key": "pronouns",
+  "value": "she/her"
+}
 ```
-username
-- your account's username (case insensitive). You can change it as long
-  as the new name is valid and not already taken.
-  eg. mist
 
-email
-- your account email. Changing it marks your email as unverified and
-  sends you a new verification email.
+## Limits
 
-private
-- whether to hide your account publicly (boolean)
-  eg. true
+| Limit | Value |
+| --- | --- |
+| Key name | Up to 20 characters |
+| Key value | Up to 1,000 characters |
+| Whole account object | Up to 25,000 bytes across all keys that don't start with `sys.` |
 
-bio
-- your profile bio. Maximum length depends on your subscription tier
-  (200 characters on Free, up to 1,000 on Pro).
+You cannot write keys that start with `sys.`; the server manages them. These keys are also locked: `key`, `password`, `max_size`, `created`, `last_login`, `sys.id` and `sys.index`.
 
-pronouns
-- shown on your profile
-  eg. "she/her"
+## Read-only keys
 
-pfp
-- special key. Set it to a data URI of an image and the server uploads it
-  to our avatar host. Your avatar is then always available at
-  https://avatars.rotur.dev/your_username
-> animated GIF avatars need a Plus subscription or higher
+| Key | Description |
+| --- | --- |
+| `key` | Your account token. Keep it secret; anyone with it can act as you. |
+| `created` | When the account was created, in milliseconds. Example: `1712792411288`. |
+| `max_size` | Your file storage limit in bytes, as a string. Set from your [subscription tier](../subscriptions.md). Example: `"5000000"` (5 MB on Free). |
+| `discord_id` | The ID of the Discord account linked to this Rotur account. Set when you link Discord. Example: `"603952506330021898"`. |
+| `sys.id` | Your permanent user ID. |
+| `sys.index` | Your account number, in order of sign-up. |
+| `sys.currency` | Your Rotur credit balance, rounded to 2 decimal places. It cannot go negative. Example: `14.35`. |
+| `sys.friends` | Usernames of your friends. Example: `["throwaway", "rm"]`. |
+| `sys.requests` | Usernames that have sent you a friend request. Example: `["temp"]`. |
+| `sys.blocked` | Usernames you have blocked. |
+| `sys.purchases` | IDs of items you own. Example: `["c4068074d5ed5bfcae9a91874383dab9"]`. |
+| `sys.total_logins` | How many times you have signed in with your password. Example: `106`. |
+| `sys.last_login` | When you last signed in with your password, in milliseconds. |
+| `sys.transactions` | Your credit history. Each entry has `type`, `user`, `amount`, `note`, `time` and `new_total`. How far back it goes depends on your tier; see [Transactions and Taxes](../transactions-and-taxes.md). |
+| `sys.notes` | Your private notes about other users, keyed by username. See [Friend Notes](../friend-notes.md). |
+| `sys.subscription` | Your subscription: `tier`, `active`, `next_billing` and billing details. |
+| `sys.social_links` | Up to 3 social links shown on your profile. |
+| `sys.email_verified` | Whether your email address is verified. |
 
-banner
-- special key. Set it to a data URI to upload a profile banner.
-> each upload costs 10 credits unless you have a Pro subscription,
-  and animated banners need Pro
+Badges are not read from the account object. Get them from [`GET /badges`](../../claw/api-endpoints/badges.md) or the `badges` field of a profile. See [Rotur Badges](../rotur-badges.md).
 
-system
-- special key. Setting it switches your account to another registered
-  rotur system. The value must match an existing system's name.
+## Writable keys
 
-theme
-- an object of colours, useful for matching your ui to the user's preference
-  eg. {
-    "primary": "#111111",
-    "secondary": "#333333",
-    "tertiary": "#555555",
-    "text": "#ffffff",
-    "background": "#000000",
-    "accent": "#57cdac"
-  }
+| Key | Description |
+| --- | --- |
+| `username` | Your username, case-insensitive. 3–20 characters of lowercase letters, numbers, `_`, `.` and `-`. The new name must not be taken. |
+| `display_name` | The name shown on your profile. |
+| `email` | Your email address. Changing it marks your email as unverified and sends a new verification email. |
+| `private` | `true` to make your profile visible only to you and your friends. |
+| `bio` | Your profile bio. The maximum length depends on your tier: 200 characters on Free, up to 1,000 on Pro. Paid tiers can use [bio templates](../bio-templates.md). |
+| `pronouns` | Shown on your profile. Example: `"she/her"`. |
+| `pfp` | Set it to an image data URI to upload a new avatar. The avatar is then served at `https://avatars.rotur.dev/<username>`. Animated GIF avatars need Plus or higher. |
+| `banner` | Set it to an image data URI to upload a profile banner. Banners cost a one-time 30-credit unlock unless you have Pro or higher. Animated banners need Plus or higher. |
+| `system` | Set it to the exact name of a registered Rotur system to move your account to that system. |
+| `theme` | Colors that apps can use to match your preferences. See the example below. |
+| `wallpaper` | A URL to use as your desktop wallpaper. Pexels images work well because Pexels does not enforce CORS. Example: `https://images.pexels.com/photos/1612351/pexels-photo-1612351.jpeg`. |
 
-wallpaper
-- a url that should be used as the user's desktop wallpaper
-> pexels is a good source for these since they don't enforce cors
-  eg. https://images.pexels.com/photos/1612351/pexels-photo-1612351.jpeg
+Example `theme`:
+
+```json
+{
+  "primary": "#111111",
+  "secondary": "#333333",
+  "tertiary": "#555555",
+  "text": "#ffffff",
+  "background": "#000000",
+  "accent": "#57cdac"
+}
 ```
+
+For keys used only by originOS, see [originOS specific keys](originos-specific-keys.md).
+
+## Errors
+
+| Status | When |
+| --- | --- |
+| `400` | The key or value is missing, too long, or locked; the key starts with `sys.`; the account would exceed 25,000 bytes; the bio is longer than your tier allows; the new username or email is invalid or taken; `pfp` or `banner` is not a data URI |
+| `403` | The token is missing or invalid, lacks `account:profile`, or you don't have enough credits to unlock banners |
+| `404` | The `system` you asked for does not exist |

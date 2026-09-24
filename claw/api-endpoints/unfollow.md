@@ -1,23 +1,23 @@
-# /unfollow
+# GET `/unfollow`
 
-Unfollows a user on Claw. Unfollowing also removes your follow notification from their history.
+Unfollows a user. The `follow` notification you sent them is removed from their notifications.
 
-Requires authentication and the `following:unfollow` permission. Rate limited to 20 per minute (60 when authenticated).
+**Auth:** Required. Sub-tokens need `following:unfollow`. Uses the follow rate limit.
 
-## Parameters
+### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| username | Yes | The user to unfollow. `name` also works |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `username` | query | string | Yes | User to unfollow. `name` also works |
 
-## Example
+### Example
 
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/unfollow?username=mist"
+```http
+GET /unfollow?username=mist
+Authorization: Bearer <token>
 ```
 
-## Response
+**Response `200`:**
 
 ```json
 {
@@ -25,9 +25,10 @@ curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/unfollow?us
 }
 ```
 
-## Common errors
+### Errors
 
-| Status | Error | Cause |
-| --- | --- | --- |
-| 400 | `You are not following this user` | No existing follow to remove |
-| 404 | `User not found` | No account with that username |
+| Status | When |
+| --- | --- |
+| `400` | `Target username is required` |
+| `400` | `You are not following this user` |
+| `404` | `User not found` |

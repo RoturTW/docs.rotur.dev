@@ -4,154 +4,106 @@ If you are making a website that connects to rotur, your users will often trust 
 
 ## About
 
-<https://rotur.dev/auth> is a versatile authentication API that supports both redirect-based and iframe-based authentication flows, allowing you to integrate Rotur authentication seamlessly into your application.
+<https://rotur.dev/auth> signs the user in and hands your app a token. It works as a redirect, a popup or an iframe.
 
 # YOU SHOULD USE THE ROTUR SDK
 https://docs.rotur.dev/rotur-sdk/rotur-sdk
 
-## Authentication Methods
+`rotur.login()` in the SDK builds the URL, opens the popup (or an iframe when the popup is blocked) and listens for the token for you. The rest of this page is for apps that cannot use the SDK.
 
-### 1. Redirect-Based Authentication (Simple)
+## Query parameters
 
-The traditional approach where you redirect your page to the auth endpoint and the user returns with a token.
+| Parameter | Required | Description |
+| --- | --- | --- |
+| `return_to` | Yes | The full URL of your page. The token is only ever delivered to this URL's origin, so without it your app never receives one. |
+| `system` | No | The system name to sign in to, e.g. `originOS`. |
+| `requires` | No | Comma-separated permission scopes your app needs, e.g. `posts:view,posts:create`. Use `full` to ask for full account access. |
+| `signup` | No | `1` opens the create-account screen first. |
+| `select_account` | No | `1` skips the "continue as" prompt so the user can pick or sign in to another account. |
 
-You should redirect with https://rotur.dev/auth?return_to=url to make sure it goes back to your original page
+If you build the URL by hand, encode `return_to` with `encodeURIComponent`. `URL.searchParams.set` does it for you.
 
-### 2. Iframe-Based Authentication (Advanced)
+## What the user sees
 
-For a more seamless user experience, you can embed the Rotur authentication flow directly in your application using an iframe and postMessage communication.
+1. They sign in, or confirm the account they are already signed in with.
+2. On rotur.dev subdomains and originchats.com the token is sent straight away.
+3. On any other site they choose which permissions to grant. You get a scoped token limited to those permissions, or their main token if they allow full access.
 
-#### How iframe authentication works
+## Receiving the token
 
-1. **Create an iframe** that loads `https://rotur.dev/auth`
-2. **Listen for postMessage events** from the iframe
-3. **Handle the authentication result** when the user completes the login process and clicks "Allow Access"
+How the token reaches you depends on how the page was opened.
 
-#### Implementation Example
+### Redirect
+
+Send the user to the auth page:
+
+```js
+const url = new URL("https://rotur.dev/auth");
+url.searchParams.set("return_to", location.href);
+location.href = url.toString();
+```
+
+When they finish, rotur.dev navigates back to `return_to` with the token added as a `token` query parameter. Read it and remove it from the address bar:
+
+```js
+const params = new URLSearchParams(location.search);
+const token = params.get("token");
+if (token) {
+  params.delete("token");
+  history.replaceState(null, "", location.pathname + (params.size ? `?${params}` : ""));
+}
+```
+
+### Popup or iframe
+
+If the auth page has a `window.opener` (a popup) or is inside a frame, it posts a message to that window instead of redirecting. The message is only sent to the origin of `return_to` and always comes from `https://rotur.dev`:
+
+```js
+{
+  type: "rotur-auth-token",
+  token: "…",
+  return_to: "https://your.app/page",
+  scope: "full",         // "full", "scoped" or "existing"
+  permissions: ["…"],    // scoped and existing tokens only
+  id: "…"                // scoped and existing tokens only
+}
+```
+
+A popup closes itself after sending the message.
+
+#### Iframe example
 
 ```html
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Rotur Iframe Auth Example</title>
-    <style>
-        #auth-container {
-            width: 400px;
-            height: 500px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            margin: 20px auto;
-        }
-        #auth-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 8px;
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div id="auth-container">
-        <iframe id="auth-iframe" src="https://rotur.dev/auth" style="display: none;"></iframe>
-        <div id="loading">Loading authentication...</div>
-        <div id="success" class="hidden">
-            <h3>Authentication Successful!</h3>
-            <p>Token: <span id="token-display"></span></p>
-        </div>
-    </div>
+<iframe
+  id="rotur-auth"
+  allow="publickey-credentials-get; publickey-credentials-create"
+  style="position: fixed; inset: 0; width: 100%; height: 100%; border: 0"
+></iframe>
 
-    <script>
-        // Listen for messages from the iframe
-        window.addEventListener('message', function(event) {
-            // Verify the origin for security
-            if (event.origin !== 'https://rotur.dev') {
-                return;
-            }
+<script>
+  const frame = document.getElementById("rotur-auth");
+  const url = new URL("https://rotur.dev/auth");
+  url.searchParams.set("return_to", location.href);
+  url.searchParams.set("requires", "full");
+  frame.src = url.toString();
 
-            // Handle authentication success
-            if (event.data.type === 'rotur-auth-token') {
-                // Authentication was successful
-                const token = event.data.token;
-                
-                // Hide the iframe and show success message
-                document.getElementById('auth-iframe').style.display = 'none';
-                document.getElementById('success').classList.remove('hidden');
-                document.getElementById('token-display').textContent = token;
-                
-                // You can now use the token for API calls
-                console.log('Received Rotur token:', token);
-                
-                // Example: Store token for later use
-                localStorage.setItem('rotur_token', token);
-            }
-        });
+  window.addEventListener("message", (event) => {
+    if (event.origin !== "https://rotur.dev") return;
+    if (event.data?.type !== "rotur-auth-token") return;
 
-        // Show the iframe when page loads
-        window.onload = function() {
-            document.getElementById('auth-iframe').style.display = 'block';
-            document.getElementById('loading').style.display = 'none';
-        };
-    </script>
-</body>
-</html>
+    frame.remove();
+    localStorage.setItem("rotur_token", event.data.token);
+  });
+</script>
 ```
 
-#### PostMessage Events
+#### Limits inside an iframe
 
-The iframe will send the following message to the parent window when authentication is successful:
+- **Google, GitHub and Discord sign-in** do not work in a frame, because those providers refuse to be framed. The auth page hides those buttons when it is framed, so users sign in with their username and password. Prefer a popup opened from a click when you can.
+- **Passkeys** only work if the iframe delegates them with `allow="publickey-credentials-get; publickey-credentials-create"`, as in the example above. Without it the passkey button is hidden.
 
-**Authentication Success:**
+## Security
 
-```javascript
-{
-    type: 'rotur-auth-token',
-    token: 'user_auth_token_here'
-}
-```
-
-Note: The message is sent to all origins (`'*'`), so always verify the origin in your event listener for security.
-
-#### Security Considerations
-
-1. **Origin Verification**: Always verify that messages come from `https://rotur.dev`
-2. **HTTPS Only**: Only use iframe authentication over HTTPS connections
-3. **Token Storage**: Store tokens securely (consider using secure HTTP-only cookies for sensitive applications)
-4. **CSP Headers**: Ensure your Content Security Policy allows framing from `rotur.dev`
-5. **Wildcard Origin**: The auth page sends messages to all origins (`'*'`), so proper origin verification is critical
-
-#### Advantages of Iframe Authentication
-
-- **Seamless UX**: Users don't leave your application
-- **Responsive Design**: Easy to style and integrate with your UI
-- **Real-time Feedback**: Immediate response without page refreshes
-- **Mobile Friendly**: Works well on mobile devices without navigation disruption
-
-#### CSS Integration Tips
-
-```css
-/* Style the iframe container */
-.rotur-auth-container {
-    max-width: 400px;
-    margin: 0 auto;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-/* Responsive iframe */
-.rotur-auth-iframe {
-    width: 100%;
-    height: 500px;
-    border: none;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .rotur-auth-container {
-        box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
-    }
-}
-```
+- Always check `event.origin === "https://rotur.dev"` before trusting a message.
+- Use HTTPS. The token grants access to the user's account, so treat it like a password.
+- If your site sends a Content Security Policy, allow `https://rotur.dev` in `frame-src` for the iframe flow.

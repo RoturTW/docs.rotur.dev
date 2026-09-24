@@ -1,8 +1,10 @@
 # Utilities
 
-Helper features: validators, link-code auth, files, and key/value storage.
+Validators, link-code login, the user's file system, and app storage.
 
-* **[Validators](validators.md)**: Generate and validate validator tokens
-* **[Linking](linking.md)**: Link-code auth flow for non-browser contexts
-* **[Files](files.md)**: User file system, upload, read, delete
-* **[Storage](storage.md)**: App-scoped key/value storage on the user's account
+| Page | Covers |
+| --- | --- |
+| [Validators](validators.md) | `rotur.validators`: generate and check validators |
+| [Linking](linking.md) | `rotur.link`: link-code login for non-browser apps |
+| [Files](files.md) | `rotur.files`: the user's file system |
+| [Storage](storage.md) | `rotur.storage`: app-scoped key/value storage on the user's account |

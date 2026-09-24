@@ -1,24 +1,27 @@
-# Get a Sub-Token
+# Get a token
 
-Retrieve a single sub-token by its ID.
+Get one sub-token by its ID.
 
-> **Authentication:** Required. The main account token can fetch any of its sub-tokens. A sub-token can only fetch its own info (its `:id` must match).
+## GET `/tokens/:id`
 
-### GET `/tokens/:id`
+Returns the sub-token, including its value. A sub-token can call this with its own ID to read its own name and permissions.
 
-**Path Parameter:**
-* `:id`: the sub-token ID (e.g. `st_abc123`)
+**Auth:** Required. The main token can get any of its sub-tokens. A sub-token can only get itself.
 
-**Query Parameters:**
-* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
+### Parameters
 
-**Example:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | string | Yes | The sub-token ID, for example `st_abc123` |
+
+### Example
 
 ```http
 GET /tokens/st_abc123
+Authorization: Bearer <token>
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -27,19 +30,19 @@ GET /tokens/st_abc123
   "permissions": ["account:view", "posts:view"],
   "created_at": 1715512345678,
   "last_used_at": 1715599999999,
-  "token": "rotur_st_xYz123...",
   "revoked": false,
+  "token": "rotur_st_xYz123...",
   "origin": "https://myapp.example.com",
   "description": "Read-only access for My App",
   "websites": ["https://myapp.example.com"]
 }
 ```
 
-`expires_at`, `revoked_at`, and `last_used_at` are omitted when they are not set.
+`last_used_at`, `expires_at`, `revoked_at`, `origin`, `description` and `websites` are left out when they are empty.
 
-**Error Responses:**
+### Errors
 
-| Status | Condition |
-|---|---|
-| 403 | A sub-token tried to view a token other than itself |
-| 404 | Token not found |
+| Status | When |
+| --- | --- |
+| `403` | A sub-token asked for a different sub-token |
+| `404` | No sub-token with this ID exists on the account |

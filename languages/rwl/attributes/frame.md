@@ -4,25 +4,25 @@ description: Attribute list for frames
 
 # Frame
 
+A frame divides its area into [sections](section.md), placed one after another along the frame's axis.
+
 ## Flags
 
-### Horizontal
+| Flag | Effect |
+| --- | --- |
+| `Horizontal` | Places sections side by side along the X axis |
+| `Vertical` | Places sections one after another along the Y axis |
 
-Makes the frame split horizontally (can be combined with Vertical)
+You can combine both flags. A frame with neither flag behaves as `Horizontal`. Any other flag is an error.
 
 ```javascript
-frame [Horizontal] { // makes it split on the X axis
-    // sections
+frame [Horizontal] {
+    // sections, split along the X axis
 }
 ```
 
-### Vertical
-
-Makes the frame split vertically (can be combined with Horizontal)
-
 ```javascript
-frame [Vertical] { // makes it split on the Y axis
-    // sections
+frame [Vertical] {
+    // sections, split along the Y axis
 }
 ```
-

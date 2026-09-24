@@ -1,39 +1,43 @@
 # share.rotur.dev
 
-Rotur Shares let you instantly publish files from your OriginOS drive to the web - ideal for hosting static sites, sharing images, or distributing small downloads.
+Rotur Shares publish files from your originOS drive to the web. Use them to host a static site, share an image or offer a small download.
 
-They are a paid only feature used in originOS, subscribing [here](https://ko-fi.com/mistium/tiers) at originDrive or originPro gives you access to create a "share" folder in your user folder within originOS. Any file that you drag into this `~/share` folder will be immediately available at the url `https://share.rotur.dev/<username>/<filename>`
+> **Base URL:** `https://share.rotur.dev`
+>
+> **Auth:** None to view files. Publishing needs a Pro subscription (formerly called originDrive) or higher.
 
-This can be used to quickly share a file from your origin drive and host it online. It also works with websites and other file types if you want static and fast file delivery. Your hosted files can't exceed your file limits.
+## How it works
 
-## Setup
+Any file you put in the `~/share` folder of your originOS user folder is available straight away at:
 
-When you load into origin and open settings, if it says your account is originDrive or originPro, you should have access to this feature.
-If you don't, DM me (@mistium on Discord) after purchasing a Patreon tier with rotur shares and I'll increase your file size limits and give access to rotur shares.
+```
+https://share.rotur.dev/<username>/<filename>
+```
 
-If you don't have a share folder when you open files, you can create one and it will work just fine.
+For example, `~/share/test.html` on the account `mist` is served at <https://share.rotur.dev/mist/test.html>.
 
-All files you put in `~/share` will be publicly available under your username.
+<img width="1055" height="646" alt="The share folder in originOS Files" src="https://github.com/user-attachments/assets/94d1af35-7353-406a-8bb4-8f0e85f4d8a1" />
 
-<img width="1055" height="646" alt="Screenshot 2025-10-26 at 17 35 28" src="https://github.com/user-attachments/assets/94d1af35-7353-406a-8bb4-8f0e85f4d8a1" />
+Files are served as static files, so any file type works, including HTML pages. Shared files count toward your file storage limit.
 
-Here's that test.html file: https://share.rotur.dev/mist/test.html
+## Set up
 
-## Who can see my files in `~/share`?
+1. Subscribe to Pro or higher. See [Subscriptions](../my-account/subscriptions.md).
+2. In originOS, open Settings and check that your account shows the tier.
+3. Open Files. If there is no `share` folder in your user folder, create one.
+4. Drag files into `~/share`.
 
-Anyone with an internet connection can see your files that you put in that folder
+If your account does not show the tier after you subscribe, message @mistium on Discord to have Rotur Shares and your file size limit enabled.
 
-## Does it get indexed by search engines?
+## Access and limits
 
-Not unless someone links to the page from other pages that do get indexed
+| | |
+| --- | --- |
+| **Who can see shared files** | Anyone with the URL. Everything in `~/share` is public. |
+| **Search engines** | Files are not indexed unless another indexed page links to them. |
+| **Bandwidth** | No fixed limit. Accounts that send excessive requests or serve large files with heavy bandwidth use may be throttled. |
+| **Tiers** | Pro (formerly originDrive) or higher. Not available on free accounts. |
 
-## Are there limits on bandwidth?
-
-There are no official limits, but if you start spam requesting or using the service to host large files and using up a lot of bandwidth, your account's bandwidth may be limited.
-
-## What tiers get rotur shares?
-
-originDrive or higher → includes Rotur Shares<br>
-Free accounts → not available
-
-Subscribe [here](https://ko-fi.com/mistium/tiers)
+{% hint style="warning" %}
+Do not put anything private in `~/share`. Every file there is publicly reachable by anyone who knows or guesses its URL.
+{% endhint %}

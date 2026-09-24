@@ -1,24 +1,23 @@
-# Delete a Group
+# Delete a group
 
-Permanently delete a group and all its data. Only the group owner can do this.
+Permanently delete a group and everything in it. Only the owner can do this.
 
-### DELETE `/v2/groups/{tag}`
+## DELETE `/v2/groups/{tag}`
 
-**Auth:** required. Token permission: `groups:manage`.
+**Auth:** Required. Sub-tokens need `groups:manage`. You must be the group owner.
 
-**Path Parameters:**
+{% hint style="danger" %}
+Deletion can't be undone. Members, roles, announcements, events, tips, products, and the group's `credits_balance` are all removed. Withdraw any credits you want to keep first.
+{% endhint %}
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
+### Example
 
-**Example request:**
-
-```bash
-curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup"
+```http
+DELETE /v2/groups/mygroup
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -26,13 +25,8 @@ curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/g
 }
 ```
 
-{% hint style="danger" %}
-Deletion is permanent. Members, roles, announcements, events, tips, and the group's credits balance are all removed.
-{% endhint %}
+### Errors
 
-**Common errors:**
-
-| Status | Error | Cause |
-|--------|-------|-------|
-| 403 | `You are not authorized to delete this group` | You are not the owner |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `403` | You aren't the owner (`You are not authorized to delete this group`) |

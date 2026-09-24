@@ -1,21 +1,14 @@
-# /bookmarks
+# GET `/bookmarks`
 
-Lists the posts you have bookmarked, most recently saved first.
+Lists the posts you have bookmarked, most recently saved first. Bookmarks of deleted posts are skipped.
 
-Requires authentication. Bookmarks of posts that have since been deleted are skipped.
+**Auth:** Required.
 
-## Parameters
+### Example
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-
-## Example
-
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/bookmarks"
+```http
+GET /bookmarks
+Authorization: Bearer <token>
 ```
 
-## Response
-
-Returns an array of post objects, same shape as [/feed](feed.md).
+**Response `200`:** an array of [post objects](feed.md#post-object).
