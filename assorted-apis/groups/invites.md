@@ -1,22 +1,21 @@
 # Invites
 
-Invite users to a group. Invites are required to join groups with the `INVITE` join policy, but work for any group.
+Invite users to a group. Invites work for any group, public or private, and are the only way to join a private group or an `INVITE` group.
 
-## List My Invites
+## GET `/v2/groups/invites/mine`
 
-### GET `/v2/groups/invites/mine`
+List your pending invites across all groups.
 
-**Auth:** required. Token permission: `groups:view`.
+**Auth:** Required. Sub-tokens need `groups:view`.
 
-Returns your pending invites across all groups.
+### Example
 
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/invites/mine"
+```http
+GET /v2/groups/invites/mine
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** an array of invites, or `[]` if you have none.
 
 ```json
 [
@@ -33,84 +32,80 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/invi
 ]
 ```
 
-***
+## GET `/v2/groups/{tag}/invites`
 
-## List a Group's Invites
+List a group's pending invites.
 
-### GET `/v2/groups/{tag}/invites`
+**Auth:** Required. Sub-tokens need `groups:invite`. You must be the owner or hold `groups.members.invite`.
 
-**Auth:** required. Token permission: `groups:invite`. You must be the group owner or hold the `groups.members.invite` group permission.
+### Example
 
-Returns the group's pending invites.
-
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/invites"
+```http
+GET /v2/groups/mygroup/invites
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):** same invite objects as above, in an array.
+**Response `200`:** an array of invites in the same shape as above, or `[]` if there are none.
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 403 | `You don't have permission to view invites` | Missing `groups.members.invite` |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `403` | You lack `groups.members.invite` (`You don't have permission to view invites`) |
 
-***
+## POST `/v2/groups/{tag}/invites`
 
-## Send an Invite
+Invite a user. They get a `group_invite` event (with `group_tag`, `group_name`, `from`, and `invite_id`) and a push notification.
 
-### POST `/v2/groups/{tag}/invites`
+**Auth:** Required. Sub-tokens need `groups:invite`. You must be the owner or hold `groups.members.invite`.
 
-**Auth:** required. Token permission: `groups:invite`. You must be the group owner or hold the `groups.members.invite` group permission.
+### Parameters
 
-The invited user gets a `group_invite` event and a push notification.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `username` | query | string | Yes | The username to invite |
 
-**Query Parameters:**
+### Example
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `username` | string | Yes | Username of the user to invite |
-
-**Example request:**
-
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/invites?username=bob"
+```http
+POST /v2/groups/mygroup/invites?username=bob
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (201):** the created invite object with `status: "PENDING"`.
+**Response `201`:** the new invite, in the same shape as above, with `status` `PENDING`.
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `You cannot invite yourself` | Self-invite |
-| 400 | `User is already a member of this group` | Already joined |
-| 400 | `User already has a pending invite` | Duplicate invite |
-| 400 | `User is banned from this group` | Target is banned |
-| 403 | `You don't have permission to invite members` | Missing `groups.members.invite` |
-| 404 | `User not found` | Username doesn't exist |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | `username` is missing (`Username is required`) |
+| `400` | You invited yourself (`You cannot invite yourself`) |
+| `400` | The user is already a member (`User is already a member of this group`) |
+| `400` | The user already has a pending invite (`User already has a pending invite`) |
+| `400` | The user is banned (`User is banned from this group`) |
+| `403` | You lack `groups.members.invite` (`You don't have permission to invite members`) |
+| `404` | No account has that username (`User not found`) |
 
-***
+## POST `/v2/groups/{tag}/invites/{inviteid}/accept`
 
-## Accept an Invite
+Accept an invite sent to you and join the group. Any entry fee is charged now. You get the roles marked `assign_on_join`, or the Member role if none are.
 
-### POST `/v2/groups/{tag}/invites/{inviteid}/accept`
+**Auth:** Required. Sub-tokens need `groups:join`.
 
-**Auth:** required. Token permission: `groups:join`.
+### Parameters
 
-Accepts an invite addressed to you and joins the group. If the group has an entry fee, it's charged when you accept. You get the roles marked `assign_on_join`.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `inviteid` | path | string | Yes | The invite's `id` |
 
-**Example request:**
+### Example
 
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/invites/inv-1/accept"
+```http
+POST /v2/groups/mygroup/invites/inv-1/accept
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** `group` is the full updated [group object](README.md#group), shortened here.
 
 ```json
 {
@@ -124,33 +119,35 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-The `group` field is the full updated group object (shortened here).
+### Errors
 
-**Common errors:**
+| Status | When |
+| --- | --- |
+| `400` | You're already a member (`You are already a member of this group`). The invite is marked accepted |
+| `400` | You can't afford the entry fee (`Insufficient funds to join this group`). The body also has `required` and `available` |
+| `403` | You're banned (`You are banned from this group`) |
+| `404` | The invite doesn't exist, isn't addressed to you, or isn't pending (`Invite not found or already handled`) |
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `You are already a member of this group` | Already joined |
-| 400 | `Insufficient funds to join this group` | Can't afford the entry fee (response includes `required` and `available`) |
-| 403 | `You are banned from this group` | You're banned |
-| 404 | `Invite not found or already handled` | Wrong ID, not yours, or not pending |
-| 404 | `Group not found` | Group doesn't exist |
+## POST `/v2/groups/{tag}/invites/{inviteid}/decline`
 
-***
+Decline an invite sent to you.
 
-## Decline an Invite
+**Auth:** Required. Sub-tokens need `groups:join`.
 
-### POST `/v2/groups/{tag}/invites/{inviteid}/decline`
+### Parameters
 
-**Auth:** required. Token permission: `groups:join`.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `inviteid` | path | string | Yes | The invite's `id` |
 
-**Example request:**
+### Example
 
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/invites/inv-1/decline"
+```http
+POST /v2/groups/mygroup/invites/inv-1/decline
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -158,30 +155,32 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `Invite not found or already handled` | Wrong ID, not yours, or not pending |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `404` | The invite doesn't exist, isn't addressed to you, or isn't pending (`Invite not found or already handled`) |
 
-***
+## DELETE `/v2/groups/{tag}/invites/{inviteid}`
 
-## Revoke an Invite
+Revoke a pending invite. It's deleted rather than marked.
 
-### DELETE `/v2/groups/{tag}/invites/{inviteid}`
+**Auth:** Required. Sub-tokens need `groups:invite`. You must be the owner or hold `groups.members.invite`.
 
-**Auth:** required. Token permission: `groups:invite`. You must be the group owner or hold the `groups.members.invite` group permission.
+### Parameters
 
-Removes a pending invite.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `inviteid` | path | string | Yes | The invite's `id` |
 
-**Example request:**
+### Example
 
-```bash
-curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/invites/inv-1"
+```http
+DELETE /v2/groups/mygroup/invites/inv-1
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -189,10 +188,9 @@ curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/g
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 403 | `You don't have permission to revoke invites` | Missing `groups.members.invite` |
-| 404 | `Invite not found or already handled` | Wrong ID or not pending |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `403` | You lack `groups.members.invite` (`You don't have permission to revoke invites`) |
+| `404` | The invite doesn't exist or isn't pending (`Invite not found or already handled`) |

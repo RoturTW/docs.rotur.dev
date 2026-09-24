@@ -1,33 +1,32 @@
-# /repost
+# GET `/repost`
 
-Reposts a post, either as a plain repost on your profile or as a quote post on the public feed.
+Reposts a post. Without `content` it is a plain repost that only shows on your profile. With `content` it is a quote post that also goes on the public feed.
 
-Requires authentication, the `posts:repost` permission, and `good` account standing.
+**Auth:** Required. Sub-tokens need `posts:repost`. Your account needs `good` standing.
 
-## Parameters
+### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| id | Yes | The ID of the post you are reposting |
-| content | No | Quote text. If you add content, the repost becomes a quote post and appears on the public feed. Without content it only shows on your profile |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | query | string | Yes | ID of the post to repost |
+| `content` | query | string | No | Quote text. Same length limit as [`/post`](post.md) for your tier |
 
-## Example
+### Example
 
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/repost?id=POST_ID&content=Look+at+this"
+```http
+GET /repost?id=abc123&content=Look%20at%20this
+Authorization: Bearer <token>
 ```
 
-## Response
+**Response `201`:** the new [post object](feed.md#post-object), with `is_repost: true` and the reposted post in `original_post`.
 
-Returns `201` with the new repost object. It has `is_repost: true` and includes the `original_post`.
+### Errors
 
-## Common errors
-
-| Status | Error | Cause |
-| --- | --- | --- |
-| 400 | `You cant repost this post` | The post author has blocked you |
-| 400 | `Content exceeds N character limit` | Quote text too long for your tier |
-| 403 | `Cannot repost a profile-only post` | The original post is profile-only |
-| 403 | `Cannot repost a repost` | The original post is itself a repost |
-| 404 | `Original post not found` | No post with that ID |
+| Status | When |
+| --- | --- |
+| `400` | `Post ID is required` |
+| `400` | `You cant repost this post` (the author has blocked you) |
+| `400` | `Content exceeds <n> character limit` |
+| `403` | `Cannot repost a profile-only post` |
+| `403` | `Cannot repost a repost` |
+| `404` | `Original post not found` |

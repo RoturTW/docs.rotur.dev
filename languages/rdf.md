@@ -1,41 +1,123 @@
 # RDF
 
-## What is RDF?
-
-RDF or rotur data format is a simplistic data storage format with support for constraining properties with types and conditions at runtime. It currently only works in javascript based environments.
-
-You can view the source code below
+RDF (Rotur Data Format) is a data storage format that can restrict each property to a type and to conditions, checked at runtime. It runs in JavaScript environments.
 
 {% @github-files/github-code-block url="https://github.com/RoturTW/.rdf" %}
 
-## How do i use RDF?
-
-RDF is pretty simple to use, just import the version with the highest number in the src folder of the github repo above into whatever project you are making by running the js file to create the RDF class globally.
-
-After the code has been run, you should have access to RDF on the window object.
-
-## Why use RDF?
-
-Well rdf allows you to type restrict specific properties of your data at runtime, meaning you can ensure no bug can just overwrite the data with an invalid type without you noticing. Same with constraints, instead of needing to enforce data constraints as the program level you can instead enforce them as the db level for anything from length checks to maths using a stripped down version of rtr.
-
-## RDF Methods
-
-### .parse()
-
-Parse is the backbone of RDF as it creates an object that you can interact with from your RDF code
-
-```javascript
-RDF.parse(`{ number age = 10 where value > 0; }`)
+```js
+{
+    string name = "Swallow";
+    object job = {
+        title = "Sr. Nest Maker";
+        company = "Nests R Us";
+        number yearsOfExperience = 2;
+    };
+    number age = 4 where value > 1;
+    array<number> scores = [] where each > 0;
+}
 ```
 
-### .stringify()
+Because types and constraints are checked whenever a value is set, a bug cannot replace a value with one of the wrong type, or one that breaks a rule, without an error. Rules such as length checks or number ranges live with the data instead of in your program.
 
-Stringify is how you get your modified RDF code back out and into a string so you can save it or store it in places that don't support the RDF structuring.
+## Install
+
+Load the highest-numbered file in the repository's `src` folder (currently `v03.js`) into your project. It defines `RDF` on `window`.
+
+## Syntax
+
+A document is a set of properties inside curly braces. End each property with `;`.
+
+Start a comment with `#`. A comment runs until the next `;`, so end it with `;` unless it is the last line.
+
+```js
+[type] name = value [where condition];
+```
+
+### Values
+
+| Value | Example |
+| --- | --- |
+| String | `"James"` (double quotes only) |
+| Number | `10`, `-2.5` |
+| Boolean | `true`, `false` |
+| Array | `[1, 2, 3]`, `[]` |
+| Object | `{ name = "James"; }` |
+
+### Types
+
+Put a type before the name to restrict what the property can hold. A property without a type accepts any value.
+
+| Type | Accepts |
+| --- | --- |
+| `string` | Strings |
+| `number` | Numbers |
+| `boolean` | `true` or `false` |
+| `object` | Objects (not arrays or `null`) |
+| `array` | Arrays |
+| `array<type>` | Arrays whose elements are all of `type`, for example `array<string>` |
+| `any` | Any value |
+
+```js
+{
+    number age = 10;
+    array<string> tags = ["a", "b"];
+}
+```
+
+### Constraints
+
+Add `where` and a condition to restrict the value. `value` stands for the property's value. For arrays, use `where each` to check every element.
+
+```js
+{
+    number age = 10 where value > 0;
+    string name = "James" where length(value) > 4;
+    array<number> scores = [3, 5] where each > 0;
+}
+```
+
+Conditions are expressions in a reduced version of [RTR](rtr/README.md). They support the operators `==`, `!=`, `>`, `<`, `>=`, `<=`, `+`, `-`, `*`, `/`, `%`, `^`, and functions such as `length`, `min`, `max`, `abs`, `round`, `floor`, `ceil`, `sqrt`, `join`, `split`, `has`, `all`, `any`, `not`, `toNum`, and `toStr`.
+
+Each property takes one constraint.
+
+{% hint style="warning" %}
+Constraints on properties inside a nested object are not supported: the parser reads the first `where` as belonging to the outer property. Put constrained properties at the top level.
+{% endhint %}
+
+## Errors
+
+Parsing throws an error if a value does not match its type or constraint. Parse errors start with `RDF <version> error:`. After parsing, assigning an invalid value to a property, or pushing an invalid element into an `array<type>` property with `push`, `unshift`, or `splice`, also throws, with messages such as `Constraint violation for 'age'` or `Constraint violation for element of 'scores'`.
+
+| Error | Cause |
+| --- | --- |
+| `Data must be enclosed in curly braces` | The document does not start with `{` and end with `}` |
+| `Invalid token: …` | A property is not in the form `name = value` |
+| `Type mismatch: '<name>' must be a <type>` | The value is the wrong type |
+| `Constraint violation for '<name>'` | The value fails its `where` condition |
+| `Type mismatch in array '<name>'` | An element of an `array<type>` is the wrong type |
+| `Type or constraint mismatch in array '<name>'` | An element of an `array<type>` with `where each` fails the type or the condition |
+| `Constraint violation in array '<name>'` | An element of an untyped array fails its `where each` condition |
+
+## Methods
+
+### RDF.parse()
+
+Parses RDF text into an object. Read and assign its properties like any JavaScript object; assignments are type-checked and constraint-checked.
+
+```javascript
+const person = RDF.parse(`{ number age = 10 where value > 0; }`);
+person.age = 11;  // ok
+person.age = -1;  // throws: Constraint violation for 'age'
+```
+
+### RDF.stringify()
+
+Converts an object back into RDF text, including each property's type and constraint. The second argument is the number of spaces to indent by. With `0` or no indent, the output is on one line.
 
 ```javascript
 // RDF.stringify(object, indentation)
 
-console.log(RDF.stringify({"hello":"world"}, 2))
+console.log(RDF.stringify({"hello": "world"}, 2))
 /*
 {
   hello = "world";
@@ -43,31 +125,13 @@ console.log(RDF.stringify({"hello":"world"}, 2))
 */
 ```
 
-### .setProperty()
+### RDF.setProperty()
 
-SetProperty allows you to quickly add any rdf parameter to any js object using the same syntax you use to write the data in the first place.
+Adds a typed property to any object, including plain JavaScript objects, using the same syntax as an RDF document. It returns the object.
 
 ```javascript
 // RDF.setProperty(object, property_string)
 
-my_obj = RDF.parse(`{ number age = 10 where value > 0 }`)
-RDF.setProperty(my_obj, "string name = \"James\" where length(value) > 4")
-// create a new RDF property on my object, this works on any object including regular json objects
+const person = RDF.parse(`{ number age = 10 where value > 0; }`);
+RDF.setProperty(person, `string name = "James" where length(value) > 4`);
 ```
-
-## RDF Formatting
-
-### Types
-
-Types can be useful when you want to ensure that a value keeps a specific type of data, for example an age should normally be a number so you can enforce that by just prefixing the name using the type.
-
-<pre class="language-javascript"><code class="lang-javascript">type name = value
-/** Type List:
-<strong>  object
-</strong>  array
-<strong>  string
-</strong>  number
-  boolean
-*/
-</code></pre>
-

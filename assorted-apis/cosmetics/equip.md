@@ -1,22 +1,23 @@
 # POST `/cosmetics/equip/:id`
 
-Equip a cosmetic you own. This sets it as your active cosmetic for its type. For overlays, this also updates `sys.overlay` on your user object so the avatar server renders it.
+Equip a cosmetic you own. It replaces whatever you had equipped of the same type. Equipping an overlay also sets `sys.overlay` on your account, which the avatar server uses to render it.
 
-**Authentication:** Required. **Permission:** `cosmetics:equip`.
+**Auth:** Required. Sub-tokens need `cosmetics:equip`.
 
-**Path Parameter:**
+### Parameters
 
-| Parameter | Description |
-|---|---|
-| `:id` | The cosmetic's unique ID (must be one you own) |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | string | Yes | The ID of a cosmetic you own. Use `custom_overlay` or `custom_background` to equip your own upload |
 
-**Example request:**
+### Example
 
 ```http
 POST /cosmetics/equip/cat_ears
+Authorization: Bearer <token>
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -24,10 +25,10 @@ POST /cosmetics/equip/cat_ears
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error |
-|---|---|
+| Status | When |
+| --- | --- |
 | `400` | `Invalid cosmetic id` |
 | `403` | `You do not own this cosmetic` |
-| `404` | `Cosmetic not found` |
+| `404` | `Cosmetic not found`. This includes `custom_overlay` and `custom_background` when you have no upload for that type or no longer have the perk |

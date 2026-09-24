@@ -1,26 +1,31 @@
-# Revoke a Sub-Token
+# Revoke a token
 
-Revoke a sub-token, making it immediately unusable.
+Revoke a sub-token so it stops working immediately.
 
-> **Authentication:** Required (main account token only)
+## POST `/tokens/:id/revoke`
 
-### POST `/tokens/:id/revoke`
+Marks the sub-token as revoked and records `revoked_at`. The record stays on your account; use [Delete a token](delete-token.md) to remove it.
 
-A revoked token cannot be un-revoked. If you need the access back, create a new token.
+**Auth:** Required. Main token only.
 
-**Path Parameter:**
-* `:id`: the sub-token ID (e.g. `st_abc123`)
+{% hint style="warning" %}
+Revoking cannot be undone. To give the app access again, create a new token.
+{% endhint %}
 
-**Query Parameters:**
-* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
+### Parameters
 
-**Example:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | string | Yes | The sub-token ID, for example `st_abc123` |
+
+### Example
 
 ```http
 POST /tokens/st_abc123/revoke
+Authorization: Bearer <main token>
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -29,10 +34,10 @@ POST /tokens/st_abc123/revoke
 }
 ```
 
-**Error Responses:**
+### Errors
 
-| Status | Condition |
-|---|---|
-| 400 | Token is already revoked |
-| 403 | Authenticated with a sub-token instead of the main account token |
-| 404 | Token not found |
+| Status | When |
+| --- | --- |
+| `400` | The token is already revoked |
+| `403` | You authenticated with a sub-token |
+| `404` | No sub-token with this ID exists on the account |

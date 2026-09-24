@@ -1,24 +1,32 @@
 # (static) .new()
 
-Creates a new Page / Document and returns it.
+Creates a page (document) and returns it.
 
 {% hint style="info" %}
-this does not create a new tab.  you can use `opentab <url>` for that.
+This does not open a tab. To open a URL in a new tab, use [`opentab`](../../../commands/opentab.md).
 {% endhint %}
 
 ## Parameters
 
-### Data
+`.new()` takes one object. All keys are optional.
 
-a json objects that can contain any of these keys:
+| Key | Type | Description |
+| --- | --- | --- |
+| `url` | [URL](../url/README.md) instance | The page's address. The Flufi Browser uses its "unknown page" URL if this is missing. |
+| `isWeb` | boolean | Whether the page comes from the Rotur web |
+| `update` | function | Function the browser calls to update the page |
+| `type` | string | Page type, for example the file extension. Defaults to `"unknown"`. |
+| `state` | any | Initial state for the page |
 
 ```json5
 {
     "url": <URL class>,
-    "isWeb": true / false,
+    "isWeb": true,
     "update": <update function>
 }
 ```
+
+Calling it on an instance instead of the class throws `static function ran on instance`.
 
 ## Implementations
 

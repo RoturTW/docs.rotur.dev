@@ -1,17 +1,52 @@
-# Data Storage
+# Data storage
 
-A massive part of any game, operating system, or software in general, is the ability to store data and thats exactly what these blocks do.
+Data storage keeps your project's data in the logged-in user's Rotur account. Each project picks a storage ID, and its keys are kept separate from other projects' data.
 
-## Setting Your Storage Key
+## Set a storage ID
 
-When you set a storage key, the user will be prompted to allow you to access that storage key, this is to give the user more choice on whether to allow a program to access a specific part of their account.
+```
+set storage id to [id]
+```
 
-After you have set your storage key, you cannot change it until the user reboots.
+Command. Every storage block works inside this ID, so set it once after logging in. Until it's set, storage blocks return `Storage ID not set`. You can change it at any time.
 
-## Getting and Setting Values
+| Block | Type | Returns |
+| --- | --- | --- |
+| `<storage id has been set>` | Boolean | `true` once a storage ID is set |
+| `(storage id)` | Reporter | The current storage ID, or an empty string |
 
-Getting a value from your storage will be very fast and not require any networking, however, updating a key will require the user to be online in order for the extension to properly request the key update to the rotur server.
+## Read and write keys
 
-Setting your id, settings key and deleting keys are the only blocks that will require networking
+Every storage block sends a request to Rotur, so the user has to be online and logged in.
 
-![Screenshot 2024-08-15 at 01 38 46](https://github.com/user-attachments/assets/2f5a0dcd-cd74-482d-a0b5-a30511006fec)
+| Block | Type | Description |
+| --- | --- | --- |
+| `(get key from storage [key])` | Reporter | The key's value. Objects come back as JSON; missing keys return an empty string. |
+| `set key [key] to [value] in storage` | Command | Saves a value |
+| `<key [key] exists in storage>` | Boolean | `true` if the key has a value |
+| `delete key [key] from storage` | Command | Removes a key |
+| `(get all keys from storage)` | Reporter | JSON array of key names in this storage ID |
+| `(get all values from storage)` | Reporter | JSON array of values in this storage ID |
+| `clear storage` | Command | Deletes every key in this storage ID |
+
+### Example
+
+```
+when authenticated
+set storage id to [my-game]
+set key [highscore] to (score) in storage
+say (get key from storage [highscore])
+```
+
+## Storage usage
+
+All sizes are in characters.
+
+| Block | Type | Returns |
+| --- | --- | --- |
+| `(storage usage (characters))` | Reporter | Size of the data in this storage ID |
+| `(storage limit (characters))` | Reporter | The account's total storage limit |
+| `(storage remaining (characters))` | Reporter | The account's limit minus this storage ID's usage |
+| `(account storage usage (characters))` | Reporter | Storage used across the whole account |
+| `(account storage limit (characters))` | Reporter | The account's total storage limit |
+| `(account storage remaining (characters))` | Reporter | Storage left on the whole account |

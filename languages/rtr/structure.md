@@ -1,225 +1,106 @@
 # Structure
 
-RTR is a lightweight scripting language with a simple but powerful structure. This document outlines the core components and structure of RTR code.
+This page describes how an RTR program is laid out: event blocks, statements, expressions, and scope.
 
-## Program Structure
+## Program
 
-An RTR program consists of one or more event blocks. Each event block contains a series of statements that are executed when the event is triggered. Note that newlines have no syntactic meaning in RTR - they are purely for readability.
+A program is one or more event blocks. The host runs a block's statements when its event happens. Code outside an event block does not run.
 
 ```js
 event (eventName) {
-    /* Statements */
+    /* statements */
 }
 
 event (anotherEvent) {
-    /* More statements */
+    /* more statements */
 }
 ```
 
-## Statement Types
+Statements end at a new line or a `;`. Spaces outside strings are ignored, so indentation is only for readability. Comments go between `/*` and `*/`.
 
-### 1. Variable Declarations
+## Statements
 
-```go
-variable := value;
-```
+| Statement | Syntax |
+| --- | --- |
+| Assignment | `variable = value` |
+| Compound assignment | `variable += value` (also `-=`, `*=`, `/=`, `%=`, `^=`) |
+| Property assignment | `object.property = value` |
+| Function definition | `name = (param1, param2)~{ body }` |
+| Function call | `name(arg1, arg2)` |
+| Return | `return(value)` |
+| If | `if (condition) { } elif (condition) { } else { }` |
+| While | `while (condition) { }` |
+| Repeat | `repeat (times) { }` |
+| For | `for (variable, array) { }` |
+| Scope | `scope { }` |
 
-### 2. Function Definitions
+## Expressions
+
+### Literals
+
+| Type | Examples |
+| --- | --- |
+| Number | `42`, `3.14`, `-7` |
+| String | `"Hello"` (double quotes only) |
+| Boolean | `true`, `false` |
+| Null | `null` |
+| Array | `[1, 2, 3]` |
+| Object | `{"key": "value"}` (JSON, keys in double quotes) |
+
+### Operators
+
+| Kind | Operators |
+| --- | --- |
+| Arithmetic | `+`, `-`, `*`, `/`, `%`, `^` |
+| Comparison | `==`, `!=`, `>=`, `<=`, `>`, `<` |
+| Assignment | `=`, `+=`, `-=`, `*=`, `/=`, `%=`, `^=` |
+
+Operators are evaluated from left to right with no precedence. For negation, call `not(value)` or `!(value)`.
+
+### Property access
 
 ```js
-functionName = (param1, param2)~{
-    /* Function body */
-}
+object.property
+object.method(arg1, arg2)
 ```
 
-### 3. Control Structures
+To read an array element by index, use [`item`](functions/array.md#item): `item(array, 0)`.
 
-```javascript
-if (condition) {
-    /* Code */
-} elif (otherCondition) {
-    /* Code */
-} else {
-    /* Code */
-}
+## Scope
 
-while (condition) {
-    /* Code */
-}
+RTR keeps variables in layers:
 
-repeat (times) {
-    /* Code */
-}
+1. **Built-ins**: the [built-in functions](functions/README.md) and variables.
+2. **Program**: variables assigned in event blocks. All events share this layer, so a variable set in `onload` can be read in another event.
+3. **Function**: each function call adds a layer for its parameters and local variables.
+4. **Block**: a `scope { }` block adds a layer.
 
-for (variable, range) {
-    /* Code */
-}
-```
-
-### 4. Function Calls
-
-```go
-result := functionName(arg1, arg2);
-```
-
-### 5. Object Operations
+Reading a variable searches from the innermost layer outwards. Assigning always writes to the innermost layer, so assigning inside a function or `scope` block creates a local variable:
 
 ```js
-obj.property = obj.method(arg1, arg2);
-```
-
-## Expression Structure
-
-### 1. Literals
-
-* Numbers: `42`, `3.14`
-* Strings: `"Hello"`, `'World'`
-* Booleans: `true`, `false`
-* Null: `null`
-* Arrays: `[1, 2, 3]`
-* Objects: `{key: value}`
-
-### 2. Operators
-
-#### Arithmetic: `+`, `-`, `*`, `/`, `%`, `^`
-
-#### Comparison: `==`, `!=`, `>=`, `<=`, `>`, `<`
-
-#### Logical: `!`, `?`
-
-#### Assignment: `=`, `+=`, `-=`, `*=`, `/=`, `^=`, `%=` , `??=`&#x20;
-
-* #### =
-
-Assigns the left hand side to the right hand side, assigning the variable's type to the value's type
-
-```java
-myVariable := "hi";
-obj.prop = "im a property";
-```
-
-* #### :=
-
-Declares a variable with an immutable type (cannot be changed)
-
-```go
-variable := "hello";
-variable = 5; // errors
-```
-
-```go
-variable := "bleh";
-scope {
-    variable := ":3";
-    log(variable); // :3
-}
-log(variable); // bleh
-```
-
-* #### +=, -=, \*=, /=, %=, ^=
-
-
-
-### 3. Function Calls
-
-```js
-functionName(arg1, arg2);
-```
-
-### 4. Property Access
-
-```js
-object.property;
-array[index];
-```
-
-## Scope Structure
-
-RTR uses lexical scoping with the following rules:
-
-1. Global Scope: Variables defined outside any event or function
-2. Event Scope: Variables defined within an event block
-3. Function Scope: Variables defined within a function
-4. Block Scope: Variables defined within a `scope` block
-
-```js
-/* Global scope */
-globalVar = 42;
-
 event (onload) {
-    /* Event scope */
-    eventVar := "Hello";
-    
-    function = ()~{
-        /* Function scope */
-        funcVar := true;
-    };
-    
+    variable = "outer"
     scope {
-        /* Block scope */
-        blockVar := 123;
+        variable = "inner"
+        log(variable)  /* inner */
     }
+    log(variable)  /* outer */
 }
 ```
 
-## Event Structure
+Assigning to a property (`object.property = value`) changes the object itself, wherever it was created.
 
-Events are the primary organizational unit in RTR. They follow this structure:
+## Built-in variables
 
-```js
-event (eventName) {
-    /* Event initialization */
-    /* Variable declarations */
-    /* Function definitions */
-    /* Main event logic */
-}
-```
+| Variable | Contents |
+| --- | --- |
+| `platform` | The host program's `name` and `version` |
+| `rtr` | `version` of the interpreter and its `environment` |
+| `mouse` | `x`, `y`, `down`, `clicked`, `moved` |
+| `keysdown` | Array of keys currently held |
 
-Common events include:
+The host program updates `mouse` and `keysdown`.
 
-* `onload`: Triggered when the program starts
-* `onclick`: Triggered on mouse click
-* `onkey`: Triggered on keyboard input
-* `ontick`: Triggered on each frame/tick
+## Events
 
-## Function Structure
-
-Functions in RTR can be defined in two ways:
-
-1. Named Functions:
-
-```js
-functionName = (param1, param2)~{
-    /* Function body */
-    return(value);
-}
-```
-
-2. Anonymous Functions:
-
-```js
-obj.method = (param)~{
-    /* Function body */
-};
-```
-
-## Error Handling
-
-RTR provides basic error handling through the event system:
-
-```js
-event (onerror) {
-    /* Handle errors */
-    log("Error occurred:", error);
-}
-```
-
-## Best Practices
-
-1. Use meaningful event names
-2. Keep functions small and focused
-3. Use proper scoping to avoid variable conflicts
-4. Use multiline comments for documentation
-5. Use built-in functions when available
-6. Handle errors appropriately
-7. Use proper indentation for readability (though not required)
+See [Events](events.md).

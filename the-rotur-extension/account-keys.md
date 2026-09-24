@@ -1,56 +1,62 @@
-# Account Keys
+# Account keys
 
-The user account is the primary focus of rotur, where you can set and retrieve all user information.
+A Rotur account is an object of keys and values. These blocks read and set keys on the logged-in account. Use them for user preferences; for app data, use [Data storage](data-storage.md).
 
-All user accounts will have the following keys that you can access:
+## Keys on every account
 
-## Main Keys
+These are the keys you can expect on an account. The `[KEY]` dropdowns list the keys the logged-in account actually has.
 
-```
-username       - (read only) The name of the user
-created        - (read only) A unix timestamp of when the account was created
-last_login     - (read only) A unix timestamp of when the user last logged in
-max_size       - (read only) An integer of the maximum number of characters that can be stored of ofsf data in this account
-system         - (read only) A string of the operating system that the account was created with
-pfp            - A url to the user's profile picture
-accent         - A colour hex code of the user's prefered accent
-onboot         - An array of apps to open when the user logs in
-theme          - An object of colours, allows user customisation, default is this: {"primary":"#222","secondary":"#555","tertiary":"#777","text":"#fff","background":"#050505"}
-```
+| Key | Writable | Description |
+| --- | --- | --- |
+| `username` | No | The user's name |
+| `created` | No | Unix timestamp of when the account was created |
+| `last_login` | No | Unix timestamp of the user's last login |
+| `max_size` | No | The maximum number of characters of OFSF data the account can store |
+| `system` | No | The operating system the account was created with |
+| `pfp` | Yes | URL of the user's profile picture |
+| `accent` | Yes | Hex code of the user's preferred accent color |
+| `onboot` | Yes | Array of apps to open when the user logs in |
+| `theme` | Yes | Object of colors for customization. Default: `{"primary":"#222","secondary":"#555","tertiary":"#777","text":"#fff","background":"#050505","accent":"#57cdac"}` |
 
-## SYS keys
+### System keys
 
-All of the below are not writable using the "set \[key] to \[value]" reporter
+Keys that start with `sys.` are managed by Rotur. You can read them, but setting one returns "System keys cannot be modified directly".
 
-```
-sys.requests   - An array of all incoming friend requests
-sys.friends    - An array of usernames that are friends with you
-sys.items      - An array of item ids that the user has made
-sys.purchases  - An array of item ids that the user has bought or made
-sys.currency   - An integer of the amount of credits a user has
-```
+| Key | Description |
+| --- | --- |
+| `sys.requests` | Array of incoming friend requests |
+| `sys.friends` | Array of usernames you're friends with |
+| `sys.items` | Array of IDs of items the user has made |
+| `sys.purchases` | Array of IDs of items the user has bought or made |
+| `sys.currency` | The user's credit balance |
+
+## Read keys
+
+| Block | Type | Returns |
+| --- | --- | --- |
+| `(get [KEY])` | Reporter | The key's value. Objects and arrays come back as JSON. Missing keys return an empty string. |
+| `<key [KEY] exists>` | Boolean | `true` if the account has the key |
+| `(get all keys)` | Reporter | JSON array of key names |
+| `(get all values)` | Reporter | JSON array of values, in the same order as `get all keys` |
+| `(get account object)` | Reporter | The whole account as a JSON object |
+| `when account updated` | Hat | Fires when a key on the account changes, including changes made from another client |
+
+Reading keys is instant: the extension keeps a copy of the account in memory and updates it as changes arrive over the socket.
 
 ## Set a key
 
-When you set a key, it has to send a request to the server so this might not complete instantly
+```
+(set [KEY] to [value])
+```
 
-If a key is read only, you will get this response:\
-![Screenshot 2024-08-15 at 01 56 37](https://github.com/user-attachments/assets/f9bcf9dd-5d14-4f09-948d-ca46ab1fe528)
+Reporter. Sends the new value to Rotur, updates the local copy and fires `when account updated`. The request takes a moment, so it doesn't finish instantly.
 
-The max length for a value is 1000
-
-The max length for a key is 20
-
-If the data you try to write to the key is too big, it will give this response:\
-![Screenshot 2024-08-15 at 02 03 54](https://github.com/user-attachments/assets/c96fc7a5-8db1-4569-b876-90b08f08cb58)
-
-If the key itself is too long, you will get this response:\
-![Screenshot 2024-08-15 at 02 00 59](https://github.com/user-attachments/assets/daeb8c25-d56d-4dc3-b8a8-72307873ca5e)
-
-If the key is updated successfully you will get this response:\
-![Screenshot 2024-08-15 at 02 03 41](https://github.com/user-attachments/assets/928922ba-a31d-4493-94c7-161947d041e6)
-
-If the key you updated makes the account go over it's maximum key storage of 25,000 characters, you will get this response:\
-![image](https://github.com/user-attachments/assets/b0b3c722-cbb5-48da-866a-5812ed977545)
-
-It is recommended that you use the storage apis for all data storage. Account keys for simply for user preferences.
+| Returns | When |
+| --- | --- |
+| `Key Set` | The key was updated |
+| `Key Too Long, Limit is 1000 Characters` | The value is longer than 1000 characters (checked before sending) |
+| `Key length exceeds 20 characters` | The key name is longer than 20 characters |
+| `Total account size exceeds 25000 bytes` | The update would take the account over its 25,000-character limit |
+| `System keys cannot be modified directly` | The key starts with `sys.` |
+| `Key '<key>' cannot be updated` | The key is read-only, such as `created` or `last_login` |
+| `Not Connected` / `Not Logged In` | There's no connection or no logged-in user |

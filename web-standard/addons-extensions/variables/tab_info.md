@@ -1,18 +1,18 @@
 # tab\_info
 
-Provides a way for pages to change the tab's title or icon.
+Pages set `tab_info` to change the tab's title or icon. Set it to an object with `title` and `icon` keys, or to a string to change only the title.
 
 {% tabs %}
 {% tab title="OSL" %}
 ```javascript
 tab_info = {"title":"my page","icon":"icn code"}
 tab_info = "my page"
-// the current_tab_name variable can also be used in the same way,
-// if your making a browser, i recommend you also support current_tab_name
-// as it is still used in a large amount of .web pages
+// current_tab_name works the same way
 ```
 {% endtab %}
 {% endtabs %}
+
+`current_tab_name` is an older name for `tab_info`, and many `.web` pages still use it. If you are building a browser, support both.
 
 ## Implementations
 

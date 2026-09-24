@@ -1,22 +1,25 @@
 # POST `/cosmetics/unequip`
 
-Remove your active cosmetic of a given type. For overlays, this also clears `sys.overlay` on your user object so the avatar server stops rendering the overlay.
+Unequip your cosmetic of one type. Unequipping an overlay also clears `sys.overlay` on your account, so the avatar server stops rendering it.
 
-**Authentication:** Required. **Permission:** `cosmetics:equip`.
+**Auth:** Required. Sub-tokens need `cosmetics:equip`.
 
-**Query Parameters:**
+### Parameters
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `type` | string | Yes | The cosmetic type to unequip (e.g. `overlay`) |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `type` | query or body | string | Yes | The cosmetic type to unequip: `overlay` or `background` |
 
-**Example request:**
+Pass `type` in the query string, or in a JSON body (`Content-Type: application/json`) when the query parameter is absent.
+
+### Example
 
 ```http
 POST /cosmetics/unequip?type=overlay
+Authorization: Bearer <token>
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -24,10 +27,11 @@ POST /cosmetics/unequip?type=overlay
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error |
-|---|---|
-| `400` | `type query parameter is required (e.g. overlay)` |
+| Status | When |
+| --- | --- |
+| `400` | `type is required (e.g. overlay or background)` |
+| `400` | `Invalid request body`: the JSON body could not be parsed |
 | `400` | `Unknown cosmetic type` |
 | `400` | `No active cosmetic of that type to remove` |

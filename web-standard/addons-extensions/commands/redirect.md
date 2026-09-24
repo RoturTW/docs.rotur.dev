@@ -1,6 +1,8 @@
 # redirect
 
-Redirects the current tab to a different url.
+Loads a different URL in the current tab. It accepts a URL string or a [URL](../api/classes/url/README.md) instance.
+
+To open the URL in a new tab instead, use [`opentab`](opentab.md).
 
 {% tabs %}
 {% tab title="OSL / OWF" %}

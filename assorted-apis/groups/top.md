@@ -1,16 +1,18 @@
-# Top Groups
+# Top groups
 
-Get the 10 biggest public groups by member count. No authentication needed.
+Get the 10 largest public groups by member count.
 
-### GET `/v2/groups/top`
+## GET `/v2/groups/top`
 
-**Example request:**
+**Auth:** None.
 
-```bash
-curl "https://api.rotur.dev/v2/groups/top"
+### Example
+
+```http
+GET /v2/groups/top
 ```
 
-**Example response (200):**
+**Response `200`:** up to 10 [group objects](README.md#group), largest first. Private groups are never included.
 
 ```json
 [
@@ -33,5 +35,3 @@ curl "https://api.rotur.dev/v2/groups/top"
   }
 ]
 ```
-
-Returns up to 10 groups, largest first. Private groups are never included.

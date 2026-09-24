@@ -1,21 +1,21 @@
-# List All Sub-Tokens
+# List tokens
 
 List every sub-token on your account, including revoked and expired ones.
 
-> **Authentication:** Required. Needs the `tokens:manage` permission, which sub-tokens can never hold, so in practice this is main-token only.
+## GET `/tokens`
 
-### GET `/tokens`
+Returns all sub-tokens with their values.
 
-**Query Parameters:**
-* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
+**Auth:** Required. Needs `tokens:manage`, which sub-tokens cannot hold, so only the main token works.
 
-**Example:**
+### Example
 
 ```http
 GET /tokens
+Authorization: Bearer <main token>
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -26,8 +26,8 @@ GET /tokens
       "permissions": ["account:view", "posts:view"],
       "created_at": 1715512345678,
       "last_used_at": 1715599999999,
-      "token": "rotur_st_xYz123...",
       "revoked": false,
+      "token": "rotur_st_xYz123...",
       "origin": "https://myapp.example.com",
       "description": "Read-only access for My App",
       "websites": ["https://myapp.example.com"]
@@ -37,4 +37,4 @@ GET /tokens
 }
 ```
 
-`expires_at`, `revoked_at`, and `last_used_at` are omitted when they are not set.
+`last_used_at`, `expires_at`, `revoked_at`, `origin`, `description` and `websites` are left out when they are empty.

@@ -1,10 +1,10 @@
 # Basics
 
-RWL (rotur web language) is a language that is used to structure rotur websites.
+RWL (Rotur Web Language) structures Rotur websites. This page shows a minimal page and the two ways to build one.
 
-### Displaying your first piece of text
+## Display text
 
-In RWL all you need to show a peice of text on a page is:
+To show text on a page, put a string inside a `root` block:
 
 ```js
 root {
@@ -12,9 +12,9 @@ root {
 }
 ```
 
-The text itself must be in `""`, `''` or ` `` `, as these are used to figure out what type a value is.
+Strings go in double quotes (`""`), single quotes (`''`), or backticks (` `` `). The quotes tell RWL the value is text.
 
-You can also add more text elements, with commas inbetween each one:
+Separate several elements with commas:
 
 ```js
 root {
@@ -24,35 +24,33 @@ root {
 }
 ```
 
-### Website Types
+## Site types
 
-RWL websites are generally in 2 different types:
+RWL sites come in two types.
 
-#### Element based:
+### Element based
 
-Uses elements to denote the layout and contents of a page.
+Elements describe the layout and content of the page. This suits static, simple sites.
 
 ```js
-// root is needed for element based websites
+// element based sites need a root block
 root {
-  // code
+  // content
 }
 ```
 
-Can be useful for more static and simple websites.
+### Script based
 
-#### Script based:
-
-Uses a script to draw the page (usually using RTR)
+A script draws the page, usually written in [RTR](../rtr/README.md). This suits dynamic sites that need custom graphics.
 
 ```js
 script [type="rtr"] {
-  // rtr code
+  // RTR code
 }
 ```
 
-Can be useful for more dynamic and complicated websites that require custom graphics.
+RWL does not parse the contents of a `script` block; the browser passes them to the language named in `type`.
 
 {% hint style="info" %}
-Drawing things with rtr can also be used on element based websites.
+Element based sites can also include scripts that draw with RTR.
 {% endhint %}

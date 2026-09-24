@@ -1,24 +1,24 @@
-# /vote\_poll
+# GET `/vote_poll`
 
-Votes in a post's poll. Voting again changes your vote.
+Votes in a post's poll. Voting again replaces your earlier vote.
 
-Requires authentication.
+**Auth:** Required.
 
-## Parameters
+### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| id | Yes | The ID of the post with the poll |
-| option | Yes | The option index to vote for, starting at 0 |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | query | string | Yes | ID of the post with the poll |
+| `option` | query | integer | Yes | Index of the option, starting at 0 |
 
-## Example
+### Example
 
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/vote_poll?id=POST_ID&option=1"
+```http
+GET /vote_poll?id=abc123&option=1
+Authorization: Bearer <token>
 ```
 
-## Response
+**Response `200`:**
 
 ```json
 {
@@ -35,11 +35,11 @@ curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/vote_poll?i
 
 `voted` is the option index you voted for.
 
-## Common errors
+### Errors
 
-| Status | Error | Cause |
-| --- | --- | --- |
-| 400 | `Post ID and option are required` | Missing parameter |
-| 400 | `Invalid option` | `option` is not a number |
-| 400 | `Option out of range` | `option` does not match a poll option |
-| 404 | `Poll not found` | The post does not exist or has no poll |
+| Status | When |
+| --- | --- |
+| `400` | `Post ID and option are required` |
+| `400` | `Invalid option` (`option` is not a number) |
+| `400` | `Option out of range` |
+| `404` | `Poll not found` (the post does not exist or has no poll) |

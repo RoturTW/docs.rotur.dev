@@ -1,36 +1,36 @@
-# Delete a Device
+# Delete a device
 
-### DELETE `/notify/device/:device_id`
+## DELETE `/notify/device/:device_id`
 
-Removes a device from your registered endpoints.
+Remove a registered device. On v2 the path is `DELETE /v2/notify/devices/:device_id`.
 
-{% hint style="info" %}
-On v2 this is `DELETE /v2/notify/devices/:device_id`.
-{% endhint %}
+**Auth:** Required. Sub-tokens need `account:settings`.
 
-**Path Parameters:**
+### Parameters
 
-| Parameter | Description |
-| --- | --- |
-| `device_id` | The server-generated device ID returned during registration |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `device_id` | path | string | Yes | The device ID returned by [register](register-endpoint.md) or [check](check-registration.md) |
 
-**Example:**
+### Example
 
+```http
+DELETE /notify/device/a4f8b2c1d3e5f7a9b0c2d4e6f8a0b2c4
+Authorization: Bearer <token>
 ```
-DELETE /notify/device/a4f8b2c1d3e5f7a9b0c2d4e6
-```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
   "message": "device removed",
-  "device_id": "a4f8b2c1d3e5f7a9b0c2d4e6"
+  "device_id": "a4f8b2c1d3e5f7a9b0c2d4e6f8a0b2c4"
 }
 ```
 
-**Common Errors:**
+### Errors
 
-| Status | Body | Condition |
-| --- | --- | --- |
-| 404 | `{"error": "device not found"}` | No endpoint with that device ID |
+| Status | When |
+| --- | --- |
+| `404` | `device not found` |
+| `500` | `failed to save notification endpoints` |

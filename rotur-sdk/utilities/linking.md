@@ -1,49 +1,71 @@
 # Linking
 
-Accessed via `rotur.link`. Link codes provide an auth flow for non-browser contexts.
+`rotur.link` logs a user in with a link code, for apps that cannot open the browser login popup (CLIs, desktop apps, servers). Your app shows a code, the user enters it on rotur.dev, and your app polls for the token. See [Authentication](../account/authentication.md) for the full flow.
 
-## Get a Link Code
+## rotur.link.getCode()
+
+Creates a new link code.
+
+**Auth:** None.
 
 ```ts
 const { code } = await rotur.link.getCode();
-// "ABCD-1234"
+console.log("Enter this code on rotur.dev:", code);
 ```
 
-Display this code and have the user enter it at `rotur.dev`.
+**Returns:** `{ code }`
 
-## Check Link Status
+## rotur.link.status(code)
+
+Gets the status of a link code.
+
+**Auth:** None.
 
 ```ts
-const { status } = await rotur.link.status("ABCD-1234");
+const { status } = await rotur.link.status(code);
 ```
 
-## Get Linked User
+**Returns:** `{ status }`
+
+## rotur.link.linkedUser(code)
+
+Gets the token for a link code once a user has linked it.
+
+**Auth:** None.
 
 ```ts
-const { linked, token } = await rotur.link.linkedUser("ABCD-1234");
-if (linked && token) {
-  rotur.setToken(token);
-}
+const { linked, token } = await rotur.link.linkedUser(code);
+if (linked && token) rotur.setToken(token);
 ```
 
-## Link Code (Authenticated)
+**Returns:** `{ linked, token? }`
 
-If you're already authenticated and want to associate a code with the current user:
+## rotur.link.pollUntilLinked(code, intervalMs?, timeoutMs?)
+
+Calls `linkedUser()` until the code is linked, then sets the token on the client and returns it.
+
+**Auth:** None.
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `code` | string | | Link code |
+| `intervalMs` | number | `1500` | Time between checks |
+| `timeoutMs` | number | `120000` | Time before giving up |
+
+```ts
+const token = await rotur.link.pollUntilLinked(code, 1500, 120_000);
+```
+
+**Returns:** the token. Throws `Error("Link polling timed out")` on timeout.
+
+## rotur.link.linkCode(code)
+
+Links a code to the signed-in user, the step a user normally does on rotur.dev.
+
+**Auth:** Required. Sub-tokens need `account:settings`.
 
 ```ts
 await rotur.link.linkCode("ABCD-1234");
 ```
 
-## Poll Until Linked
-
-Convenience method that polls `linkedUser` until the code is linked:
-
-```ts
-const token = await rotur.link.pollUntilLinked(
-  "ABCD-1234",
-  1500,     // poll every 1.5s
-  120_000,  // timeout after 2 minutes
-);
-```
-
-On success the token is set on the client automatically and returned. Throws an error on timeout.
+**Returns:** the response as a `string`.

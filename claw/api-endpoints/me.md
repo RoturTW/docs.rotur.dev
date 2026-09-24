@@ -1,36 +1,34 @@
-# /me
+# GET `/me`
 
-Returns the full account object for the authenticated user. This is the primary way to get your own user data.
+Returns the full account object for your account: username, credits, subscription, badges, settings and other account data. `/get_user` and `/get_user_new` are the same endpoint.
 
-Uses the profile rate limit (30 per minute, 120 when authenticated).
+**Auth:** Required. Send a token, or sign in with a username and password instead. A sub-token without `account:view` gets a reduced, profile-only object. Uses the profile rate limit.
 
-## Parameters
+### Parameters
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes* | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| username | No* | Alternative login: your username, paired with `password` |
-| password | No* | Alternative login: your password, paired with `username` |
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `username` | query | string | No* | Your username, for password sign-in |
+| `password` | query | string | No* | Your password, for password sign-in |
 
-*You can authenticate with either `auth` or a `username` and `password` pair.
+*Only needed when you do not send a token. A JSON body with `username` and `password` also works.
 
-## Example
+### Example
 
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/me"
+```http
+GET /me
+Authorization: Bearer <token>
 ```
 
-## Response
+**Response `200`:** your account object.
 
-Returns your account object, including your username, credits, subscription, badges, and settings.
+### Errors
 
-This endpoint is functionally identical to `/get_user` and `/get_user_new`.
-
-## Common errors
-
-| Status | Error | Cause |
-| --- | --- | --- |
-| 403 | `Invalid authentication credentials` | Wrong username or password |
-| 403 | `User is banned` | The account is banned |
-| 403 | `Email address not verified` | The account email is not verified |
-| 403 | `Terms-Of-Service are not accepted or outdated` | The account needs to accept the current TOS |
+| Status | When |
+| --- | --- |
+| `403` | `Invalid authentication credentials` (no valid token, or wrong username or password) |
+| `403` | `User is banned` |
+| `403` | `Email address not verified` |
+| `403` | `Terms-Of-Service are not accepted or outdated` |
+| `403` | `Unable to login to this account` (your IP is blocked on this account) |
+| `403` | `Tor is not allowed` |

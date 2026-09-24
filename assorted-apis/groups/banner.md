@@ -1,34 +1,28 @@
-# Group Banner
+# Group banner
 
-Upload and fetch a group's banner image.
+Upload a group's banner, or fetch it as an image.
 
-## Upload a Banner
+## POST `/v2/groups/{tag}/banner`
 
-### POST `/v2/groups/{tag}/banner`
+Upload a new banner. The image is resized to 900×300, replacing any previous banner, and the group's `banner_url` is updated. The saved format follows the file part's `Content-Type`: `image/gif` stays an animated GIF, `image/png` stays PNG, and anything else is saved as JPEG.
 
-**Auth:** required. Token permission: `groups:manage`. You must be the group owner or hold the `groups.group.edit` or `groups.manage` group permission.
+**Auth:** Required. Sub-tokens need `groups:manage`. You must be the owner or hold `groups.group.edit` or `groups.manage`.
 
-The image is resized to **900x300**. JPEG and PNG uploads keep their format; GIFs stay animated. Any previous banner is replaced, and the group's `banner_url` is updated automatically.
+### Parameters
 
-**Path Parameters:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `banner` | body (multipart/form-data) | file | Yes | Image file, up to 5 MB and 50 megapixels |
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-
-**Body (multipart/form-data):**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `banner` | file | Yes | Image file (max 5MB, JPEG/PNG/GIF) |
-
-**Example request:**
+### Example
 
 ```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/banner" \  -F "banner=@banner.png"
+curl -X POST "https://api.rotur.dev/v2/groups/mygroup/banner" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "banner=@banner.png"
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -37,34 +31,33 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Banner image file is required` | No file in the `banner` field |
-| 400 | `Image too large (max 5MB)` | File exceeds 5MB |
-| 400 | `Invalid image format` | File couldn't be decoded as an image |
-| 400 | `Invalid GIF image` | GIF couldn't be processed |
-| 403 | `You are not authorized to update this group` | No edit access |
-| 404 | `Group not found` | Group doesn't exist |
-| 500 | `Failed to save banner` / `Failed to encode banner` | Server-side processing error |
+| Status | When |
+| --- | --- |
+| `400` | There's no file in the `banner` field (`Banner image file is required`) |
+| `400` | The file is over 5 MB (`Image too large (max 5MB)`) |
+| `400` | The file isn't a readable image or is over 50 megapixels (`Invalid image format`) |
+| `400` | The GIF couldn't be resized (`Invalid GIF image`) |
+| `403` | You don't have edit access (`You are not authorized to update this group`) |
+| `500` | The server couldn't read, save, or encode the image (`Failed to read image`, `Failed to save banner`, `Failed to encode banner`) |
 
-***
+## GET `/v2/groups/{tag}/banner`
 
-## Get a Banner
+Return the group's banner image.
 
-### GET `/v2/groups/{tag}/banner`
+**Auth:** None.
 
-Returns the group's banner image. No authentication needed.
+### Example
 
-**Example request:**
-
-```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/banner" -o banner.png
+```http
+GET /v2/groups/mygroup/banner
 ```
 
-**Common errors:**
+**Response `200`:** the image file, as JPEG, PNG, or GIF.
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `No banner found` | Group has no banner uploaded |
+### Errors
+
+| Status | When |
+| --- | --- |
+| `404` | The group has no uploaded banner, or doesn't exist (`No banner found`) |

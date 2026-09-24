@@ -1,33 +1,26 @@
-# Leave a Group
+# Leave a group
 
-Leave a group you're a member of. Owners can't leave their own group; [transfer ownership](transfer.md) or [delete the group](delete.md) instead.
+Leave a group you're a member of. The owner can't leave; [transfer ownership](transfer.md) or [delete the group](delete.md) instead.
 
-### POST `/v2/groups/{tag}/leave`
+## POST `/v2/groups/{tag}/leave`
 
-**Auth:** required. Token permission: `groups:leave`.
+**Auth:** Required. Sub-tokens need `groups:leave`.
 
-**Path Parameters:**
+### Example
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-
-**Example request:**
-
-```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/leave"
+```http
+POST /v2/groups/mygroup/leave
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
-
-Returns the updated group info:
+**Response `200`:** the updated [group object](README.md#group).
 
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "tag": "mygroup",
   "name": "My Group",
-  "description": "A cool group",
+  "description": "A group for testing",
   "readme": "",
   "rules": "",
   "icon_url": "",
@@ -42,10 +35,9 @@ Returns the updated group info:
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `You cannot leave the group you own` | You are the owner |
-| 400 | `You are not a member of this group` | Not a member |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | You own the group (`You cannot leave the group you own`) |
+| `400` | You aren't a member (`You are not a member of this group`) |

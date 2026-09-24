@@ -1,23 +1,25 @@
-# /bookmark
+# GET `/bookmark`
 
-Saves a post to your bookmarks. Bookmarking requires a Plus subscription or higher.
+Saves a post to your bookmarks.
 
-Requires authentication. You can keep up to 200 bookmarks; the oldest is dropped when you go over.
+**Auth:** Required. Your account needs a Plus subscription or higher.
 
-## Parameters
+You can keep up to 200 bookmarks. New bookmarks go to the front of the list, and when you go over 200 the oldest is dropped.
 
-| Parameter | Required | Description |
-| --------- | -------- | ----------- |
-| auth | Yes | Your authentication key. Use the `Authorization` header with `Bearer <token>` (preferred). The `auth` query parameter is still accepted as fallback. |
-| id | Yes | The ID of the post to save |
+### Parameters
 
-## Example
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | query | string | Yes | ID of the post to save |
 
-```bash
-curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/bookmark?id=POST_ID"
+### Example
+
+```http
+GET /bookmark?id=abc123
+Authorization: Bearer <token>
 ```
 
-## Response
+**Response `200`:**
 
 ```json
 {
@@ -25,12 +27,12 @@ curl -H "Authorization: Bearer YOUR_AUTH_KEY" "https://api.rotur.dev/bookmark?id
 }
 ```
 
-If it was already bookmarked you get `{ "message": "Already saved" }`.
+If the post is already bookmarked, `message` is `Already saved`.
 
-## Common errors
+### Errors
 
-| Status | Error | Cause |
-| --- | --- | --- |
-| 400 | `Post ID is required` | Missing `id` parameter |
-| 403 | `Saving posts requires a Plus subscription or higher` | Free or Lite account |
-| 404 | `Post not found` | No post with that ID |
+| Status | When |
+| --- | --- |
+| `400` | `Post ID is required` |
+| `403` | `Saving posts requires a Plus subscription or higher` |
+| `404` | `Post not found` |

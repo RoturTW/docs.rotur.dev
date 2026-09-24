@@ -1,64 +1,61 @@
 # Currency
 
-The Currency system in rotur is simple and intuitive.
+Rotur accounts hold credits, which users can send to each other and spend on keys. These blocks read the logged-in user's balance and history and send credits. Users get credits from the daily claim on Rotur; the extension has no block for claiming. See [Transactions and taxes](../my-account/transactions-and-taxes.md) for fees.
 
-Every day that a user logs in, they gain 1 credit that they can send to any other user or buy items with.
-
-## Get Balance
-
-![block\_15\_08\_2024-02\_28\_38](https://github.com/user-attachments/assets/45f2d2af-8aa7-4946-9495-658c2163c757)
-
-This block lets you view how many credits that your user account has, and will update when others send you credits or when you send them credits, or make purchases.
-
-## Transfer To
-
-![block\_15\_08\_2024-02\_28\_40](https://github.com/user-attachments/assets/c66ae48f-7444-4112-a303-23de9e68b416)
-
-This block is simple and allows you to transfer a number of credits from your account to another
-
-### Successful Transfer
+## Get balance
 
 ```
-"Success"
+(get balance)
 ```
 
-### Failed Transfer
+Reporter. The logged-in user's credit balance. It's loaded at login and refreshed every 15 seconds, and after each transfer or purchase you make with the extension.
+
+## Transfer credits
 
 ```
-Attempted to send a string:
-"Transaction Must Be A Number"
-
-Attempted to send a small value
-"Transaction Cannot Be Less Than 0.01"
-
-Tried to transfer currency to yourself:
-"You Cannot Send To Yourself"
-
-Attempted to send to an account that doesn't exist:
-"No Account With That Name"
-
-Attempted to send more credits than you have:
-"Not Enough Credits For This Transaction"
+(transfer [0] to [user])
 ```
 
-## When Balance Changed
+Reporter. Sends `AMOUNT` credits to `USER`. Amounts are rounded to 2 decimal places.
 
-![block\_15\_08\_2024-02\_28\_42](https://github.com/user-attachments/assets/4f43cd08-8a7f-4244-a79b-d50610556929)
+| Returns | When |
+| --- | --- |
+| `Success` | The credits were sent |
+| `Invalid amount` | `AMOUNT` isn't a number, or is 0 or less |
+| `Minimum amount is 0.01` | `AMOUNT` rounds to less than 0.01 |
+| `Cannot send credits to yourself` | `USER` is the logged-in user |
+| `recipient user not found` | No account has that username |
+| `insufficient funds (required: 5.00, available: 2.00)` | You don't have enough credits. The numbers are the amount and your balance. |
 
-This hat block will fire whenever the user's balance has changed
+## When balance changed
 
-## Get Transactions
+```
+when balance changed
+```
 
-![block\_15\_08\_2024-02\_28\_43](https://github.com/user-attachments/assets/75d0999a-a730-490b-a63c-f2f53f7d7a92)
+Hat. Fires when the balance differs from the last check. The balance is checked every 15 seconds, so the hat can fire up to 15 seconds after the change. Transfers and purchases made with the extension update the balance without firing it.
 
-This reporter will return an array of text that can be displayed to the user for each past transaction on the account
+## Get transactions
 
-Example data:
+```
+(get transactions)
+```
 
-```js
+Reporter. JSON array of the account's transactions, read from the `sys.transactions` account key.
+
+Example:
+
+```json
 [
-  "sent 5 to Hello",
-  "sent 1234 to Mist",
-  "got 1234 from mist",
+  {
+    "type": "out",
+    "user": "(user ID of the other account)",
+    "amount": 5,
+    "note": "transfer",
+    "time": 1723684583612,
+    "new_total": 12
+  }
 ]
 ```
+
+`type` is `in` for credits received and `out` for credits sent. Other types, such as key sales and gifts, are listed in [Transactions and taxes](../my-account/transactions-and-taxes.md).

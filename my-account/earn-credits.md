@@ -1,125 +1,81 @@
-# Earning Rotur Credits
+# Earn credits
 
-Rotur Credits are the virtual currency used across the Rotur platform, powering purchases, apps, services, and premium features. As a developer, you can earn credits by creating **keys** that users can buy. Keys let you sell items, features, subscriptions, or anything else your service provides.
+Rotur credits are the currency used across Rotur for purchases, apps and services. This page explains how developers earn credits by selling keys, and how users earn credits.
 
-Users earn credits passively through daily rewards or client-specific systems, but the largest and most consistent source of credits in the economy comes from developers who create valuable things that users want to spend credits on.
+## Sell keys
 
-## How Earning Credits Works
+A key is something users buy from you with credits: an app feature, a server plan, a membership, or anything else your service provides. The [Keys API](../assorted-apis/keys.md) has the full endpoint reference.
 
-When a user purchases one of your keys:
+When a user buys one of your keys:
 
-1. Credits are transferred from the buyer to you.
-2. A **10% fee** is automatically applied.
-3. You receive **90% of the credits**.
-4. If your key has a webhook, you receive a real-time event for fulfillment.
+1. The price is taken from the buyer's balance.
+2. Rotur keeps a 10% fee, and you receive 90% of the price.
+3. If the key has a webhook, Rotur sends it a purchase event so you can deliver the purchase.
 
-Keys can be created through the Key Manager:
-
-**[https://rotur.dev/key-manager](https://rotur.dev/key-manager)**
-
-Each key includes:
+Create and manage keys in the [Key Manager](https://rotur.dev/key-manager) or through the API. Each key has:
 
 * A unique ID
-* A price (in credits)
-* A type (one-time or subscription)
+* A price in credits
+* A type: one-time or subscription
 * An optional webhook URL
 
-You can also grant any of your keys to users for free via the UI or APIs.
+You can also give a key to a user for free, from the Key Manager or the API.
 
-## Key Types
+### One-time keys
 
-### One-Time Keys
+The user pays once and you receive the credits straight away.
 
-A simple single purchase. The user pays once and you receive credits immediately.
+### Subscription keys
 
-### Subscription Keys
+The user is charged again at the end of each billing period. A period is a number of days, weeks, months or years, such as every 2 weeks. If the user can't pay a renewal, they lose access to the key.
 
-These keys charge the user automatically on a repeating schedule. Supported cycles:
+### Key limits
 
-* Every **X days**
-* Every **X weeks**
-* Every **X months**
-* Every **X years**
+The number of keys you can create depends on your [subscription tier](subscriptions.md):
 
-Subscription keys are ideal for:
+| Tier | Keys |
+| --- | --- |
+| Free | 5 |
+| Lite | 10 |
+| Plus | 20 |
+| Pro | 50 |
 
-* Premium app features
-* Server plans
-* Memberships
-* Recurring unlocks
+`GET /keys/mine` returns every key you own, with prices, types, users, webhook settings and subscription settings.
 
 ## Webhooks
 
-If a key has a webhook configured, Rotur sends a POST request every time it is purchased. Recurring subscription charges also trigger a webhook.
+If a key has a webhook, Rotur sends it a `POST` request with a JSON body each time the key is bought and each time a subscription renews.
 
-### Webhook Payload
+| Field | Type | Description |
+| --- | --- | --- |
+| `username` | string | The buyer's Rotur username |
+| `key` | string | The key ID |
+| `price` | number | The price in credits |
+| `content` | string | A readable summary of the event |
+| `timestamp` | number | Unix timestamp, in seconds |
 
 ```json
 {
-  "username": "buyer_username",  // purchaser's Rotur username
-  "key": "KEY_ID",               // the key that was purchased
-  "price": 100,                  // price in credits
+  "username": "buyer_username",
+  "key": "KEY_ID",
+  "price": 100,
   "content": "buyer_username purchased key KEY_ID for 100 credits",
-  "timestamp": 1732118400        // Unix timestamp
+  "timestamp": 1732118400
 }
 ```
 
-For recurring charges, `content` reads `buyer_username was charged by key: KEY_ID for 100 credits` instead.
-
-This lets your backend:
-
-* Activate purchases
-* Deliver digital items
-* Unlock app features
-* Grant user roles or perks
-* Track purchase events
-
-## Developer Limits
-
-On the free plan, you can create up to **5 keys**. Plus raises this to 20, and Pro to 50.
-
-To create additional keys, subscribe to a higher [Ko-fi](https://ko-fi.com/mistium) tier.
-
-You can view all your key data with:
-
-```
-GET https://api.rotur.dev/keys/mine
-```
-
-This returns every key you own, including prices, types, users, webhook configuration, and subscription settings.
+For a subscription renewal, `content` reads `buyer_username was charged by key: KEY_ID for 100 credits`.
 
 ## Refunds
 
-Refunds are **not handled automatically** by the system.
+Refunds are not automatic. If a user was scammed or a purchase went wrong, they can contact **@mistium** on Discord, **@mist** on Rotur, or send an Rmail, and the refund is handled by hand.
 
-If a user has been scammed or a mistake was made, they can contact:
+## How users earn credits
 
-* **@mistium** on Discord
-* **@mist** on Rotur
-* RMail or similar channels
+* **Daily claim.** Every user can claim credits once every 24 hours with [`/claim_daily`](../claw/api-endpoints/claim_daily.md), or from the Wallet app on originOS. Free accounts get 1 credit and Pro accounts get 3; see [Daily credit claims](subscriptions.md#daily-credit-claims).
+* **Transfers and sales.** Users receive credits from other users, and from selling items and cosmetics.
+* **Apps and systems.** Some Rotur-connected apps, operating systems and games have their own ways to earn credits.
 
-Refunds and reversals can be processed manually when needed.
+## Economy statistics
 
-## How Users Earn Credits
-
-### Daily Credits
-
-Every user can claim free credits once every 24 hours via the `/claim_daily` endpoint. On OriginOS this is done through the **Wallet app**. The amount depends on your subscription tier (1 credit on Free, up to 3 on Pro).
-
-### Client-Specific Systems
-
-Some Rotur-connected clients (apps, OS environments, games, etc.) may offer their own earning mechanics.
-
-## Economic Tracking
-
-Rotur maintains full credit statistics internally, including total supply, circulation, transactions, developer earnings, and platform fees. You can see some of these via the public stats endpoints such as `https://api.rotur.dev/stats/economy`.
-
-## Summary
-
-* Developers earn credits by selling keys.
-* Key sales carry a **10% fee**, with **90% going to the developer**.
-* Keys can be one-time or subscription-based (days, weeks, months, or years).
-* Webhooks notify you instantly when purchases and recurring charges happen.
-* You can grant keys to users for free.
-* Free tier developers can create up to 5 keys.
-* Refunds are manual and handled by contacting support.
+[`GET /stats/economy`](https://api.rotur.dev/stats/economy) returns public statistics about the credit economy, including the total supply and the current value of a credit in pence and cents.

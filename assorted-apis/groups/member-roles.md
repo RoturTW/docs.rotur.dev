@@ -1,26 +1,23 @@
-# Member Roles, Permissions & Benefits
+# Member roles and permissions
 
-Inspect and manage the roles held by an individual member.
+Look up the roles, permissions, and benefits of one member, and assign or remove their roles.
 
-{% hint style="info" %}
-The `{userid}` path segment on these endpoints accepts either a username or a user ID.
-{% endhint %}
+On these endpoints, `{userid}` accepts a username or a user ID.
 
-## Get a Member's Roles
+## GET `/v2/groups/{tag}/members/{userid}/roles`
 
-### GET `/v2/groups/{tag}/members/{userid}/roles`
+Get every role the member holds. The Owner role is returned with the full permission list.
 
-**Auth:** required. Token permission: `groups:view`.
+**Auth:** Required. Sub-tokens need `groups:view`.
 
-Returns every role assigned to the member. The Owner role includes the full permission list.
+### Example
 
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles"
+```http
+GET /v2/groups/mygroup/members/alice/roles
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** `roles` holds [role objects](README.md#role).
 
 ```json
 {
@@ -39,30 +36,26 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygr
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `User is not a member of this group` | User not in the group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `404` | The user isn't a member (`User is not a member of this group`) |
 
-***
+## GET `/v2/groups/{tag}/members/{userid}/permissions`
 
-## Get a Member's Permissions
+Get the combined permissions from all the member's roles. A member with the Owner role gets the full list.
 
-### GET `/v2/groups/{tag}/members/{userid}/permissions`
+**Auth:** Required. Sub-tokens need `groups:view`.
 
-**Auth:** required. Token permission: `groups:view`.
+### Example
 
-Returns the combined permissions from all the member's roles. Members with the Owner role always get the full list.
-
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/alice/permissions"
+```http
+GET /v2/groups/mygroup/members/alice/permissions
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -70,30 +63,26 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygr
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `User is not a member of this group` | User not in the group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `404` | The user isn't a member (`User is not a member of this group`) |
 
-***
+## GET `/v2/groups/{tag}/members/{userid}/benefits`
 
-## Get a Member's Benefits
+Get the combined benefits from all the member's roles.
 
-### GET `/v2/groups/{tag}/members/{userid}/benefits`
+**Auth:** Required. Sub-tokens need `groups:view`.
 
-**Auth:** required. Token permission: `groups:view`.
+### Example
 
-Returns the combined benefits from all the member's roles.
-
-**Example request:**
-
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/alice/benefits"
+```http
+GET /v2/groups/mygroup/members/alice/benefits
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -101,28 +90,32 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygr
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `User is not a member of this group` | User not in the group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `404` | The user isn't a member (`User is not a member of this group`) |
 
-***
+## PUT `/v2/groups/{tag}/members/{userid}/roles/{roleid}`
 
-## Assign a Role
+Give a member a role.
 
-### PUT `/v2/groups/{tag}/members/{userid}/roles/{roleid}`
+**Auth:** Required. Sub-tokens need `groups:manage`. You need `groups.roles.assign`, unless the role is `self_assignable` and you're giving it to yourself.
 
-**Auth:** required. Token permission: `groups:manage`. Requires the `groups.roles.assign` group permission, unless the role is `self_assignable` and you're assigning it to yourself.
+### Parameters
 
-**Example request:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `roleid` | path | string | Yes | The role's `id` |
 
-```bash
-curl -X PUT -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles/role-3"
+### Example
+
+```http
+PUT /v2/groups/mygroup/members/alice/roles/role-3
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -130,31 +123,35 @@ curl -X PUT -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/grou
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `User already has this role` | Role already assigned |
-| 403 | `You don't have permission to assign roles` | Missing `groups.roles.assign` and not self-assigning a self-assignable role |
-| 404 | `Role not found` | Role ID doesn't exist in this group |
-| 404 | `User is not a member of this group` | Target not in the group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | The member already has the role (`User already has this role`) |
+| `403` | You lack `groups.roles.assign` and aren't self-assigning a self-assignable role (`You don't have permission to assign roles`) |
+| `404` | No role has that ID in this group (`Role not found`) |
+| `404` | The user isn't a member (`User is not a member of this group`) |
 
-***
+## DELETE `/v2/groups/{tag}/members/{userid}/roles/{roleid}`
 
-## Remove a Role
+Remove a role from a member. The Owner role can't be removed this way; [transfer ownership](transfer.md) instead.
 
-### DELETE `/v2/groups/{tag}/members/{userid}/roles/{roleid}`
+**Auth:** Required. Sub-tokens need `groups:manage`. You need `groups.roles.assign`, including to remove a role from yourself.
 
-**Auth:** required. Token permission: `groups:manage`. Requires the `groups.roles.assign` group permission. The Owner role can't be removed this way; use [ownership transfer](transfer.md) instead.
+### Parameters
 
-**Example request:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `roleid` | path | string | Yes | The role's `id` |
 
-```bash
-curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/members/alice/roles/role-3"
+### Example
+
+```http
+DELETE /v2/groups/mygroup/members/alice/roles/role-3
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -162,13 +159,12 @@ curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/g
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Cannot remove Owner role` | Tried to remove the Owner role |
-| 400 | `User doesn't have this role` | Role not assigned to this member |
-| 403 | `You don't have permission to remove roles` | Missing `groups.roles.assign` |
-| 404 | `Role not found` | Role ID doesn't exist in this group |
-| 404 | `User is not a member of this group` | Target not in the group |
-| 404 | `Group not found` | Group doesn't exist |
+| Status | When |
+| --- | --- |
+| `400` | The role is the Owner role (`Cannot remove Owner role`) |
+| `400` | The member doesn't have the role (`User doesn't have this role`) |
+| `403` | You lack `groups.roles.assign` (`You don't have permission to remove roles`) |
+| `404` | No role has that ID in this group (`Role not found`) |
+| `404` | The user isn't a member (`User is not a member of this group`) |

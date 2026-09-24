@@ -1,126 +1,75 @@
 # Friends
 
-The friends system is by far the easiest plug and play friends system that you will find on any scratch extension.
+The friend blocks read the logged-in user's friend list and incoming friend requests, and send, accept and decline requests. A friendship applies to both users: accepting a request adds each user to the other's list.
 
-## How does it work?
+The extension loads the friend list and incoming requests when you log in, and refreshes them every 15 seconds. There's no block for the requests you have sent.
 
-The friends system has 2 arrays for each user, an array of incoming friend requests, and an array of current friends.
+The `[FRIEND]` dropdowns list your friends or your incoming requests. Before you log in they show `Not Authenticated`, and when the list is empty they show `No Friends` or `No Requests`. You can also drop a reporter into them.
 
-You cannot see a list of the friend requests you have sent.
+## Friend list
 
-### What is "Not Authenticated"
+| Block | Type | Returns |
+| --- | --- | --- |
+| `(get friend list)` | Reporter | JSON array of your friends' usernames |
+| `(get friend count)` | Reporter | How many friends you have |
+| `(get friend status of [friend])` | Reporter | `Friend`, `Requested` or `Not Friend` (see below) |
+| `(remove friend [FRIEND])` | Reporter | Removes the friendship for both users. Returns `Friend Removed`. |
 
-![block\_15\_08\_2024-12\_32\_27](https://github.com/user-attachments/assets/74c9637e-4561-4fb4-8ae4-60919f2826c8)
+Example `get friend list` result:
 
-This simply means you haven't logged in yet, When you do login, it will show a list of users on your friends list.
-
-## Blocks
-
-### Friend List
-
-![block\_15\_08\_2024-12\_37\_16](https://github.com/user-attachments/assets/e449b778-0f44-4057-9000-ba9ebd5359c8)
-
-This returns an array of all the usernames of people in your friends list
-
-Example:
-
-```js
-[
-  "wow"
-]
+```json
+["wow"]
 ```
 
-### Remove Friend
+`get friend status of` returns:
 
-![block\_15\_08\_2024-12\_36\_17](https://github.com/user-attachments/assets/836d257c-74cf-449e-a204-58bcc600c8d6)
+| Value | When |
+| --- | --- |
+| `Friend` | You're friends with the user |
+| `Requested` | The user has sent you a friend request |
+| `Not Friend` | Anything else |
 
-This block is pretty self explanatory, it removes the friendship status from both you and the person you unfriended.
-
-### Accept Request
-
-![block\_15\_08\_2024-12\_38\_17](https://github.com/user-attachments/assets/25fea74e-e2e5-4ea6-9e45-b9d08c5025aa)
-
-This allows you to accept a friend request from a username, adding them to your friends list, and you to theirs
-
-### Decline Request
-
-![block\_15\_08\_2024-12\_39\_06](https://github.com/user-attachments/assets/ce8b7a98-7386-47c1-957b-227eb08698c2)
-
-This block allows you to remove a pending friend request from a user
-
-### Send Request
-
-![block\_15\_08\_2024-12\_47\_57](https://github.com/user-attachments/assets/5c0ce4b6-a87f-4087-828a-d0f3a16c77a2)
-
-This block allows you to send a friend request to another user.
-
-#### Success
+## Send a request
 
 ```
-"Sent Successfully"
+(send friend request to [friend])
 ```
 
-#### Failure
+Reporter.
 
-```
-Attempted to send a request to someone you are friends with
-"Already Friends"
+| Returns | When |
+| --- | --- |
+| `Sent Successfully` | The request was sent. If that user had already sent you a request, you become friends straight away. |
+| `Already Friends` | You're already friends |
+| `Already Requested` | You've already sent this user a request |
+| `Account Does Not Exist` | No account has that username |
+| `You Need Other Friends :/` | You sent a request to yourself |
+| `You cant send friend requests to this user` | The user has blocked you |
+| `Unblock this user before sending a friend request` | You have blocked the user |
 
-Attempted to send a request to someone you already friend requested
-"Already Requested"
+## Incoming requests
 
-Attempted to send a friend request to an account that doesn't exist
-"Account Does Not Exist"
+| Block | Type | Returns |
+| --- | --- | --- |
+| `(get friend requests)` | Reporter | JSON array of usernames that sent you a request |
+| `(accept friend request from [FRIEND])` | Reporter | Adds you to each other's friend lists. Returns `Request Accepted`. |
+| `(decline friend request from [FRIEND])` | Reporter | Removes the request. Returns `Request Declined`. |
 
-Attempted to friend request yourself
-"You Need Other Friends :/"
-```
+Example `get friend requests` result:
 
-### When Request Received
-
-![block\_15\_08\_2024-12\_56\_00](https://github.com/user-attachments/assets/bb9f023d-c133-4da8-80de-732681ce711e)
-
-This event block will fire whenever someone else sends you a friend request
-
-### When Request Accepted
-
-![block\_15\_08\_2024-12\_56\_37](https://github.com/user-attachments/assets/263c1acc-d6da-4f71-a73a-4b94a1c7b2a4)
-
-This event block will fire whenever someone accepts one of your friend requests
-
-### Get Requests
-
-![block\_15\_08\_2024-12\_57\_13](https://github.com/user-attachments/assets/c839af93-1efe-4636-bdda-a2c6963ad8df)
-
-This block returns an array of the incoming friend requests to your account
-
-Example:
-
-```js
-[
-  "constellinux"
-]
+```json
+["constellinux"]
 ```
 
-### Friend Status
+## Events
 
-![block\_15\_08\_2024-12\_58\_15](https://github.com/user-attachments/assets/6bd39e25-47eb-4419-91f2-e38bfb4f44ef)
+These hats are driven by the 15-second refresh, so they can fire up to 15 seconds late.
 
-Put the username of someone in this block and it can output a few different things:
+| Block | Fires when |
+| --- | --- |
+| `when friend request received` | Your number of incoming requests goes up |
+| `when friend request accepted` | Your number of incoming requests goes down between two refreshes, for example when a request is accepted or declined in another app, or the sender cancels it |
 
-```
-When you are friends with someone
-"Friend"
-
-When you have a request from someone
-"Requested"
-
-Otherwise
-"Not Friend"
-```
-
-### Friend Count
-
-![block\_15\_08\_2024-13\_00\_41](https://github.com/user-attachments/assets/77f32a72-3125-40ef-9b06-65debfedcdd1)
-
-This block simply tells you how many friends that you have
+{% hint style="info" %}
+`when friend request accepted` is about your incoming requests. It doesn't fire when someone accepts a request you sent, or when you accept or decline a request with the blocks on this page.
+{% endhint %}

@@ -1,21 +1,21 @@
-# List Active Sub-Tokens
+# List active tokens
 
-List only the sub-tokens that are still usable: not revoked and not expired.
+List the sub-tokens that still work: not revoked and not expired.
 
-> **Authentication:** Required. Needs the `tokens:manage` permission, which sub-tokens can never hold, so in practice this is main-token only.
+## GET `/tokens/active`
 
-### GET `/tokens/active`
+Returns the active sub-tokens with their values.
 
-**Query Parameters:**
-* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
+**Auth:** Required. Needs `tokens:manage`, which sub-tokens cannot hold, so only the main token works.
 
-**Example:**
+### Example
 
 ```http
 GET /tokens/active
+Authorization: Bearer <main token>
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -26,8 +26,8 @@ GET /tokens/active
       "permissions": ["account:view", "posts:view"],
       "created_at": 1715512345678,
       "last_used_at": 1715599999999,
-      "token": "rotur_st_xYz123...",
       "revoked": false,
+      "token": "rotur_st_xYz123...",
       "origin": "https://myapp.example.com",
       "description": "Read-only access for My App",
       "websites": ["https://myapp.example.com"]
@@ -36,3 +36,5 @@ GET /tokens/active
   "total": 1
 }
 ```
+
+Each token has the same fields as in [List tokens](list-tokens.md).

@@ -2,29 +2,38 @@
 
 Upload a new profile picture or banner for your account.
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `https://avatars.rotur.dev/rotur-upload-pfp` | POST | Upload a profile picture |
-| `https://avatars.rotur.dev/rotur-upload-banner` | POST | Upload a banner |
+> **Base URL:** `https://avatars.rotur.dev`
+>
+> **Auth:** Your main account token in the `token` body field. Sub-tokens and the `Authorization` header are not accepted.
 
-**Request Body (JSON):**
+| Method | Endpoint | v2 path | Description |
+| --- | --- | --- | --- |
+| POST | `/rotur-upload-pfp` | `/v2/avatars/upload/pfp` | Upload a profile picture |
+| POST | `/rotur-upload-banner` | `/v2/avatars/upload/banner` | Upload a banner |
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `image` | string | Yes | The image as a base64 data URI (e.g. `data:image/png;base64,...`) |
-| `token` | string | Yes | Your account token |
+Both endpoints take the same body.
 
-**Limits and processing:**
+### Parameters
 
-* Maximum decoded size is 10 MB, and at most 50 megapixels
-* Profile pictures are resized to 256x256. GIFs stay animated, everything else becomes JPEG
-* Banners are resized to 900x300 and kept as GIF, PNG or JPEG
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `image` | body | string | Yes | The image as a Base64 data URI, for example `data:image/png;base64,...` |
+| `token` | body | string | Yes | Your main account token |
 
-{% hint style="info" %}
-Animated uploads are accepted from anyone, but the animation only plays for viewers of accounts with the required subscription tier (Plus for avatars, Pro for banners).
-{% endhint %}
+### Limits and processing
 
-**Example request:**
+* The decoded image can be up to 10 MB and 50 million pixels.
+* Profile pictures are resized to 256×256. GIFs stay animated; everything else is converted to JPEG.
+* Banners are resized to 900×300 and kept as GIF, PNG or JPEG. A fully transparent banner is rejected.
+* Anyone can upload an animated GIF, but it only plays for accounts with a Plus subscription or higher.
+
+## POST `/rotur-upload-pfp`
+
+Replaces your profile picture.
+
+**Auth:** Required. Main token in the `token` body field.
+
+### Example
 
 ```http
 POST https://avatars.rotur.dev/rotur-upload-pfp
@@ -36,7 +45,7 @@ Content-Type: application/json
 }
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -45,13 +54,55 @@ Content-Type: application/json
 }
 ```
 
-The banner endpoint responds with `"Banner uploaded successfully"`.
+### Errors
 
-**Common errors:**
+| Status | When |
+| --- | --- |
+| `400` | The body is not valid JSON (`Invalid JSON data`) |
+| `400` | `image` is missing (`Missing image`) |
+| `400` | The image is not a valid data URI, cannot be decoded, or is too large |
+| `403` | `token` is not a valid main account token (`Invalid token`) |
 
-| Status | Error |
-|---|---|
-| `400` | `Invalid JSON data` |
-| `400` | `Missing image` |
-| `400` | `invalid image format` / `invalid image data` / `image too large` |
-| `403` | `Invalid token` |
+## POST `/rotur-upload-banner`
+
+Replaces your banner.
+
+**Auth:** Required. Main token in the `token` body field.
+
+{% hint style="warning" %}
+Banners cost a one-time 30-credit unlock, charged on your first successful upload. Pro and higher subscribers upload banners for free, and accounts that already had a banner are already unlocked.
+{% endhint %}
+
+### Example
+
+```http
+POST https://avatars.rotur.dev/rotur-upload-banner
+Content-Type: application/json
+
+{
+  "image": "data:image/png;base64,iVBORw0KGgo...",
+  "token": "YOUR_TOKEN"
+}
+```
+
+**Response `200`:**
+
+```json
+{
+  "status": "Success",
+  "message": "Banner uploaded successfully",
+  "banner": "https://avatars.rotur.dev/.banners/mist?v=1715512345678"
+}
+```
+
+`banner` is your banner URL with a `v` cache-busting parameter.
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `400` | The body is not valid JSON (`Invalid JSON data`) |
+| `400` | `image` is missing (`Missing image`) |
+| `400` | The image is not a valid data URI, cannot be decoded, is too large, or is fully transparent |
+| `403` | `token` is not a valid main account token (`Invalid token`) |
+| `403` | Banners are not unlocked and you have fewer than 30 credits |

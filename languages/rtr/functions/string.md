@@ -1,48 +1,51 @@
-# String Functions
+# String functions
 
-RTR provides several built-in functions for string manipulation and operations.
+| Function | Returns |
+| --- | --- |
+| `join(a, b, ...)` | All arguments joined into one string, with no separator |
+| `split(string, separator)` | An array of the parts of `string` between each `separator` |
+| `chr(code)` | The character with character code `code` |
+| `ord(string)` | The character code of the first character of `string` |
+| `length(string)` | The number of characters in `string` |
+| `toStr(value)` | `value` converted to a string |
 
 ## join
 
-Concatenates multiple strings together.
-
 ```js
-join("Hello ", "World");  /* Returns "Hello World" */
-join("a", "b", "c");     /* Returns "abc" */
+join("Hello ", "World")  /* "Hello World" */
+join("a", "b", "c")      /* "abc" */
 ```
 
 ## split
 
-Splits a string into an array of substrings based on a delimiter.
-
 ```js
-split("Hello World", " ");    /* Returns ["Hello", "World"] */
-split("a-b-c", "-");          /* Returns ["a", "b", "c"] */
+split("Hello World", " ")  /* ["Hello", "World"] */
+split("a-b-c", "-")        /* ["a", "b", "c"] */
 ```
 
 ## chr
 
-Converts a number to its corresponding ASCII character.
-
 ```js
-chr(65);                      /* Returns "A" */
-chr(97);                      /* Returns "a" */
+chr(65)  /* "A" */
+chr(97)  /* "a" */
 ```
 
 ## ord
 
-Converts a character to its corresponding ASCII code.
-
 ```js
-ord("A");                     /* Returns 65 */
-ord("a");                     /* Returns 97 */
+ord("A")  /* 65 */
+ord("a")  /* 97 */
 ```
 
 ## length
 
-Returns the length of a string.
+```js
+length("Hello")  /* 5 */
+length("")       /* 0 */
+```
+
+## toStr
 
 ```js
-length("Hello");              /* Returns 5 */
-length("");                   /* Returns 0 */
+toStr(5)  /* "5" */
 ```

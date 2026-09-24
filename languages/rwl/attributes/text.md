@@ -1,16 +1,31 @@
 ---
 description: >-
-  Attribute list for any non-block element, this could also be any type, for
-  example a number.
+  Attribute list for any non-block element, such as text or a number.
 ---
 
 # Text
 
-## Key-Value Pairs
+These attributes apply to any element that is not a block, including numbers.
+
+Text without an `anchor` or `padding` continues from where the previous element ended. Setting either one positions the text inside its frame instead.
+
+## Key-value pairs
+
+| Key | Type | Default | Description |
+| --- | --- | --- | --- |
+| `font` | String | | Font used to render the text |
+| `size` | Number | `10` | Text size |
+| `spacing` | Number | `1` | Space between characters, as a multiple of the normal spacing |
+| `line_height` | Number | `1` | Space between lines, as a multiple of the normal line height |
+| `anchor` | String | `"c"` | Where in the frame the text is placed |
+| `alignment` | String | `"c"` | Which point of the text sits at the anchor |
+| `padding` | Number | `10` | Space between the text and the edge of the frame |
+| `link` | String | | Makes the text a link to this address |
+| `decoration` | String | | Text decoration, for example `"none"` |
+
+`anchor` and `alignment` take the names listed in [Alignments and anchors](../alignments-and-anchors.md), in full or short form.
 
 ### font
-
-Changes the font used for rendering the text
 
 ```javascript
 "Hello World" [font="llama"]
@@ -18,66 +33,50 @@ Changes the font used for rendering the text
 
 ### size
 
-The size of the text, the default text size being 10.
-
 ```javascript
 "Large Text" [size=20]
 ```
 
 ### spacing
 
-The space between each character in a font
-
 ```javascript
-// the space between each character would be x2 what it would normally be
+// twice the normal space between characters
 "Wide Text" [spacing=2]
 ```
 
 ### line\_height
 
-The space between each line in a font
-
 ```javascript
-// the space between each line would be 2x what it would normally be
+// twice the normal space between lines
 "Text With\nBig Lines" [line_height=2]
 ```
 
 ### anchor
 
-The side(s) that the text will be neighboring, which can use both their full name and short name so e.g. "bottom right" and "br"
-
 ```javascript
-"Im in the corner :3" [anchor="top left"]
+"I'm in the corner" [anchor="top left"]
 ```
 
 ### alignment
 
-The position from where the element's text will start from:
-
 ```javascript
-"Im centered :3" [alignment="center"],
-"Im centered from the left" [alignment="left"]
+"I'm centered" [alignment="center"],
+"I'm centered from the left" [alignment="left"]
 ```
-
-{% hint style="info" %}
-alignments use the same names as anchors.
-{% endhint %}
 
 ### padding
 
-The space between the text and the border of a frame, the default being 10.
-
 ```javascript
-"Ive got padding :P" [padding=100,anchor="tl"]
+"I've got padding" [padding=100, anchor="tl"]
 ```
 
 {% hint style="info" %}
-this doesnt have any affect when the anchor is the center.
+Padding has no effect when the anchor is `center`.
 {% endhint %}
 
 ### link
 
-Sets the text to be clickable to redirect or open a new page for the user
+By default, clicking a link opens the address in a new tab.
 
 ```javascript
 "Funny Website" [link="flufi.web"]
@@ -85,26 +84,23 @@ Sets the text to be clickable to redirect or open a new page for the user
 
 ### decoration
 
-Sets the text decoration, e.g. hiding the blue text on a link:
+Use `decoration="none"` to remove the link styling:
 
 ```javascript
-"This is actually a link!" [link="flufi.web",decoration="none"]
+"This is actually a link" [link="flufi.web", decoration="none"]
 ```
 
 ## Flags
 
-### Redirect
-
-Used on links to instead of opening a new tab in the browser, redirecting the current page to the link.
+| Flag | Effect |
+| --- | --- |
+| `Redirect` | On a link, loads the address in the current tab instead of a new tab |
+| `Wrapped` | Wraps the text at the edges of the current frame, or the window if there is no frame |
 
 ```javascript
-"Redirecting link :3" [link="flufi.web",Redirect]
+"Redirecting link" [link="flufi.web", Redirect]
 ```
 
-### Wrapped
-
-Makes the text automatically wrap against the boundries of the current frame (or window if there is no frame)
-
 ```javascript
-"This is super very long and very big text that will be wrapped!" [size=50,Wrapped]
+"This is long text that will wrap at the edge of the frame" [size=50, Wrapped]
 ```

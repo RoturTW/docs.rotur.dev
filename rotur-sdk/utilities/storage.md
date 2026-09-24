@@ -1,54 +1,106 @@
 # Storage
 
-Accessed via `rotur.storage`. App-scoped key/value storage on the signed-in user's account. All methods require authentication.
+`rotur.storage` stores key/value data for your app on the signed-in user's account. Every method needs a token.
 
-Each `id` namespaces an independent bag of keys (for example, one id per app or project), kept separate from the user's account object. Values persist across sessions and devices for that user.
+Data is grouped by `id`: each id holds its own set of keys (for example, one id per app or project), separate from the user's account keys. Values persist across sessions and devices for that user.
 
-## Read
+## rotur.storage.get(id)
+
+Gets every key and value stored under `id`.
+
+**Auth:** Required. Sub-tokens need `storage:view`.
 
 ```ts
-// Every key/value pair stored under an id
 const { data } = await rotur.storage.get("my-app");
+```
 
-// A single value (undefined if unset)
+**Returns:** `{ id, data: Record<string, unknown> }`
+
+## rotur.storage.getKey(id, key)
+
+Gets one value stored under `id`. It calls `get(id)` and reads `key` from the result.
+
+**Auth:** Required. Sub-tokens need `storage:view`.
+
+```ts
 const theme = await rotur.storage.getKey("my-app", "theme");
-
-// With a type parameter
 const volume = await rotur.storage.getKey<number>("my-app", "volume");
 ```
 
-## Write
+**Returns:** the value, or `undefined` when the key is not set.
+
+## rotur.storage.set(id, key, value)
+
+Sets one key under `id`.
+
+**Auth:** Required. Sub-tokens need `storage:manage`.
 
 ```ts
-// Set one key; returns the updated bag
 const { data } = await rotur.storage.set("my-app", "theme", "dark");
 ```
 
-## Delete
+**Returns:** `{ id, data }` after the change.
+
+## rotur.storage.delete(id, key)
+
+Deletes one key under `id`.
+
+**Auth:** Required. Sub-tokens need `storage:delete`.
 
 ```ts
-// Delete one key; returns the updated bag
 await rotur.storage.delete("my-app", "theme");
-
-// Remove every key under an id
-await rotur.storage.clear("my-app");
-// { id: "my-app", cleared: 5 }
-
-// Remove ALL storage across every id
-await rotur.storage.clearAll();
-// { cleared: 12 }
 ```
+
+**Returns:** `{ id, data }` after the change.
+
+## rotur.storage.clear(id)
+
+Deletes every key under `id`.
+
+**Auth:** Required. Sub-tokens need `storage:delete`.
+
+```ts
+const { cleared } = await rotur.storage.clear("my-app");
+```
+
+**Returns:** `{ id, cleared }`
+
+## rotur.storage.clearAll()
+
+Deletes all of the user's storage, under every id.
 
 {% hint style="warning" %}
-`clearAll()` wipes storage for every id on the account, not just your app's. Use `clear(id)` unless you really mean all of it.
+`clearAll()` wipes storage for every id on the account, not only your app's. Use `clear(id)` unless you mean all of it.
 {% endhint %}
 
-## Usage & Quota
+**Auth:** Required. Sub-tokens need `storage:delete`.
 
 ```ts
-// List every storage id, plus total usage
-const { ids, usage, max } = await rotur.storage.list();
+const { cleared } = await rotur.storage.clearAll();
+```
 
-// Just usage and quota
+**Returns:** `{ cleared }`
+
+## rotur.storage.list()
+
+Lists every storage id the user has, with total usage.
+
+**Auth:** Required. Sub-tokens need `storage:view`.
+
+```ts
+const { ids, usage, max } = await rotur.storage.list();
+```
+
+**Returns:** `{ ids: string[], usage, max }`
+
+## rotur.storage.usage()
+
+Gets total storage usage and the quota.
+
+**Auth:** Required. Sub-tokens need `storage:view`.
+
+```ts
 const { usage, max } = await rotur.storage.usage();
 ```
+
+**Returns:** `{ usage, max }`

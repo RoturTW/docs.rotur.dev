@@ -1,40 +1,43 @@
 # Standing
 
-Accessed via `rotur.standing`. Standing represents a user's reputation level on the platform.
+`rotur.standing` looks up an account's standing: the level that limits what the account can do after moderation action.
 
-## Get a User's Standing
+## rotur.standing.get(username)
+
+Gets a user's standing and its history.
+
+**Auth:** None.
 
 ```ts
 const info = await rotur.standing.get("alice");
 ```
 
-Returns a `StandingInfo`:
+**Returns:** `StandingInfo`:
 
 ```ts
 {
   username: "alice",
-  standing: "good",        // "good" | "warning" | "suspended" | "banned"
-  recover_at: 0,           // unix timestamp when standing auto-recovers (0 = never)
+  standing: "warning",   // "good" | "warning" | "suspended" | "banned"
+  recover_at: 0,         // timestamp when standing recovers (0 = never)
   history: [
     {
       level: "warning",
+      previous: "good",  // optional
       reason: "Spamming",
-      set_by: "admin-id",
-      set_at: 1735689600,
+      admin_id: "user-id", // optional
+      timestamp: 1735689600,
     },
   ],
 }
 ```
 
-This endpoint is public (no auth required).
-
-## Standing Levels
+## Standing levels
 
 | Level | Effect |
-|-------|--------|
+| --- | --- |
 | `good` | Full access to all features |
-| `warning` | Reduced trading/interaction ability |
-| `suspended` | Severely limited, cannot create content |
+| `warning` | Reduced trading and interaction |
+| `suspended` | Severely limited; cannot create content |
 | `banned` | Account disabled |
 
-Standing automatically recovers over time (warning → good after 7 days, suspended → warning after 30 days) unless set to `banned`.
+Standing recovers over time unless it is `banned`: `warning` returns to `good` after 7 days, and `suspended` returns to `warning` after 30 days.

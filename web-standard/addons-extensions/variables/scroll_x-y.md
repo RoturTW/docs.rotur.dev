@@ -1,11 +1,10 @@
 # scroll\_x / y
 
-Gives the page info on the current scroll of the containing frame
+The current horizontal (`scroll_x`) and vertical (`scroll_y`) scroll position of the frame the page is drawn in. The browser sets them before each update.
 
 {% tabs %}
 {% tab title="OSL" %}
 ```javascript
-// example
 goto scroll_x scroll_y
 ```
 {% endtab %}

@@ -1,197 +1,86 @@
 # Subscription Tiers
 
-Rotur has four subscription tiers:
+A Rotur subscription raises your account limits and unlocks extra features across Rotur services. This page lists what each tier includes and how to get one.
 
-```text
-Free → Lite → Plus → Pro
-```
+There are four tiers. Each tier includes everything in the tiers below it.
 
-Each tier includes all benefits from the tiers below it. When a higher tier lists a new limit for an existing benefit, that limit replaces the lower-tier limit.
+| Tier | Price |
+| --- | --- |
+| Free | Free |
+| Lite | 15 credits per month |
+| Plus | £1 per month |
+| Pro | £5 per month |
 
-> **Drive** is another name for the **Pro** tier. Drive and Pro accounts receive exactly the same benefits.
+Plus and Pro can also be paid yearly, for the price of 8 months. **Drive** is an older name for Pro; Drive accounts get exactly the Pro benefits. The API also defines a **Max** tier above Pro (500 keys, 10 GB of storage, 50 MB notification log, 1,000-character posts), which is not sold through checkout.
 
----
+To check your own tier and limits, call `GET /me/benefits`. Your tier is also in `sys.subscription` on your [account object](rotur-account-objects/README.md).
 
-# Free
+## Rotur account
 
-The default tier for every Rotur account. No subscription is required.
-
-## Rotur
-
-* **5 currency keys**
-* **10 login history entries**
-* **20 transaction history entries**
-* **5 MB of file storage** through the Rotur file system
-* **200-character bio**
-* **1 credit per daily claim**
-
-## Claw and Pounce
-
-* Posts of up to **400 characters**
-* **1 pinned post**
-* **1 attachment per post**
-
-## Mail
-
-* Store up to **100 Rmails**
-
-## RoturGate
-
-* Create up to **20 shortened URLs**
-
-## Connect
-
-* **1 GB per day**
-* **10 GB per month**
-
----
-
-# Lite — 15 RC per month
-
-A small upgrade for users who want more storage and additional profile customization.
-
-Includes everything in **Free**, plus:
-
-## Rotur
-
-* **10 MB of file storage**, increased from 5 MB
-* **Bio templates**, including expressions such as `{{ user username }}` for displaying dynamic profile information
-
----
-
-# Plus — £1 per month
-
-Designed for active users who want more capacity, profile customization, and additional features across Rotur services.
-
-Includes everything in **Lite**, with the following upgrades:
-
-## Rotur
-
-* **20 currency keys**, increased from 5
-* **100 login history entries**, increased from 10
-* **100 transaction history entries**, increased from 20
-* **15 MB of file storage**, increased from 10 MB
-* **500-character bio**, increased from 200 characters
-* **Animated profile pictures**
-* **2 credits per daily claim**
-* **Friend notes**, allowing you to privately save notes about other users through the `/me/note/:username` endpoint
-* **Time bio templates** using expressions such as `{{ time HH:MM }}`
-* 50 user emojis that you can use in originchats and across rotur
+| Benefit | Free | Lite | Plus | Pro |
+| --- | --- | --- | --- | --- |
+| [Keys](earn-credits.md) you can create | 5 | 10 | 20 | 50 |
+| File storage | 5 MB | 25 MB | 100 MB | 1 GB |
+| Bio length | 200 characters | 300 characters | 500 characters | 1,000 characters |
+| [Credits per daily claim](#daily-credit-claims) | 1 | 1 | 2 | 3 |
+| Login history entries | 10 | 25 | 100 | 100 |
+| [Credit history](transactions-and-taxes.md#transaction-history) kept | 1 month | 6 months | 12 months | Unlimited |
+| Notification log | 256 KB | 1 MB | 2 MB | 10 MB |
+| [Bio templates](bio-templates.md) | — | Yes | Yes | Yes |
+| [Friend notes](friend-notes.md) | — | — | Yes | Yes |
+| Animated avatars and banners | — | — | Yes | Yes |
+| Custom overlay uploads | — | — | Yes | Yes |
+| Custom emojis for originChats and across Rotur | — | — | 50 | 500 |
+| Banners without the 30-credit unlock | — | — | — | Yes |
+| Custom profile backgrounds, including video | — | — | — | Yes |
+| `pro` [badge](rotur-badges.md) | — | — | — | Yes |
 
 ## Claw and Pounce
 
-* Posts of up to **600 characters**
-* Edit your own posts
-* **2 attachments per post**
-* **3 pinned posts**
-* Premium crown
+| Benefit | Free | Lite | Plus | Pro |
+| --- | --- | --- | --- | --- |
+| Post length | 300 characters | 400 characters | 600 characters | 800 characters |
+| Pinned posts | 1 | 1 | 3 | 5 |
+| Attachments per post | 1 | 1 | 2 | 4 |
+| Feed size | 100 posts | 100 posts | 200 posts | 200 posts |
+| Edit your posts | — | — | Yes | Yes |
+| Polls, scheduled posts and bookmarks | — | — | Yes | Yes |
+| Premium crown on your posts | — | — | Yes | Yes |
+| Video posts | — | — | — | Yes |
 
-## Mail
+## Other services
 
-* Store up to **1,000 Rmails**
+| Benefit | Free | Lite | Plus | Pro |
+| --- | --- | --- | --- | --- |
+| Stored Rmails | 100 | 250 | 1,000 | 100,000 |
+| RoturGate shortened URLs | 20 | 20 | 100 | 1,000 |
+| RoturGate custom paths (`https://gate.rotur.dev/:name`) | — | — | Yes | Yes |
+| Sable model catalogue | — | — | Full | Full |
+| Sable token discount | — | — | 25% | 50% |
+| Connect data per day | 1 GB | 1 GB | 10 GB | 50 GB |
+| Connect data per month | 10 GB | 10 GB | 100 GB | 1 TB |
 
-## RoturGate
+## Daily credit claims
 
-* Create up to **100 shortened URLs**
-* Choose custom RoturGate paths, such as `https://gate.rotur.dev/:name`
+Every user can claim credits once every 24 hours with [`/claim_daily`](../claw/api-endpoints/claim_daily.md). The amount depends on your tier:
 
-## Sable
+| Tier | Credits per claim |
+| --- | --- |
+| Free | 1 |
+| Lite | 1 |
+| Plus | 2 |
+| Pro | 3 |
 
-* Access to the full model catalogue
-* Tokens cost **25% less** than on the Free tier
+## Get a subscription
 
-## Connect
+| Method | Tiers | How it works |
+| --- | --- | --- |
+| Stripe | Plus, Pro | Subscribe monthly or yearly from your Rotur account (`POST /me/billing/checkout`). Accounts that have never subscribed get a 7-day trial of Plus. Manage or cancel the plan with `POST /me/billing/portal`. |
+| Gift | Plus, Pro | Someone else buys a subscription for you as a gift. |
+| Lite subscription key | Lite | Buy the Lite key with Rotur credits. Lite stays active for as long as the key does. |
+| Ko-fi (legacy) | Any | Subscribe on [Ko-fi](https://ko-fi.com/mistium/tiers). Rotur matches the payment to your account by your linked Discord account, then by the email on the Ko-fi payment. Each payment gives 31 days. |
+| Administrator | Any | A Rotur administrator can set your tier by hand. |
 
-* **10 GB per day**
-* **100 GB per month**
+## Expiry
 
----
-
-# Pro — £5 per month
-
-The highest tier, intended for power users and developers who need substantially higher limits.
-
-Includes everything in **Plus**, with the following upgrades:
-
-## Rotur
-
-* **50 currency keys**, increased from 20
-* **500 transaction history entries**, increased from 100
-* **1 GB of file storage**, increased from 15 MB
-* **1,000-character bio**, increased from 500 characters
-* **Animated profile banners**
-* **Free banner uploads**, instead of the usual 10-credit upload fee
-* **3 credits per daily claim**
-* Pro subscriber badge
-* **URL bio templates** using expressions such as `{{ url https://... }}`, allowing your bio to display content retrieved from an external URL
-* 500 user emoji slots that you can use in originchats and across rotur
-* video backgrounds that let you set a video that plays on/behind your profile
-
-> URL bio templates may also be used to track profile visits.
-
-## Claw and Pounce
-
-* Posts of up to **800 characters**
-* **4 attachments per post**
-* **5 pinned posts**
-
-## Mail
-
-* Store up to **100,000 Rmails**
-
-## RoturGate
-
-* Create up to **1,000 shortened URLs**
-
-## Sable
-
-* Tokens cost **50% less** than on the Free tier
-
-## Connect
-
-* **50 GB per day**
-* **1 TB per month**
-
----
-
-# Daily Credit Claims
-
-Every user can claim credits once every 24 hours through the `/claim_daily` endpoint.
-
-| Tier        | Credits per claim |
-| ----------- | ----------------: |
-| Free        |                 1 |
-| Lite        |                 1 |
-| Plus        |                 2 |
-| Pro / Drive |                 3 |
-
----
-
-# Getting a Subscription
-
-Subscriptions can be obtained in three ways:
-
-### Ko-fi
-
-Subscribe through [Ko-fi](https://ko-fi.com/mistium).
-
-Rotur attempts to match the purchase to your account using either:
-
-* Your linked Discord account
-* The email address associated with your Ko-fi purchase
-
-Each Ko-fi billing cycle grants **31 days** of subscription access.
-
-### Administrator assignment
-
-A Rotur administrator can manually assign a subscription tier to an account.
-
-### Lite subscription key
-
-The Lite tier can be purchased using Rotur Credits. Your Lite subscription remains active for as long as the subscription key is active.
-
----
-
-# Subscription Expiry
-
-Subscriptions must be renewed at the end of each billing cycle. When a subscription expires, the account returns to the **Free** tier and its limits and available features are adjusted accordingly.
+When a subscription reaches the end of its billing period without renewing, the account returns to the Free tier and Free limits apply again.

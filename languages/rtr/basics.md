@@ -1,264 +1,241 @@
 # Basics
 
-This guide covers the fundamental concepts and syntax of the RTR language.
+This page covers RTR's syntax: variables, operators, control flow, functions, and objects.
 
-## Getting Started
+## First program
 
-RTR is a simple but powerful scripting language. Here's a basic example:
+All code goes inside an event block. The `onload` event runs when the program starts.
 
-```c
+```js
 event (onload) {
     /* Print a message */
-    log("Hello, World!");
-    
+    log("Hello, World!")
+
     /* Create a variable */
-    name := "John";
-    
+    name = "John"
+
     /* Use the variable */
-    log(join("Hello, ", name));
+    log(join("Hello, ", name))
 }
 ```
+
+End each statement with a new line or a `;`. Comments go between `/*` and `*/`.
 
 ## Variables
 
-Variables in RTR are dynamically typed and can hold any type of value.
+Assign a variable with `=`. Variables are dynamically typed and can hold any value.
 
-```go
+```js
 /* Numbers */
-age := 25;
-pi := 3.14159;
+age = 25
+pi = 3.14159
 
-/* Strings */
-name := "Alice";
-greeting := 'Hello';
+/* Strings, in double quotes */
+name = "Alice"
 
 /* Booleans */
-isActive := true;
-isDone := false;
+isActive = true
+isDone = false
+
+/* Null */
+nothing = null
 
 /* Arrays */
-numbers := [1, 2, 3, 4, 5];
-names := ["John", "Jane", "Bob"];
+numbers = [1, 2, 3, 4, 5]
+names = ["John", "Jane", "Bob"]
 
 /* Objects */
-person := {name: "John", age: 30, isActive: true};
+person = {"name": "John", "city": "Oslo"}
 ```
 
-## Basic Operations
+Array and object literals are read as JSON, so object keys must be in double quotes. You can also create an empty object with `obj()` and set its properties one by one.
 
-### Arithmetic Operations
+Reading a variable that has not been set returns `null`.
 
-```go
-a := 10; b := 3;
+## Operators
 
-sum := a + b;        /* 13 */
-difference := a - b; /* 7 */
-product := a * b;    /* 30 */
-quotient := a / b;   /* 3.333... */
-remainder := a % b;  /* 1 */
-power := a ^ b;      /* 1000 */
+### Arithmetic
+
+```js
+a = 10
+b = 3
+
+sum = a + b         /* 13 */
+difference = a - b  /* 7 */
+product = a * b     /* 30 */
+quotient = a / b    /* 3.333... */
+remainder = a % b   /* 1 */
+power = a ^ b       /* 1000 */
 ```
 
-### String Operations
+`%` returns a result with the same sign as the right-hand side, so `-7 % 3` is `2`.
 
-```go
-firstName := "John"; lastName := "Doe";
+{% hint style="warning" %}
+RTR micro has no operator precedence: operators are evaluated from left to right, so `2 + 3 * 4` is `20`. Parentheses do not group parts of an expression. Split a calculation across several variables when the order matters.
+{% endhint %}
 
-/* String concatenation */
-fullName := join(firstName, " ", lastName);
+### Assignment
 
-/* String length */
-nameLength := length(fullName);
+| Operator | Effect |
+| --- | --- |
+| `=` | Sets the variable |
+| `+=`, `-=`, `*=`, `/=`, `%=`, `^=` | Applies the operator to the current value and the right-hand side |
 
-/* String splitting */
-parts := split(fullName, " ");
+```js
+count = 0
+count += 1
 ```
 
-### Comparison Operations
+### Comparison
 
-```go
-a := 5; b := 10;
+```js
+a = 5
+b = 10
 
-isEqual := a == b;      /* false */
-isNotEqual := a != b;   /* true */
-isGreater := a > b;     /* false */
-isLess := a < b;        /* true */
-isGreaterOrEqual := a >= b; /* false */
-isLessOrEqual := a <= b;    /* true */
+log(a == b)  /* false */
+log(a != b)  /* true */
+log(a > b)   /* false */
+log(a < b)   /* true */
+log(a >= b)  /* false */
+log(a <= b)  /* true */
 ```
 
-### Logical Operations
+`==` and `!=` compare strictly: `5 == "5"` is `false`.
 
-```go
-isTrue := true; isFalse := false;
+{% hint style="warning" %}
+A line that contains a comparison is never treated as an assignment, so `isLess = a < b` does not set `isLess`. Use comparisons directly in conditions and function arguments.
+{% endhint %}
 
-andResult := all(isTrue, isFalse);  /* false */
-orResult := any(isTrue, isFalse);   /* true */
-notResult := not(isTrue);           /* false */
+### Logic
+
+Use the [logical functions](functions/logical.md):
+
+```js
+andResult = all(true, false)  /* false */
+orResult = any(true, false)   /* true */
+notResult = not(true)         /* false */
 ```
 
-## Control Flow
+## Strings
 
-### If Statements
+```js
+firstName = "John"
+lastName = "Doe"
 
-```c
-age := 18;
+fullName = join(firstName, " ", lastName)  /* "John Doe" */
+nameLength = length(fullName)              /* 8 */
+parts = split(fullName, " ")               /* ["John", "Doe"] */
+```
+
+## Control flow
+
+### If
+
+```js
+age = 18
 
 if (age >= 18) {
-    log("Adult");
+    log("Adult")
 } elif (age >= 13) {
-    log("Teenager");
+    log("Teenager")
 } else {
-    log("Child");
+    log("Child")
 }
 ```
 
-### Loops
+### While
 
-#### While Loop
-
-```c
-count := 0;
+```js
+count = 0
 while (count < 5) {
-    log(count);
-    count += 1;
+    log(count)
+    count += 1
 }
 ```
 
-#### Repeat Loop
+{% hint style="warning" %}
+A `while` loop that runs more than 1,000 times stops with the error `Infinite while loop detected`. Use `repeat` or `for` for longer loops.
+{% endhint %}
 
-```lua
+### Repeat
+
+Runs the block a fixed number of times.
+
+```js
 repeat (5) {
-    log("Hello");
+    log("Hello")
 }
 ```
 
-#### For Loop
+### For
+
+Runs the block once for each element of an array, setting the variable to that element.
 
 ```js
 for (i, range(1, 5)) {
-    log(i);
+    log(i)
 }
 ```
 
 ## Functions
 
-### Function Definition
+Define a function with `(parameters)~{ body }` and assign it to a variable. Use `return(value)` to return a value.
 
 ```js
 greet = (name)~{
-    return(join("Hello, ", name));
+    return(join("Hello, ", name))
 }
+
+message = greet("John")
+log(message)  /* Hello, John */
 ```
-
-### Function Call
-
-```go
-message := greet("John");
-log(message);  /* Outputs: Hello, John */
-```
-
-### Function with Multiple Parameters
 
 ```js
-calculate = (a, b, operation)~{
-    if (operation == "add") {
-        return(a + b);
-    } elif (operation == "subtract") {
-        return(a - b);
-    } elif (operation == "multiply") {
-        return(a * b);
-    } elif (operation == "divide") {
-        return(a / b);
-    }
+multiply = (a, b)~{
+    return(a * b)
 }
+
+log(multiply(3, 4))  /* 12 */
 ```
 
-## Objects and Methods
+A function can read variables from outside it. Assigning to a variable inside a function creates a local variable and does not change the outer one.
 
-### Object Creation
+{% hint style="warning" %}
+In RTR micro, an `if` block inside a function body fails with an error. `repeat`, `for`, and `while` blocks work.
+{% endhint %}
 
-```go
-person := obj(); person.name = "John"; person.age = 30;
+## Objects
+
+Create an empty object with `obj()` and set properties with `.`:
+
+```js
+person = obj()
+person.name = "John"
+person.age = 30
 ```
 
-```go
-person := { name: "John", age: 30 };
-```
-
-### Method Definition
+A property can hold a function, which you then call as a method:
 
 ```js
 person.greet = (name)~{
-    return(join("Hello, ", name, "! I am ", this.name));
+    return(join("Hello, ", name))
 }
+
+message = person.greet("Alice")
+log(message)  /* Hello, Alice */
 ```
 
-### Method Call
+Methods do not receive `this` in RTR micro. To use the object's own data, read it from the variable, such as `person.name`.
 
-```go
-message := person.greet("Alice");
-log(message);  /* Outputs: Hello, Alice! I am John */
-```
+## Built-in functions
 
-## Built-in Functions
+See [Functions](functions/README.md) for the full list.
 
-### Mathematical Functions
-
-```js
-min(5, 3, 8);     /* Returns 3 */
-max(5, 3, 8);     /* Returns 8 */
-abs(-5);          /* Returns 5 */
-round(3.7);       /* Returns 4 */
-floor(3.7);       /* Returns 3 */
-ceil(3.7);        /* Returns 4 */
-sqrt(16);         /* Returns 4 */
-```
-
-### String Functions
-
-```js
-join("Hello", " ", "World");  /* Returns "Hello World" */
-split("Hello World", " ");    /* Returns ["Hello", "World"] */
-chr(65);                      /* Returns "A" */
-ord("A");                     /* Returns 65 */
-```
-
-### Array Functions
-
-```js
-numbers = [1, 2, 3, 4, 5];
-length(numbers);              /* Returns 5 */
-item(numbers, 2);             /* Returns 3 */
-range(1, 5);                  /* Returns [1, 2, 3, 4, 5] */
-```
-
-### Object Functions
-
-```js
-person := { name: "John", age: 30 };
-keys(person);                 /* Returns ["name", "age"] */
-values(person);               /* Returns ["John", 30] */
-has(person, "name");          /* Returns true */
-```
-
-## Error Handling
-
-Basic error handling can be done using the `onerror` event:
-
-```js
-event (onerror) {
-    log("An error occurred:", error);
-}
-```
-
-## Best Practices
-
-1. Use meaningful variable names
-2. Use multiline comments for documentation
-3. Break complex operations into smaller functions
-4. Use proper indentation for readability (though not required)
-5. Handle errors appropriately
-6. Use built-in functions when available
-7. Keep functions small and focused
-8. Use proper scoping
+| Category | Functions |
+| --- | --- |
+| [Math](functions/math.md) | `min`, `max`, `abs`, `round`, `floor`, `ceil`, `sqrt`, `sin`, `cos`, `tan`, `asin`, `acos`, `atan` |
+| [String](functions/string.md) | `join`, `split`, `chr`, `ord`, `length`, `toStr` |
+| [Array](functions/array.md) | `length`, `item`, `range` |
+| [Object](functions/object.md) | `obj`, `keys`, `values`, `has`, `set`, `del` |
+| [Logical](functions/logical.md) | `all`, `any`, `not` |
+| [Utility](functions/utility.md) | `log`, `return`, `typeof`, `type`, `toNum`, `input` |

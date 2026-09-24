@@ -1,32 +1,38 @@
-# Utility Functions
+# Utility functions
 
-RTR provides several built-in utility functions for common operations.
+| Function | Effect |
+| --- | --- |
+| `log(a, b, ...)` | Writes the arguments to the console, separated by spaces. Arrays and objects are written as JSON. |
+| `return(value)` | Ends the current function and returns `value` |
+| `typeof(value)`, `type(value)` | Returns the value's JavaScript type, such as `"number"`, `"string"`, `"boolean"`, or `"object"`. Arrays, objects, and functions you define are all `"object"`. |
+| `toNum(value)` | Converts `value` to a whole number, dropping any fraction. Returns `0` if it is not a number. |
+| `input(message)` | Asks the user for text with `message` as the prompt, and returns it |
 
 ## log
 
-Outputs a message to the console.
-
 ```js
-log("Hello, World!");         /* Outputs: Hello, World! */
-log("Value:", 42);            /* Outputs: Value: 42 */
+log("Hello, World!")  /* Hello, World! */
+log("Value:", 42)     /* Value: 42 */
 ```
 
 ## return
 
-Exits a function and returns a value.
-
 ```js
 greet = (name)~{
-    return(join("Hello, ", name));
+    return(join("Hello, ", name))
 }
 ```
 
-## error
-
-Throws an error with the specified message.
+## typeof
 
 ```js
-if (age < 0) {
-    error("Age cannot be negative");
-}
-``` 
+typeof("a")  /* "string" */
+typeof([1])  /* "object" */
+```
+
+## toNum
+
+```js
+toNum("42")  /* 42 */
+toNum(3.9)   /* 3 */
+```

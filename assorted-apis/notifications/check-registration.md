@@ -1,47 +1,50 @@
-# Check Registration
+# Check registration
 
-### GET `/notify/check`
+## GET `/notify/check`
 
-Checks whether a device is already registered for a given source.
+Check whether this device is registered for a source.
 
-**Query Parameters:**
+**Auth:** Required. Sub-tokens need `notifications:view`.
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| `source` | Yes | The application/source name |
-| `fingerprint` | Yes | The device fingerprint used during registration |
+### Parameters
 
-**Example:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `source` | query | string | Yes | The source name |
+| `fingerprint` | query | string | Yes | The fingerprint you register the device with |
 
-```
+### Example
+
+```http
 GET /notify/check?source=originChats&fingerprint=a1b2c3d4e5f6
+Authorization: Bearer <token>
 ```
 
-**Response (registered):**
+**Response `200` (registered):**
 
 ```json
 {
   "registered": true,
-  "device_id": "a4f8b2c1d3e5f7a9b0c2d4e6",
+  "device_id": "a4f8b2c1d3e5f7a9b0c2d4e6f8a0b2c4",
   "endpoint": "https://push.example.com/deliver/abc123",
   "source": "originChats",
   "created_at": 1715054321000
 }
 ```
 
-**Response (not registered):**
+**Response `200` (not registered):**
 
 ```json
 {
   "registered": false,
-  "device_id": "a4f8b2c1d3e5f7a9b0c2d4e6"
+  "device_id": "a4f8b2c1d3e5f7a9b0c2d4e6f8a0b2c4"
 }
 ```
 
-The `device_id` is always returned, so you can persist it without needing to register first.
+`device_id` is always returned, so you can learn it without registering first. `created_at` is when the endpoint was last registered (Unix ms).
 
-**Common Errors:**
+### Errors
 
-| Status | Body | Condition |
-| --- | --- | --- |
-| 400 | `{"error": "source and fingerprint query params are required"}` | Missing query parameters |
+| Status | When |
+| --- | --- |
+| `400` | `source and fingerprint query params are required` |

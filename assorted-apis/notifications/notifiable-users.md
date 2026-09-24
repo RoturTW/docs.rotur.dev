@@ -1,26 +1,27 @@
-# Notifiable Users
+# Notifiable users
 
-### GET `/notify/:source/users`
+## GET `/notify/:source/users`
 
-Lists every user who has allowed you to send them notifications from a given source. Useful for finding out who you can actually reach before sending.
+List every user who has allowed you to send them notifications for a source. On v2 the path is `GET /v2/notify/sources/:source/users`.
 
-{% hint style="info" %}
-On v2 this is `GET /v2/notify/sources/:source/users`.
-{% endhint %}
+**Auth:** Required. Sub-tokens need `notifications:view`.
 
-**Path Parameters:**
+The list is based on allowed senders only. It does not check whether the user has blocked you, turned push off, or registered any devices.
 
-| Parameter | Description |
-| --- | --- |
-| `source` | The source to check |
+### Parameters
 
-**Example:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `source` | path | string | Yes | The source to check |
 
-```
+### Example
+
+```http
 GET /notify/originChats/users
+Authorization: Bearer <token>
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -33,4 +34,4 @@ GET /notify/originChats/users
 }
 ```
 
-`users` is `null` when nobody has allowed you for the source.
+`users` is `null`, not an empty array, when nobody has allowed you for the source.

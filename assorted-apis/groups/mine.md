@@ -1,18 +1,19 @@
-# List My Groups
+# List your groups
 
-Get every group you're a member of.
+List every group you're a member of, including groups you own.
 
-### GET `/v2/groups/mine`
+## GET `/v2/groups/mine`
 
-**Auth:** required. Token permission: `groups:view`.
+**Auth:** Required. Sub-tokens need `groups:view`.
 
-**Example request:**
+### Example
 
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mine"
+```http
+GET /v2/groups/mine
+Authorization: Bearer YOUR_TOKEN
 ```
 
-**Example response (200):**
+**Response `200`:** an array of [group objects](README.md#group), or `[]` if you aren't in any groups.
 
 ```json
 [
@@ -20,7 +21,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mine
     "id": "550e8400-e29b-41d4-a716-446655440000",
     "tag": "mygroup",
     "name": "My Group",
-    "description": "A cool group",
+    "description": "A group for testing",
     "readme": "",
     "rules": "",
     "icon_url": "",
@@ -35,5 +36,3 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mine
   }
 ]
 ```
-
-Returns an empty array `[]` if you aren't in any groups.

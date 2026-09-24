@@ -4,35 +4,40 @@ description: Attribute list for sections
 
 # Section
 
-## Key-Value Pairs
+A section is one part of a [frame](frame.md). Sections must be inside a frame; a section anywhere else is an error. Each section takes its size from the space the earlier sections in the frame left over. A section without a size fills all the remaining space.
+
+## Key-value pairs
+
+| Key | Value | Description |
+| --- | --- | --- |
+| `width` | Number or percentage | Width of the section |
+| `height` | Number or percentage | Height of the section |
+| `size` | Number or percentage | Size along the frame's axes. `width` and `height` take priority over it. |
+| `overflow` | String | What happens to content that goes outside the section |
+
+A number is a size in pixels. A percentage is a share of the space remaining in the parent frame.
 
 ### width
 
-determines the width of the section, percentages being a % of the remaining space in the parent [frame](frame.md) and numbers being the pixel size
-
 ```javascript
 section [width = 50%] {
-    // code
+    // content
 }
 ```
 
 ### height
 
-determines the height of the section, using the same rules as width
-
 ```javascript
 section [height = 100] {
-    // code
+    // content
 }
 ```
 
 ### size
 
-similar to width and height, but it uses the frame axes.
-
 ```javascript
 frame [Horizontal] {
-    section [size=50%] {
+    section [size = 50%] {
         // uses 50% of the frame horizontally
     }
 }
@@ -40,7 +45,9 @@ frame [Horizontal] {
 
 ### overflow
 
-This describes the behaviour of an element when it is partially or fully outside the section.
-
-<table><thead><tr><th width="108">name</th><th>behaviour</th></tr></thead><tbody><tr><td>visible</td><td>simply lets the text go over the section boundries</td></tr><tr><td>clip</td><td>clips off the text that is over the section boundries</td></tr><tr><td>scroll</td><td>turns the section into a scrollview on both axes at all times</td></tr><tr><td>auto</td><td>turns into a scroll view on the axes that are overflowing</td></tr></tbody></table>
-
+| Value | Behavior |
+| --- | --- |
+| `visible` | Content can extend past the section's edges |
+| `clip` | Content past the section's edges is cut off |
+| `scroll` | The section scrolls on both axes at all times |
+| `auto` | The section scrolls on each axis where content overflows |

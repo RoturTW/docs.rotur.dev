@@ -1,33 +1,17 @@
 # (static) .new()
 
-Creates an instanced URL class.
+Creates a URL instance from its parts. The arguments are positional, in the order below.
+
+The Example column shows each part of `web://wow.bouncy.flf/subdir/subdir2/shocker.txt?test=wow&crazy=noway`.
 
 ## Parameters
 
-### Scheme (str) (defaults to browser choice or null)
-
-_**web**_://wow.bouncy.flf/subdir/subdir2/shocker.txt?test=wow\&crazy=noway
-
-### Domain name (str) (defaults to browser choice or null)
-
-web://wow._**bouncy**_.flf/subdir/subdir2/shocker.txt?test=wow\&crazy=noway
-
-### Domain top (str) (defaults to browser choice or null)
-
-web://wow.bouncy._**flf**_/subdir/subdir2/shocker.txt?test=wow\&crazy=noway
-
-### Domain sub (str) (defaults to null)
-
-web://_**wow**_.bouncy.flf/subdir/subdir2/shocker.txt?test=wow\&crazy=noway
-
-### Path (str) (defaults to an empty string)
-
-web://wow.bouncy.flf/_**subdir/subdir2**_/shocker.txt?test=wow\&crazy=noway
-
-### Params (obj) (defaults to null)
-
-web://wow.bouncy.flf/subdir/subdir2/shocker.txt?_**test=wow\&crazy=noway**_
-
-### File Name (str) (defaults to index.osl, whatever other file type)
-
-web://wow.bouncy.flf/subdir/subdir2/_**shocker.txt**_?test=wow\&crazy=noway
+| # | Name | Type | Default | Example |
+| --- | --- | --- | --- | --- |
+| 1 | Scheme | string | Browser's choice, or `null` | `web` |
+| 2 | Domain name | string | Browser's choice, or `null` | `bouncy` |
+| 3 | Domain top | string | Browser's choice, or `null` | `flf` |
+| 4 | Domain sub | string | `null` | `wow` |
+| 5 | Path | string | Empty string | `subdir/subdir2` |
+| 6 | Params | object | `null` | `{"test": "wow", "crazy": "noway"}` |
+| 7 | File name | string | `index.osl`, or the browser's default for other file types | `shocker.txt` |

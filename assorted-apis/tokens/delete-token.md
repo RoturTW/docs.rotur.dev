@@ -1,26 +1,27 @@
-# Delete a Sub-Token
+# Delete a token
 
-Permanently remove a sub-token from your token store.
+Permanently remove a sub-token from your account.
 
-> **Authentication:** Required (main account token only)
+## DELETE `/tokens/:id`
 
-### DELETE `/tokens/:id`
+Deletes the sub-token record. If the token was still active it stops working immediately. Unlike [revoking](revoke-token.md), nothing is kept.
 
-Unlike revocation, this removes the token record entirely.
+**Auth:** Required. Main token only.
 
-**Path Parameter:**
-* `:id`: the sub-token ID (e.g. `st_abc123`)
+### Parameters
 
-**Query Parameters:**
-* `Authorization`: send `Bearer <token>` via the `Authorization` header (preferred). `auth` query parameter is accepted as legacy fallback.
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | string | Yes | The sub-token ID, for example `st_abc123` |
 
-**Example:**
+### Example
 
 ```http
 DELETE /tokens/st_abc123
+Authorization: Bearer <main token>
 ```
 
-**Response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -29,9 +30,9 @@ DELETE /tokens/st_abc123
 }
 ```
 
-**Error Responses:**
+### Errors
 
-| Status | Condition |
-|---|---|
-| 403 | Authenticated with a sub-token instead of the main account token |
-| 404 | Token not found |
+| Status | When |
+| --- | --- |
+| `403` | You authenticated with a sub-token |
+| `404` | No sub-token with this ID exists on the account |

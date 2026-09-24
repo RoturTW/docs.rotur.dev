@@ -1,69 +1,72 @@
-# Mathematical Functions
+# Math functions
 
-RTR provides several built-in mathematical functions for performing common calculations.
+| Function | Returns |
+| --- | --- |
+| `min(a, b, ...)` | The smallest argument |
+| `max(a, b, ...)` | The largest argument |
+| `abs(x)` | The absolute value of `x` |
+| `round(x)` | `x` rounded to the nearest integer. Halves round up. |
+| `floor(x)` | `x` rounded down |
+| `ceil(x)` | `x` rounded up |
+| `sqrt(x)` | The square root of `x` |
+| `sin(x)`, `cos(x)`, `tan(x)` | Sine, cosine, and tangent of `x`, in radians |
+| `asin(x)`, `acos(x)`, `atan(x)` | Inverse sine, cosine, and tangent, in radians |
 
 ## min
 
-Returns the smallest value among the provided arguments.
-
 ```js
-min(5, 3, 8);     /* Returns 3 */
-min(-1, -5, 0);   /* Returns -5 */
+min(5, 3, 8)    /* 3 */
+min(-1, -5, 0)  /* -5 */
 ```
 
 ## max
 
-Returns the largest value among the provided arguments.
-
 ```js
-max(5, 3, 8);     /* Returns 8 */
-max(-1, -5, 0);   /* Returns 0 */
+max(5, 3, 8)    /* 8 */
+max(-1, -5, 0)  /* 0 */
 ```
 
 ## abs
 
-Returns the absolute value of a number.
-
 ```js
-abs(-5);          /* Returns 5 */
-abs(3.14);        /* Returns 3.14 */
+abs(-5)    /* 5 */
+abs(3.14)  /* 3.14 */
 ```
 
 ## round
 
-Rounds a number to the nearest integer.
-
 ```js
-round(3.7);       /* Returns 4 */
-round(3.2);       /* Returns 3 */
-round(-3.7);      /* Returns -4 */
+round(3.7)   /* 4 */
+round(3.2)   /* 3 */
+round(-3.7)  /* -4 */
 ```
 
 ## floor
 
-Rounds a number down to the nearest integer.
-
 ```js
-floor(3.7);       /* Returns 3 */
-floor(3.2);       /* Returns 3 */
-floor(-3.7);      /* Returns -4 */
+floor(3.7)   /* 3 */
+floor(3.2)   /* 3 */
+floor(-3.7)  /* -4 */
 ```
 
 ## ceil
 
-Rounds a number up to the nearest integer.
-
 ```js
-ceil(3.7);        /* Returns 4 */
-ceil(3.2);        /* Returns 4 */
-ceil(-3.7);       /* Returns -3 */
+ceil(3.7)   /* 4 */
+ceil(3.2)   /* 4 */
+ceil(-3.7)  /* -3 */
 ```
 
 ## sqrt
 
-Returns the square root of a number.
+```js
+sqrt(16)  /* 4 */
+sqrt(2)   /* 1.4142135623730951 */
+```
+
+## Trigonometry
 
 ```js
-sqrt(16);         /* Returns 4 */
-sqrt(2);          /* Returns 1.4142135623730951 */
-``` 
+sin(0)  /* 0 */
+cos(0)  /* 1 */
+```

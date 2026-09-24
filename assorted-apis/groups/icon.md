@@ -1,34 +1,28 @@
-# Group Icon
+# Group icon
 
-Upload and fetch a group's icon image.
+Upload a group's icon, or fetch it as an image.
 
-## Upload an Icon
+## POST `/v2/groups/{tag}/icon`
 
-### POST `/v2/groups/{tag}/icon`
+Upload a new icon. The image is resized to 256×256 and saved as JPEG, replacing any previous icon, and the group's `icon_url` is updated.
 
-**Auth:** required. Token permission: `groups:manage`. You must be the group owner or hold the `groups.group.edit` or `groups.manage` group permission.
+**Auth:** Required. Sub-tokens need `groups:manage`. You must be the owner or hold `groups.group.edit` or `groups.manage`.
 
-The image is resized to **256x256** and saved as JPEG. Any previous icon is replaced, and the group's `icon_url` is updated automatically.
+### Parameters
 
-**Path Parameters:**
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `icon` | body (multipart/form-data) | file | Yes | Image file, up to 5 MB and 50 megapixels |
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `tag` | string | Yes | The group tag |
-
-**Body (multipart/form-data):**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `icon` | file | Yes | Image file (max 5MB) |
-
-**Example request:**
+### Example
 
 ```bash
-curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/groups/mygroup/icon" \  -F "icon=@icon.png"
+curl -X POST "https://api.rotur.dev/v2/groups/mygroup/icon" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "icon=@icon.png"
 ```
 
-**Example response (200):**
+**Response `200`:**
 
 ```json
 {
@@ -37,33 +31,32 @@ curl -X POST -H "Authorization: Bearer YOUR_TOKEN" "https://api.rotur.dev/v2/gro
 }
 ```
 
-**Common errors:**
+### Errors
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 400 | `Icon image file is required` | No file in the `icon` field |
-| 400 | `Image too large (max 5MB)` | File exceeds 5MB |
-| 400 | `Invalid image format` | File couldn't be decoded as an image |
-| 403 | `You are not authorized to update this group` | No edit access |
-| 404 | `Group not found` | Group doesn't exist |
-| 500 | `Failed to read image` / `Failed to encode icon` | Server-side processing error |
+| Status | When |
+| --- | --- |
+| `400` | There's no file in the `icon` field (`Icon image file is required`) |
+| `400` | The file is over 5 MB (`Image too large (max 5MB)`) |
+| `400` | The file isn't a readable image or is over 50 megapixels (`Invalid image format`) |
+| `403` | You don't have edit access (`You are not authorized to update this group`) |
+| `500` | The server couldn't read or encode the image (`Failed to read image`, `Failed to encode icon`) |
 
-***
+## GET `/v2/groups/{tag}/icon.jpg`
 
-## Get an Icon
+Return the group's icon image.
 
-### GET `/v2/groups/{tag}/icon.jpg`
+**Auth:** None.
 
-Returns the group's icon as a JPEG. No authentication needed.
+### Example
 
-**Example request:**
-
-```bash
-curl "https://api.rotur.dev/v2/groups/mygroup/icon.jpg" -o icon.jpg
+```http
+GET /v2/groups/mygroup/icon.jpg
 ```
 
-**Common errors:**
+**Response `200`:** the image file.
 
-| Status | Error | Cause |
-|--------|-------|-------|
-| 404 | `No icon found` | Group has no icon uploaded |
+### Errors
+
+| Status | When |
+| --- | --- |
+| `404` | The group has no uploaded icon, or doesn't exist (`No icon found`) |
