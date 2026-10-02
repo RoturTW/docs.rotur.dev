@@ -6,6 +6,10 @@ description: Let people sign in to your website or app with their Rotur account,
 
 By the end of this page, people can click **Sign in with Rotur** on your site and you get their Rotur ID, username, display name and avatar.
 
+{% hint style="info" %}
+**Building a website?** [Add Sign in with Rotur in two lines](sign-in-button.md) with one script tag, and skip the rest of this page. Read on to do the OAuth yourself, or for a server, desktop app or game.
+{% endhint %}
+
 Sign in with Rotur is standard OAuth 2.0: the authorisation code flow with PKCE. If you have added "Sign in with Google" or "Sign in with GitHub" before, this works the same way. Any OAuth 2.0 library that supports PKCE will work too.
 
 You need:

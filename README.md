@@ -26,6 +26,7 @@ You build your app and moderate your own content.
 
 | You want to | Use | Start with |
 | --- | --- | --- |
+| Add a Sign in with Rotur button to a website, with one script tag | **signin.js** | [Add Sign in with Rotur in two lines](build-an-app/sign-in-button.md) |
 | Let people sign in to your website, game or app with their Rotur account | **Sign in with Rotur** (OAuth 2.0) | [Quickstart](build-an-app/quickstart.md) |
 | Act on someone's account: post for them, read their friends, spend credits | A **Rotur account token** | [Act on a user's account](accounts-and-tokens/README.md) |
 | Build for originOS, or in TurboWarp or MistWarp | **The Rotur Extension** | [Connect to Rotur](the-rotur-extension/connecting-to-rotur.md) |
@@ -33,7 +34,20 @@ You build your app and moderate your own content.
 | Look up an endpoint | **The API reference** | [How the API works](api-reference/README.md) |
 | Move a system over to Rotur Apps | **Rotur Apps** | [Migrate from systems](build-an-app/migrate-from-systems.md) |
 
+## Sign in with Rotur in two lines
+
+On a website, this is all you need:
+
+```html
+<script src="https://rotur.dev/signin.js" data-client-id="app_YOUR_ID" data-on-sign-in="signedIn"></script>
+<div data-rotur-signin></div>
+```
+
+You get a Sign in with Rotur button, and in Chromium browsers a "Continue as …" prompt for anyone already signed in. [Add Sign in with Rotur in two lines](build-an-app/sign-in-button.md) covers setup and options.
+
 ## Sign in with Rotur in four steps
+
+For anything that isn't a web page, or if you'd rather not use the script:
 
 1. Create an app at [rotur.dev/me/developer](https://rotur.dev/me/developer) and add a redirect URI. You get a client ID (`app_…`) and a secret (`rsec_…`).
 2. Send people to `https://api.rotur.dev/oauth/authorize` with PKCE.

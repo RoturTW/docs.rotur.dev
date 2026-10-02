@@ -4,6 +4,7 @@
 
 ## Build an app
 
+* [Add Sign in with Rotur in two lines](build-an-app/sign-in-button.md)
 * [Quickstart: Sign in with Rotur](build-an-app/quickstart.md)
 * [Set up your app](build-an-app/set-up-your-app.md)
 * [Sign users in](build-an-app/sign-users-in.md)
