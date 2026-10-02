@@ -131,6 +131,10 @@ Sends a push notification to one user.
 
 **Auth:** Required. Sub-tokens need `notifications:send`.
 
+{% hint style="warning" %}
+`send()` posts to `/v2/notify/<username>`, a route the v2 API does not have (it serves `/v2/notify/users/<username>`), so it currently fails with a `404`. Until the SDK is fixed, use `sendMany()` with a one-item list.
+{% endhint %}
+
 | Option | Type | Description |
 | --- | --- | --- |
 | `title` | string | Notification title |
@@ -149,7 +153,7 @@ await rotur.push.send("alice", "my-app", {
 
 ## rotur.push.sendMany(users, source, options?)
 
-Sends the same push notification to several users. Takes the same options as `send()`.
+Sends the same push notification to several users. Takes the same options as `send()`, and also works for a single user.
 
 **Auth:** Required. Sub-tokens need `notifications:send`.
 

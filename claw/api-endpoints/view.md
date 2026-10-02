@@ -2,7 +2,7 @@
 
 Records that you viewed one or more posts and returns their view counts. Each user counts once per post.
 
-**Auth:** Required.
+**Auth:** Required. Sub-tokens need `posts:view`.
 
 ### Parameters
 

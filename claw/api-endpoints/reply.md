@@ -1,6 +1,6 @@
 # GET `/reply`
 
-Adds a reply to a post. The post's author gets a `reply` notification, and anyone you @mention gets a `mention` notification.
+Adds a reply to a post. The post's author gets a `reply` notification, and anyone you @mention gets a `mention` notification if their privacy settings let you message them.
 
 **Auth:** Required. Sub-tokens need `posts:reply`. Your account needs `good` standing.
 
@@ -35,5 +35,5 @@ Authorization: Bearer <token>
 | --- | --- |
 | `400` | `Post ID is required` or `Content is required` |
 | `400` | `Content exceeds <n> character limit` |
-| `400` | `You cant reply to this post` (the author has blocked you) |
+| `400` | `You cant reply to this post` (the author has blocked you, or only shows their posts to friends and you are not one) |
 | `404` | `Post not found` |

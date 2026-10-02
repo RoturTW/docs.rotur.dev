@@ -1,6 +1,6 @@
 # Notifications
 
-Your in-app notification feed. Rotur adds a notification when someone follows you, replies to, likes, mentions or reposts you, buys your item and so on. Notifications that apps send you with [send notification](../../assorted-apis/notifications/send-notification.md) are added here too, with `type` `notification`.
+Your in-app notification feed. Rotur adds a notification when someone follows you, replies to, likes, mentions or reposts you, buys your item and so on. Notifications that apps send you with [send notification](../../api-reference/notifications/send-notification.md) are added here too, with `type` `notification`.
 
 > **Auth:** Every endpoint requires a token. Sub-tokens need `notifications:view`, including for marking notifications read and deleting them.
 
@@ -65,6 +65,8 @@ Authorization: Bearer <token>
 ```
 
 Every notification has `type`, `id`, `timestamp`, `created` (same as `timestamp`) and `read`, plus fields for its type. Fields that name a user, such as `user`, `follower` and `from`, hold usernames, not user IDs. Notifications sent by apps have `from`, `source`, `title` and, if set, `body`, plus `actor` (the sender), `platform` (the source) and `platform_data` (the data the app attached).
+
+Notices about something Rotur staff did, with `type` `standing`, `account_blocked`, `content_removed` or `report_outcome`, never have an `actor`. They do not say which member of staff acted.
 
 ### Errors
 
@@ -136,7 +138,9 @@ Authorization: Bearer <token>
 
 | Status | When |
 | --- | --- |
-| `404` | `notification not found`. This is also returned if the notification is already read |
+| `404` | `notification not found` |
+
+Marking a notification that is already read still returns `200`.
 
 ## DELETE `/notifications/:id`
 

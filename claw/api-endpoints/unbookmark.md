@@ -2,7 +2,7 @@
 
 Removes a post from your bookmarks. It succeeds even if the post was not bookmarked.
 
-**Auth:** Required.
+**Auth:** Required. Sub-tokens need `posts:bookmark`.
 
 ### Parameters
 

@@ -5,7 +5,7 @@ Groups, systems, statistics, account standing, and the dev fund.
 | Page | Covers |
 | --- | --- |
 | [Groups](groups.md) | `rotur.groups`: members, roles, invites, announcements, events, tips, products |
-| [Systems](systems.md) | `rotur.systems`: registered systems and system badges |
+| [Systems](systems.md) | `rotur.systems`: registered systems and system badges. Deprecated: systems were replaced by Rotur Apps |
 | [Stats](stats.md) | `rotur.stats`: economy, user, post, and follower statistics |
 | [Standing](standing.md) | `rotur.standing`: account standing lookups |
 | [DevFund](devfund.md) | `rotur.devfund`: dev fund escrow transfers |

@@ -1,6 +1,6 @@
 # GET `/following_feed`
 
-Returns posts from the users you follow, newest first. This includes their profile-only posts and plain reposts, which the public feed leaves out.
+Returns posts from the users you follow, newest first. This includes their profile-only posts and plain reposts, which the public feed leaves out. Posts from someone who only shows their posts to friends appear only if you are their friend.
 
 **Auth:** Required. Sub-tokens need `posts:view`.
 

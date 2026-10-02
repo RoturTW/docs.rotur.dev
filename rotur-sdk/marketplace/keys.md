@@ -1,6 +1,6 @@
 # Keys
 
-`rotur.keys` manages access keys: objects that users own, buy once, or subscribe to. `get()` and `check()` need no token; every other method does.
+`rotur.keys` manages access keys: objects that users own, buy once, or subscribe to. `get()` and `check()` need no token; every other method does. Only the key's creator can rename, update, revoke, delete, or change the users of a key.
 
 ## rotur.keys.create(name, options?)
 
@@ -14,8 +14,8 @@ Creates a key.
 | `options.description` | string | No | Description |
 | `options.price` | number | No | Price in credits |
 | `options.subscription` | boolean | No | Make the key a subscription |
-| `options.frequency` | number | No | Billing frequency |
-| `options.period` | string | No | Billing period, for example `"month"` |
+| `options.frequency` | number | No | Billing frequency. Defaults to `1` |
+| `options.period` | string | No | Billing period. Defaults to `"month"` |
 
 ```ts
 const key = await rotur.keys.create("my-key", {
@@ -31,7 +31,7 @@ const key = await rotur.keys.create("my-key", {
 
 ## rotur.keys.mine()
 
-Lists your keys.
+Lists the keys you created or bought. For keys you bought, `users` only holds your own entry, and `data`, `webhook`, and `total_income` are left out.
 
 **Auth:** Required. Sub-tokens need `keys:view`.
 
@@ -79,7 +79,7 @@ await rotur.keys.rename("key-id", "new-name");
 
 ## rotur.keys.update(id, key, data)
 
-Sets one field on a key. `key` is the field name and `data` is the new value.
+Sets one field on a key. `key` is the field name and `data` is the new value. If `data` is valid JSON, it is stored parsed.
 
 **Auth:** Required. Sub-tokens need `keys:manage`.
 
@@ -91,7 +91,7 @@ await rotur.keys.update("key-id", "data", "new-value");
 
 ## rotur.keys.revoke(id, user)
 
-Revokes a user's access to a key.
+Revokes a user's access to a key. You can't revoke your own access as the creator.
 
 **Auth:** Required. Sub-tokens need `keys:manage`.
 
@@ -103,7 +103,7 @@ await rotur.keys.revoke("key-id", "bob");
 
 ## rotur.keys.addUser(id, user)
 
-Adds a user to a key (admin action).
+Gives a user access to your key without them paying.
 
 **Auth:** Required. Sub-tokens need `keys:manage`.
 
@@ -115,7 +115,7 @@ await rotur.keys.addUser("key-id", "alice");
 
 ## rotur.keys.removeUser(id, user)
 
-Removes a user from a key (admin action).
+Removes a user from your key.
 
 **Auth:** Required. Sub-tokens need `keys:manage`.
 
@@ -139,7 +139,7 @@ await rotur.keys.buy("key-id");
 
 ## rotur.keys.cancel(id)
 
-Cancels your subscription to a key.
+Cancels your subscription to a key. For a subscription key, you keep access until the next billing date, returned as `cancel_at`. For any other key, your access is removed straight away.
 
 **Auth:** Required. Sub-tokens need `keys:manage`.
 
@@ -163,7 +163,7 @@ await rotur.keys.delete("key-id");
 
 ## rotur.keys.debugSubscriptions()
 
-Runs the key subscription debug endpoint.
+Logs key subscription debug info on the server. Network admins only.
 
 **Auth:** Required. Sub-tokens need `keys:view`.
 

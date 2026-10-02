@@ -18,7 +18,13 @@ const profile = await rotur.profiles.get("alice");
 const withoutPosts = await rotur.profiles.get("alice", false);
 ```
 
-**Returns:** `UserProfile` with `username`, `pfp`, `banner`, `background`, `profile_video`, `bio`, `pronouns`, `system`, `created`, `followers`, `following`, `currency`, `subscription`, `max_size`, `badges`, `theme`, `private`, `banned`, `status`, `posts`, `followed`, `follows_me`, `id`, and `index`. `subscription` is always the tier name as a string (`"Free"` when there is none).
+**Returns:** `UserProfile` with `id`, `username`, `display_name`, `pfp`, `banner`, `background`, `profile_video` (deprecated alias of `background`), `bio`, `pronouns`, `system`, `created`, `followers`, `following`, `currency`, `subscription`, `max_size`, `badges`, `theme`, `private`, `sys.banned`, `status`, `group_tag`, `connections`, `discord_id`, `discord_verified`, `index`, and `posts` (when `includePosts` is `true`). `subscription` is always the tier name as a string (`"Free"` when there is none).
+
+Sub accounts (bots and organisations) also have `account_type`, and `owner` when the owning account is discoverable. `currency` and `subscription` follow the account's "show balance" setting, and `status` follows its presence setting.
+
+If the profile is private, you only get `{ username, id, pfp, private: true, restricted: true }`, plus `account_type` and the Discord fields where they apply.
+
+This method sends no token, so `followed` and `follows_me` are never set.
 
 ## rotur.profiles.exists(username)
 
@@ -34,7 +40,7 @@ const { exists } = await rotur.profiles.exists("alice");
 
 ## rotur.profiles.supporters()
 
-Lists every user with a paid subscription.
+Lists every user with a paid subscription who shows it publicly.
 
 **Auth:** None.
 
@@ -59,7 +65,11 @@ This deletes the account. It cannot be undone from the SDK.
 await rotur.profiles.delete("alice");
 ```
 
-**Returns:** `{ message }`
+The API asks the person to confirm it is really them. Accounts with a password must send it, and this method can't, so for them it fails with `400` and code `password_required`. Accounts without a password must use the main token and have signed in within the last 10 minutes, or it fails with `403` and code `reauth_required`. For most apps, send people to rotur.dev to delete their account.
+
+Posts and replies are kept as "Deleted User" for adults and removed for under-18s.
+
+**Returns:** `{ message, content_deleted }`
 
 ## Image URL helpers
 

@@ -1,6 +1,8 @@
 # Tokens
 
-`rotur.tokens` manages sub-tokens: tokens with a limited set of permissions that you give to third-party apps. Creating and changing sub-tokens needs your main token. For the HTTP endpoints, see [Tokens](../../assorted-apis/tokens/README.md).
+`rotur.tokens` manages sub-tokens: tokens with a limited set of permissions that you give to third-party apps. Creating and changing sub-tokens needs your main token. For the HTTP endpoints, see [Tokens](../../accounts-and-tokens/tokens/README.md).
+
+You can have up to 250 active sub-tokens. A sub-token that hasn't been used for 30 days (or, if never used, 30 days after it was created) is deleted automatically.
 
 Sub-tokens are returned as `SubTokenPublic`: `{ id, name, permissions, created_at, revoked, last_used_at?, expires_at?, revoked_at?, origin?, description?, websites?, token? }`.
 
@@ -50,7 +52,7 @@ Creates a sub-token.
 | --- | --- | --- | --- |
 | `name` | string | Yes | Token name |
 | `permissions` | string[] | Yes | Permissions to grant, for example `["posts:view"]` |
-| `options.expiresInHrs` | number | No | Hours until the token expires |
+| `options.expiresInHrs` | number | No | Hours until the token expires, up to `8760` (one year) |
 | `options.origin` | string | No | Origin of the app using the token |
 | `options.description` | string | No | Description |
 | `options.websites` | string[] | No | Websites of the app |
@@ -65,6 +67,8 @@ const result = await rotur.tokens.create("my-bot", ["posts:view", "posts:create"
 console.log(result.token);
 ```
 
+You can't grant `tokens:manage`. If you already have 250 active sub-tokens, this throws an `ApiError` with status `400`.
+
 {% hint style="warning" %}
 Store `token` from the response right away. It is only shown once.
 {% endhint %}
@@ -73,7 +77,7 @@ Store `token` from the response right away. It is only shown once.
 
 ## rotur.tokens.get(id)
 
-Gets one sub-token.
+Gets one sub-token. A sub-token can only get its own details.
 
 **Auth:** Required. No specific permission.
 

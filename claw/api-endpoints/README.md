@@ -4,7 +4,7 @@ Claw's endpoints live on the main Rotur API server. Use them to read and write p
 
 > **Base URL:** `https://api.rotur.dev`
 >
-> **Auth:** Send your account token in the `Authorization` header, as `Bearer <token>` or the bare token. The legacy `auth` query parameter (`?auth=<token>`) and the `claw_session` cookie (trusted browser origins only) also work. Each endpoint's **Auth** line says whether it needs a token.
+> **Auth:** Send your account token in the `Authorization` header, as `Bearer <token>` or the bare token. The legacy `auth` query parameter (`?auth=<token>`) also works. On rotur.dev itself, the browser's `__Host-rotur_session` cookie signs requests in; it is ignored for requests from any other origin. Each endpoint's **Auth** line says whether it needs a token.
 
 Most Claw endpoints are `GET` requests that take their input as query parameters, including the ones that change data.
 
@@ -21,10 +21,14 @@ Endpoints that require a token return `403` with an `error` field when:
 | `User is banned` | The account is banned |
 | `Email address not verified` | The account's email is not verified |
 | `Terms-Of-Service are not accepted or outdated` | The account has not accepted the current Terms of Service |
+| `This account is suspended until <date>, …` | The account is under the minimum age for its country. The body also has `code: age_restricted` |
+| `OAuth access tokens can only read the public profile` | You sent an OAuth access token (see below) |
 
 ### Token permissions
 
-Your main account token can call every endpoint. A sub-token can only call an endpoint if it holds that endpoint's permission (for example `posts:create` for [`/post`](post.md)); otherwise you get `403` with `Token lacks permission: <permission>`. See [permissions](../../assorted-apis/tokens/permissions.md) for the full list.
+Your main account token can call every endpoint. A sub-token can only call an endpoint if it holds that endpoint's permission (for example `posts:create` for [`/post`](post.md)); otherwise you get `403` with `Token lacks permission: <permission>`. See [permissions](../../accounts-and-tokens/tokens/permissions.md) for the full list.
+
+An OAuth access token from "Sign in with Rotur" is not a general-purpose token. It can read the public profile through [`/me`](me.md), and endpoints that accept an optional token treat it as signed out. Endpoints that require a token refuse it with `403`, apart from a few that report what the token can do.
 
 ### Account standing and restrictions
 
@@ -53,11 +57,13 @@ Limits are counted per account when you send a valid token, and per IP address o
 | Bucket | Without a token | With a token |
 | --- | --- | --- |
 | default | 100 per minute | 300 per minute |
-| profile | 30 per minute | 120 per minute |
+| profile | 6000 per minute | 24000 per minute |
 | follow | 20 per minute | 60 per minute |
 | search | 20 per minute | 60 per minute |
 
-[`/post`](post.md) also has its own limit of 5 posts per minute. Over a limit you get `429` with `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` headers.
+[`/post`](post.md) also has its own limit of 5 posts per minute. Over a limit you get `429` with `Rate limit exceeded.` and `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` headers.
+
+Endpoints on the profile limit also stop account scraping. In one minute you can look up at most 300 different accounts (1000 with a token), and about 30 accounts in a row by sign-up order. Past that you get `429` with `Too many distinct or sequential account lookups.` and a `Retry-After` header.
 
 ### Post objects
 

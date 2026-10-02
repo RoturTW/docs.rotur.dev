@@ -1,6 +1,6 @@
 # Currency
 
-Rotur accounts hold credits, which users can send to each other and spend on keys. These blocks read the logged-in user's balance and history and send credits. Users get credits from the daily claim on Rotur; the extension has no block for claiming. See [Transactions and taxes](../my-account/transactions-and-taxes.md) for fees.
+Rotur accounts hold credits, which users can send to each other and spend on keys. These blocks read the logged-in user's balance and history and send credits. Users get credits from the daily claim on Rotur; the extension has no block for claiming. See [Transactions and taxes](../api-reference/economy/transactions-and-taxes.md) for fees.
 
 ## Get balance
 
@@ -58,4 +58,4 @@ Example:
 ]
 ```
 
-`type` is `in` for credits received and `out` for credits sent. Other types, such as key sales and gifts, are listed in [Transactions and taxes](../my-account/transactions-and-taxes.md).
+`type` is `in` for credits received and `out` for credits sent. Other types, such as key sales and gifts, are listed in [Transactions and taxes](../api-reference/economy/transactions-and-taxes.md).

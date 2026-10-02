@@ -4,15 +4,15 @@
 
 ## rotur.gifts.create(amount, options?)
 
-Creates a gift code paid for from your balance. The response shows the tax and the total you paid.
+Creates a gift code paid for from your balance. A 1% tax is added on top. The response shows the tax and the total you paid.
 
 **Auth:** Required. Sub-tokens need `gifts:create`.
 
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
 | `amount` | number | Yes | Credits in the gift |
-| `options.note` | string | No | Note shown with the gift |
-| `options.expiresInHrs` | number | No | Hours until the code expires |
+| `options.note` | string | No | Note shown with the gift, up to 50 characters |
+| `options.expiresInHrs` | number | No | Hours until the code expires. Defaults to and can be at most `168` (7 days) |
 
 ```ts
 const gift = await rotur.gifts.create(100, {

@@ -2,7 +2,7 @@
 
 Saves a post to your bookmarks.
 
-**Auth:** Required. Your account needs a Plus subscription or higher.
+**Auth:** Required. Sub-tokens need `posts:bookmark`. Your account needs a Plus subscription or higher.
 
 You can keep up to 200 bookmarks. New bookmarks go to the front of the list, and when you go over 200 the oldest is dropped.
 

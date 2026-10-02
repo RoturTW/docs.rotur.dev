@@ -17,6 +17,8 @@ console.log(me.username, me.currency);
 
 **Returns:** `MeData`: the profile fields (`username`, `pfp`, `bio`, `currency`, `subscription`, `badges`, …), every custom key on the account, and `sys.*` keys such as `sys.friends`, `sys.blocked`, `sys.transactions`, and `sys.subscription`.
 
+With a sub-token you only get the parts of the account its permissions cover. Every token gets the public profile. `account:view` adds the custom keys and the profile `sys.*` keys, `credits:view` adds `sys.currency` and `sys.transactions`, `friends:view` adds `sys.friends` and `sys.requests`, `blocked:view` adds `sys.blocked`, `account:email` adds `email`, and `account:signins` adds the sign-in history. Under-18 accounts never release their email or sign-in history to apps. Other `sys.*` keys, such as billing, date of birth and sub account ownership, only come back to the main token.
+
 ## rotur.me.getKey(key)
 
 Reads one account key from the WebSocket cache. No request is made.
@@ -61,14 +63,18 @@ unsubscribe();
 
 Sets one key on your account.
 
-**Auth:** Required. No specific permission.
+**Auth:** Required. Sub-tokens need `account:profile`. The SDK's `METHOD_PERMISSIONS` does not list this yet, so add it to `requires` yourself.
 
 ```ts
 await rotur.me.update("bio", "Hello world");
 await rotur.me.update("pronouns", "they/them");
 ```
 
-`pfp` and `banner` accept data URIs and are uploaded for you. Setting `email` starts re-verification.
+Keys can be up to 20 characters and values up to 1000. The whole account must stay under 25,000 bytes. You can't set `sys.*` keys, and `bio` is limited to your plan's `bio_length`.
+
+`pfp` and `banner` must be data URIs and are uploaded for you. The first banner costs 30 credits unless your plan includes free banner uploads.
+
+Changing `email` needs your password (or, for an account without one, a sign-in in the last 10 minutes on the main token). `update()` can't send a password, so send people to rotur.dev to change their email. A new email starts re-verification.
 
 **Returns:** `{ message, username, key, value }`
 
@@ -89,12 +95,12 @@ await rotur.me.deleteKey("some_custom_key");
 Deletes your account.
 
 {% hint style="warning" %}
-Deprecated. Use [`rotur.profiles.delete(username)`](profiles.md), which calls the same endpoint.
+Deprecated. Use [`rotur.profiles.delete(username)`](profiles.md), which calls the same endpoint and has the same limits.
 {% endhint %}
 
 **Auth:** Required. Sub-tokens need `account:delete`.
 
-**Returns:** `{ message }`
+**Returns:** `{ message, content_deleted }`
 
 ## rotur.me.changePassword(currentPassword, newPassword)
 
@@ -112,7 +118,7 @@ await rotur.me.changePassword("old-password", "new-password");
 
 Sends the email verification message again.
 
-**Auth:** Required. No specific permission.
+**Auth:** Required. Main token only.
 
 ```ts
 await rotur.me.resendVerification();
@@ -148,11 +154,13 @@ Sends credits to another user.
 await rotur.me.transfer("bob", 50, "For the pizza");
 ```
 
+The smallest transfer is 0.01 credits, and you can't send credits to yourself. Transfers between users are free. See [Transactions and taxes](../../api-reference/economy/transactions-and-taxes.md).
+
 **Returns:** `{ message, from, to, amount, debited }`
 
 ## rotur.me.claimDaily()
 
-Claims your daily credits.
+Claims your daily credits. The account must be in good standing, and sub accounts can't claim.
 
 **Auth:** Required. Sub-tokens need `credits:daily`.
 
@@ -178,7 +186,7 @@ const { wait_time } = await rotur.me.claimTime();
 
 Gets your transaction history. It reads `sys.transactions` from `rotur.me.get()`.
 
-**Auth:** Required. No specific permission.
+**Auth:** Required. Sub-tokens need `credits:view`. Without it, `sys.transactions` is left out and you get an empty array.
 
 ```ts
 const transactions = await rotur.me.transactions();
@@ -190,7 +198,7 @@ const transactions = await rotur.me.transactions();
 
 Gets your subscription. It reads `sys.subscription` from `rotur.me.get()`.
 
-**Auth:** Required. No specific permission.
+**Auth:** Required. Sub-tokens need `account:view`. Without it, you get the `"Free"` fallback below.
 
 ```ts
 const sub = await rotur.me.subscription();
@@ -210,23 +218,31 @@ const { benefits, subscription } = await rotur.me.benefits();
 console.log(benefits.max_keys, benefits.file_system_size);
 ```
 
-**Returns:** `{ benefits, subscription }`. `benefits` has `max_keys`, `max_login_history`, `max_transaction_history`, `max_rmails`, `file_system_size`, `bio_length`, `animated_pfp`, `animated_banner`, `free_banner_uploads`, `bio_templating`, `profile_notes`, and `daily_credit_multiplier`.
+**Returns:** `{ benefits, subscription, perk_restrictions }`.
+
+- `benefits` has `max_keys`, `max_login_history`, `max_transaction_history` (deprecated), `transaction_history_months`, `max_rmails`, `notification_log_size`, `file_system_size`, `bio_length`, `animated_pfp`, `animated_banner`, `free_banner_uploads`, `custom_overlay_uploads`, `custom_background_uploads`, `external_url_bio_templates`, `bio_templating`, `profile_notes`, `daily_credit_multiplier`, and `max_sub_accounts`.
+- `subscription` has `active`, `tier`, `next_billing`, `provider`, `external_id`, `status`, `cancel_at_period_end`, and `tenure_months`.
+- `perk_restrictions` lists any cosmetic perks that have been turned off for your account.
+
+See [Subscriptions](../../api-reference/account/subscriptions.md) for what each tier gives.
 
 ## rotur.me.billing()
 
 Gets your billing status.
 
-**Auth:** Required. Sub-tokens need `account:view`.
+**Auth:** Required. Main token only.
 
 ```ts
 const billing = await rotur.me.billing();
 ```
 
-**Returns:** `{ provider, stripe_customer, stripe_portal, legacy_kofi, billing_configured, plus_trial_eligible, plus_trial_days, subscription, available_lookup_keys }`
+**Returns:** `{ cooling_off_ends, provider, stripe_customer, stripe_portal, legacy_kofi, billing_configured, plus_trial_eligible, plus_trial_days, subscription, available_lookup_keys }`. `available_lookup_keys` is `sable_credits_50`, `sable_credits_250`, `sable_credits_500`, `rotur_plus_monthly`, `rotur_pro_monthly`, `rotur_plus_yearly` and `rotur_pro_yearly`.
 
 ## rotur.me.checkout(lookupKey)
 
-Starts a checkout session for a subscription. `lookupKey` is one of the `available_lookup_keys` from `billing()`.
+Starts a checkout session for a subscription or a Sable credit pack. `lookupKey` is one of the `available_lookup_keys` from `billing()`.
+
+Rotur no longer sells Rotur credits. The old `rotur_credits_50`, `rotur_credits_250` and `rotur_credits_500` keys fail with `410` and code `product_retired`.
 
 **Auth:** Required. Sub-tokens need `credits:manage`.
 
@@ -239,9 +255,9 @@ window.location.href = url;
 
 ## rotur.me.billingPortal()
 
-Gets a link to the billing portal where you can manage your subscription.
+Gets a link to the billing portal where you can manage your subscription. It fails with `404` until you have started a Plus or Pro checkout.
 
-**Auth:** Required. Sub-tokens need `account:view`.
+**Auth:** Required. Main token only.
 
 ```ts
 const { url } = await rotur.me.billingPortal();
@@ -251,15 +267,16 @@ const { url } = await rotur.me.billingPortal();
 
 ## rotur.me.badges()
 
-Gets the names of your badges.
+Gets your badges in the order they show on your profile.
 
 **Auth:** Required. Sub-tokens need `account:view`.
 
 ```ts
-const { badge_names } = await rotur.me.badges();
+const result = await rotur.me.badges();
+// typed as { badge_names: string[] }; see below
 ```
 
-**Returns:** `{ badge_names: string[] }`
+**Returns:** `{ badges, badge_names, all_badges, preferences }`. `badges` holds the badge objects you show, in order. `badge_names` is a deprecated alias of `badges`: the SDK types it as `string[]`, but it holds the same badge objects. `all_badges` is every badge you have, with the same fields as `badges` in `badgePreferences()`, and `preferences` is your hidden list and order.
 
 ## rotur.me.badgePreferences()
 
@@ -339,7 +356,7 @@ const { notes } = await rotur.me.notes();
 
 ## rotur.me.note(username, content)
 
-Sets your private note on a friend. Notes are a Plus-tier feature.
+Sets your private note on a user. Notes need Plus or higher and can be up to 300 characters.
 
 **Auth:** Required. Sub-tokens need `account:profile`.
 

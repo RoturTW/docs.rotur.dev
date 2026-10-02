@@ -6,23 +6,23 @@ Read and set user status over HTTP with `rotur.status`, or use the real-time Web
 
 Gets a user's current status.
 
-**Auth:** None.
+**Auth:** None. If the client has a token, it is sent, so you see what that user lets you see.
 
 ```ts
 const status = await rotur.status.get("alice");
 ```
 
-**Returns:** `{ username, status, presence, activities }`. `activities` is an object keyed by activity ID.
+**Returns:** `{ username, status, presence, activities }`. `activities` is an object keyed by activity ID. Throws `ApiError` `404` when the user has no status or hides their presence from you.
 
 ## rotur.status.setLive(options)
 
-Sets your status text and presence over HTTP.
+Sets your status text and presence over HTTP. Pass at least one of the two.
 
-**Auth:** Required. No specific permission.
+**Auth:** Required. Sub-tokens need `account:profile`.
 
 | Option | Type | Description |
 | --- | --- | --- |
-| `status` | string | Status text |
+| `status` | string | Status text, up to 128 characters |
 | `presence` | string | `"online"`, `"idle"`, `"dnd"`, or `"invisible"` |
 
 ```ts

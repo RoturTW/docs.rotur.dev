@@ -2,7 +2,9 @@
 
 `rotur.storage` stores key/value data for your app on the signed-in user's account. Every method needs a token.
 
-Data is grouped by `id`: each id holds its own set of keys (for example, one id per app or project), separate from the user's account keys. Values persist across sessions and devices for that user.
+Data is grouped by `id`: each id holds its own set of keys (for example, one id per app or project), separate from the user's account keys. Values persist across sessions and devices for that user. An id can be up to 128 characters and cannot contain `/`, `\`, or `..`; other ids get `400`.
+
+The storage quota is the same size as the user's file storage limit, which depends on their subscription. `usage` and `max` are in bytes.
 
 ## rotur.storage.get(id)
 
@@ -39,7 +41,7 @@ Sets one key under `id`.
 const { data } = await rotur.storage.set("my-app", "theme", "dark");
 ```
 
-**Returns:** `{ id, data }` after the change.
+**Returns:** `{ id, data }` after the change. Throws `ApiError` `413` when the change would go over the user's quota.
 
 ## rotur.storage.delete(id, key)
 

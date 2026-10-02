@@ -2,7 +2,7 @@
 
 The **My Keys** blocks work with Rotur keys: things a user can buy or be given, such as access to a paid feature. Use them to check whether the user owns a key, read a key's data, and buy one.
 
-You create and manage keys on [rotur.dev/keys](https://rotur.dev/keys); the **Mange My Keys** button in the palette opens that page. The extension has no blocks for creating keys. To create them from code, use the [Keys API](../assorted-apis/keys.md) or [`rotur.keys`](../rotur-sdk/marketplace/keys.md) in the SDK.
+You create and manage keys on [rotur.dev/keys](https://rotur.dev/keys); the **Mange My Keys** button in the palette opens that page. The extension has no blocks for creating keys. To create them from code, use the [Keys API](../api-reference/economy/keys.md) or [`rotur.keys`](../rotur-sdk/marketplace/keys.md) in the SDK.
 
 ## Blocks
 
@@ -25,7 +25,7 @@ if <not <do I own key of id: [premium-key-id]>> then
 end
 ```
 
-If a key has a price, buying it spends the user's credits. The seller's fees are listed in [Transactions and taxes](../my-account/transactions-and-taxes.md).
+If a key has a price, buying it spends the user's credits. The seller's fees are listed in [Transactions and taxes](../api-reference/economy/transactions-and-taxes.md).
 
 ## Hidden blocks
 

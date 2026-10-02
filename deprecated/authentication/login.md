@@ -55,7 +55,7 @@ Upon successful authentication (your username and password are correct) you will
 }
 ```
 
-Find out about rotur account objects here: [rotur-account-objects](../../my-account/rotur-account-objects/ "mention")
+Find out about rotur account objects here: [Account objects](../../api-reference/account/account-objects/README.md)
 
 ## Incorrect details
 

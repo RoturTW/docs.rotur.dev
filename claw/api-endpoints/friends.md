@@ -48,6 +48,8 @@ Authorization: Bearer <token>
 }
 ```
 
+If your account is treated as under 18, the response also has `needs_caution`: the usernames among `requests` that your app should show a safety prompt for before you accept.
+
 ## GET `/friends/requests_out`
 
 Lists the usernames you have sent a friend request to.
@@ -73,13 +75,16 @@ Authorization: Bearer <token>
 
 Sends a friend request. If that user has already sent you one, you become friends straight away and the message is `Friend request accepted automatically`.
 
-**Auth:** Required. Sub-tokens need `friends:request`. Your account needs `good` standing.
+**Auth:** Required. Sub-tokens need `friends:request`. Your account needs `good` standing. Uses the follow rate limit.
 
 ### Parameters
 
 | Name | In | Type | Required | Description |
 | --- | --- | --- | --- | --- |
 | `username` | path | string | Yes | User to send the request to |
+| `notice` | query | string | No | `1` (or `true`, `ask`) asks the server to check before sending. If the other account is treated as under 18, you get `409` with `code: under_18_notice` and nothing is sent. Send the request again without `notice` to confirm |
+
+When the other account is treated as under 18, a successful response can also include `"notice": "under_18"`, so your app can tell the sender.
 
 ### Example
 
@@ -103,9 +108,11 @@ Authorization: Bearer <token>
 | `400` | `You need other friends` (you tried to friend yourself) |
 | `400` | `Already Friends` |
 | `400` | `Already Requested` |
-| `400` | `You cant send friend requests to this user` (they have blocked you) |
+| `400` | `You cant send friend requests to this user` (they have blocked you, or turned off friend requests) |
 | `400` | `Unblock this user before sending a friend request` |
 | `404` | `Account Does Not Exist` |
+| `409` | `This account is treated as belonging to someone under 18. …` (only with `notice`; `code: under_18_notice`) |
+| `429` | `You can't send more friend requests right now. …` (`code: friend_request_limit`). There is a limit on pending and daily requests to accounts under 18; when you reach it, you cannot send any friend requests for a while |
 
 ## POST `/friends/accept/:username`
 

@@ -51,7 +51,7 @@ If you scheduled the post, you get this instead:
 | `400` | An attachment is invalid: `Attachment URL exceeds 200 character limit`, `Attachment must be a valid URL`, `Attachment from prohibited website`, or `Attachment must be an image or video (PNG, JPEG, GIF, MP4, WEBM)` |
 | `400` | `Invalid poll` or `A poll needs between 2 and 6 options` |
 | `400` | `Invalid scheduled time` |
-| `400` | `System must match a valid system` (unknown `os`), or `OS detail exceeds 64 character limit` / `OS detail contains invalid characters` |
+| `400` | `os` is invalid: `System must match a valid system`, `System must be at least 3 characters long`, `System must not exceed 20 characters`, `OS detail exceeds 64 character limit` or `OS detail contains invalid characters` |
 | `403` | `Polls require a Plus subscription or higher` |
 | `403` | `Scheduling posts requires a Plus subscription or higher` |
 | `429` | `Rate limit exceeded. Try again later.` (more than 5 posts in a minute) |

@@ -4,7 +4,7 @@ Send credits to someone through a redeem code. You create a gift, share its code
 
 > **Auth:** Looking up a gift by code needs no token. Every other endpoint requires one; sub-tokens need the permission listed on each endpoint.
 
-Creating a gift costs its amount plus a 1% tax. Every gift expires, after at most 7 days. Gifts have a `kind` of `credits`, or `subscription` for paid membership gifts, which are bought through a separate checkout and cannot be created or cancelled with these endpoints.
+Creating a gift costs its amount plus a 1% tax. Every gift expires, after at most 7 days. Gifts have a `kind` of `credits`, or `subscription` for paid membership gifts. Membership gifts are bought through a separate checkout, so you cannot create them with these endpoints, but you can cancel an unclaimed one for a refund within 14 days of paying.
 
 ## POST `/gifts/create`
 
@@ -91,7 +91,7 @@ GET /gifts/a1b2c3d4e5f6a7b8
 }
 ```
 
-`ready` is `true` while the gift can still be claimed. `creator_id` is the creator's username. `claimed_at` and `cancelled_at` appear once they apply, and `tier` appears on subscription gifts.
+`ready` is `true` while the gift can still be claimed. `creator_id` is the creator's username. `claimed_at` and `cancelled_at` appear once they apply, and `tier` appears on subscription gifts. An unclaimed membership gift also has `refundable_until`, the time in Unix milliseconds until which the buyer can cancel it for a refund.
 
 ### Errors
 
@@ -138,11 +138,11 @@ Authorization: Bearer <token>
 | `400` | `You cannot claim your own gift` |
 | `400` | `This gift has already been claimed`, `This gift has been cancelled` or `This gift has expired` |
 | `404` | `Gift not found` |
-| `409` | A subscription gift, and you already have an active paid plan |
+| `409` | `Membership gifts can only be claimed on an account without an active paid plan` |
 
 ## POST `/gifts/cancel/:id`
 
-Cancels one of your unclaimed credit gifts and refunds the amount. The 1% tax is not refunded.
+Cancels one of your unclaimed gifts. For a credit gift, the amount goes back to your balance; the 1% tax is not refunded. For a membership gift, the payment is refunded, as long as it is within 14 days of paying.
 
 **Auth:** Required. Sub-tokens need `gifts:cancel`.
 
@@ -169,12 +169,15 @@ Authorization: Bearer <token>
 }
 ```
 
+For a membership gift, the response is `{ "message": "Gift cancelled and refunded", "refund": { "amount": 499, "currency": "gbp" } }` instead. `refund.amount` is in the smallest unit of the currency, such as pence.
+
 ### Errors
 
 | Status | When |
 | --- | --- |
 | `400` | `This gift has already been claimed`, `This gift has already been cancelled` or `This gift has expired` |
-| `400` | `Paid membership gifts cannot be cancelled here` |
+| `400` | `This gift hasn't been paid for yet` or `This gift has already been claimed or cancelled` (membership gifts) |
+| `409` | `The 14 days to cancel this gift for a refund have ended` (membership gifts, `code: cooling_off_ended`) |
 | `403` | `You can only cancel your own gifts` |
 | `404` | `Gift not found` |
 
@@ -214,4 +217,4 @@ Authorization: Bearer <token>
 }
 ```
 
-`claimed_at` and `claimed_by` (a username) only appear on claimed gifts.
+`claimed_at` and `claimed_by` (a username) only appear on claimed gifts. `cancelled_at`, `tier` and `refundable_until` appear as on `GET /gifts/:code`.

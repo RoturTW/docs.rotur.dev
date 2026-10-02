@@ -12,7 +12,7 @@ Moves credits from your balance into escrow for a petition.
 | --- | --- | --- | --- |
 | `amount` | number | Yes | Credits to put in escrow. Minimum 0.01 |
 | `petitionId` | string | Yes | Petition to fund |
-| `note` | string | No | Description, up to 50 characters |
+| `note` | string | No | Description. Cut to 50 characters |
 
 ```ts
 const result = await rotur.devfund.escrowTransfer(100, "petition-123", "Funding the project");
@@ -22,7 +22,9 @@ const result = await rotur.devfund.escrowTransfer(100, "petition-123", "Funding 
 
 ## rotur.devfund.escrowRelease(amount, toUsername, petitionId, note?)
 
-Releases escrowed credits to a developer. Admin only.
+Releases escrowed credits to a developer. Only Rotur staff, signed in as themselves, can call it; anyone else gets `403`.
+
+Each petition is paid out once. If the petition has already been released, nothing is paid and the response has `replayed: true`.
 
 **Auth:** Required. Sub-tokens need `credits:manage`.
 
@@ -31,17 +33,17 @@ Releases escrowed credits to a developer. Admin only.
 | `amount` | number | Yes | Credits to release |
 | `toUsername` | string | Yes | Developer to pay |
 | `petitionId` | string | Yes | Petition being fulfilled |
-| `note` | string | No | Description |
+| `note` | string | No | Description. Cut to 50 characters |
 
 ```ts
 const result = await rotur.devfund.escrowRelease(100, "developer_name", "petition-123", "Milestone completed");
 ```
 
-**Returns:** `{ message, to, amount, petition_id, new_balance }`
+**Returns:** `{ message, to, amount, petition_id, new_balance, replayed }`
 
 ## rotur.devfund.escrowReleaseService(amount, toUsername, petitionId, apiKey, note?)
 
-Releases escrowed credits using a DevFund service key instead of a user token. Use it from a trusted server.
+Releases escrowed credits using a DevFund service key instead of a user token. Use it from a trusted server. It pays each petition once, like `escrowRelease()`.
 
 **Auth:** No token. Sends `apiKey` in the `X-Devfund-Key` header.
 
@@ -59,4 +61,4 @@ const result = await rotur.devfund.escrowReleaseService(
 );
 ```
 
-**Returns:** `{ message, to, amount, petition_id, new_balance }`
+**Returns:** `{ message, to, amount, petition_id, new_balance, replayed }`
