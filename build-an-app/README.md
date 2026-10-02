@@ -45,7 +45,7 @@ GET https://api.rotur.dev/v2/validators/verify?v=<validator>&key=app_0123456789a
 
 ## What Rotur does for you
 
-People who can't use your app never get through: people you've banned, people banned or suspended on Rotur, under-18s on an app that declares mature content, and teens whose parent hasn't allowed it. Rotur tells them why on its own screens. Your server gets a refusal, with a `code`, when it checks their validator.
+People who can't use your app never get through: people you've banned, people banned or suspended on Rotur, under-18s on an app that declares mature content, and teens whose parent hasn't allowed it. Rotur tells them why on its own screens, the SDK tells your page with a `RoturDeniedError`, and your server gets a refusal with a `code` when it checks a validator.
 
 ## Other ways in
 

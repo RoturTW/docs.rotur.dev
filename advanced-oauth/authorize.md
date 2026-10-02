@@ -152,7 +152,7 @@ The answer has the same shape as step 3, always with a new `refresh_token`.
 
 * Each refresh token works once. Keep the new one, and throw the old one away.
 * Refreshing stops the access token the refresh token last gave.
-* A refresh token stops working after 60 days without being used, or when the person leaves your app, is banned from it, or revokes the app's token in Token Manager.
+* A refresh token stops working after 60 days without being used, when the person leaves your app or revokes the app's token in Token Manager, or when a refresh is refused because they can't use your app.
 * A person can be signed in to your app this way on up to 10 devices. Signing in on an eleventh ends the oldest.
 
 ## Errors from the token endpoint
@@ -166,7 +166,8 @@ Errors are JSON with `error` and `error_description`.
 | `400` | `invalid_grant` | `Authorization code is invalid or expired` | The code was already used, is over 5 minutes old, belongs to another app, or `redirect_uri` doesn't match. Sign the person in again |
 | `400` | `invalid_grant` | `PKCE verification failed` | You sent the wrong verifier. Use the one you stored for this sign-in |
 | `400` | `invalid_grant` | `Refresh token is invalid or expired` | It was already used, expired or revoked. Sign the person in again |
-| `400` | `invalid_grant` | `This account can't use this app` | The person can no longer use your app, for example because you banned them. Tell them they can't sign in with that account |
+| `400` | `invalid_grant` | `This account can't use this app` | Swapping a code: the person can't use your app right now, for example because you banned them |
+| `400` | `invalid_grant` | Why, in words for the person, such as `You've been banned from Sketchpad.` | Refreshing: the person can't use your app right now. `denied` has the `code`, and for a ban the `reason` and `until`. Show them `error_description`. The refresh token is used up, so they must sign in again once they can |
 | `400` | `invalid_grant` | `account has reached its active token limit` | The person has too many active tokens. They can remove some on rotur.dev |
 | `429` | | | Too many requests from your IP address. Most endpoints allow 100 a minute |
 
@@ -201,7 +202,7 @@ Authorization: Bearer rotur_st_…
 | `profile` | Their profile page on rotur.dev |
 | `email`, `email_verified` | Only with the `email` scope, for people who share it. See [Scopes](scopes.md#the-email-scope) |
 
-**Errors:** `401` with `error: "invalid_token"` and a `WWW-Authenticate: Bearer` header, when the token is missing, wrong, over an hour old or revoked, or the person can no longer use your app.
+**Errors:** `401` with `error: "invalid_token"` and a `WWW-Authenticate: Bearer` header, when the token is missing, wrong, over an hour old or revoked, or the person can't use your app right now.
 
 Calling `/oauth/userinfo` also updates when the person last used your app, which you see in your [users list](../build-an-app/users.md).
 
@@ -215,11 +216,9 @@ With permission scopes, it can also call each endpoint those permissions cover, 
 
 There's no endpoint for your app to revoke a token. To sign someone out, end your own session and throw the tokens away. An access token stops working within the hour.
 
-Tokens also stop working straight away when:
+Tokens stop working straight away when the person leaves your app from [rotur.dev/me/apps](https://rotur.dev/me/apps), or you delete your app.
 
-* the person leaves your app from [rotur.dev/me/apps](https://rotur.dev/me/apps);
-* you [ban them](../build-an-app/bans.md), or Rotur bans or suspends their account;
-* Rotur suspends your app, or you delete it.
+While someone can't use your app, for example because you [banned them](../build-an-app/bans.md) or Rotur suspended your app, Rotur refuses their tokens without ending them. Calls answer `403` with `error`, `code` (such as `app_banned`), and for a ban `reason` and `until`. `/oauth/userinfo` answers `401`. The tokens work again once the person can use your app.
 
 If you keep your own sessions, also set up [webhooks](../build-an-app/webhooks.md) so you hear when someone leaves your app, is banned from Rotur or deletes their account.
 
