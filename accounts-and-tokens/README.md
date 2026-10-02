@@ -1,24 +1,23 @@
 ---
-description: When your app needs to act on someone's Rotur account, not just know who they are.
+description: Rotur account tokens, for Rotur's own clients, tools on your own account, and devices that link with a code.
 ---
 
 # Act on a user's account
 
-[Sign in with Rotur](../build-an-app/quickstart.md) tells your app who someone is. That's all it does: its tokens can only read the public profile.
+Apps for other people don't need this section. [Sign in with Rotur](../build-an-app/sign-people-in.md) lets an app post for someone, read their friends and so on: the SDK asks the person for each permission the app uses.
 
-Some apps need more. A Claw client posts for you, a file manager reads your files, a game spends your credits. For that, the person gives your app a **Rotur account token**: a sub-token holding only the permissions they choose.
+**Rotur account tokens** are for Rotur's own clients, for tools you run on your own account, and for devices that link with a code. A token holds only the permissions the person chooses.
 
 {% hint style="warning" %}
-Use account tokens only when your app really acts on the account. To let people sign in, use [Sign in with Rotur](../build-an-app/quickstart.md). Rotur's ban, age and parental checks for apps, and your app's users, bans and reports, only work with Sign in with Rotur.
+Rotur's ban, age and parental checks for apps, and your app's users, bans and reports, only work with Sign in with Rotur.
 {% endhint %}
 
 ## Sign in with Rotur or an account token?
 
 | | Sign in with Rotur | Rotur account token |
 | --- | --- | --- |
-| What your app learns | Who signed in: ID, username, display name, avatar, and email if allowed | Whatever its permissions allow |
-| What your app can do | Nothing on the account | Post, read friends, spend, manage files and so on, as permitted |
-| How long it lasts | One hour | Until the person revokes it, it expires, or it goes unused for 30 days |
+| What your app can do | Whatever permissions the person gives it | Whatever permissions the person gives it |
+| How long it lasts | An hour, renewed by the SDK until the person signs out or leaves your app | Until the person revokes it, it expires, or it goes unused for 30 days |
 | Needs a Rotur App | Yes | No |
 | Rotur enforces your bans and its age and parental checks | Yes | No |
 | Standard | OAuth 2.0 | Rotur's own hand-off |

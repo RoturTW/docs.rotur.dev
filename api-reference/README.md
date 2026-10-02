@@ -28,7 +28,7 @@ Which token you have decides what you can call:
 
 | Token | Where it comes from | What it can call |
 | --- | --- | --- |
-| Sign in with Rotur access token | [Sign in with Rotur](../build-an-app/sign-users-in.md) | Only `/oauth/userinfo` (and `/me` for the public profile). Other endpoints answer `403` with `OAuth access tokens can only read the public profile` |
+| Sign in with Rotur access token | [Sign in with Rotur](../advanced-oauth/authorize.md) | `/oauth/userinfo`, `/me` for the public profile, and whatever permissions the person gave the app. With no permissions, other endpoints answer `403` with `OAuth access tokens can only read the public profile` |
 | Rotur account sub-token (`rotur_st_…`) | [rotur.dev/auth](../accounts-and-tokens/rotur-dev-auth.md), [linking](../accounts-and-tokens/linking.md) or the [tokens API](../accounts-and-tokens/tokens/README.md) | Endpoints its [permissions](../accounts-and-tokens/tokens/permissions.md) allow. Each endpoint's **Auth** line names the permission |
 | The account's main token | The account itself | Everything, including the endpoints marked "main token only" |
 | App credentials (`app_…` and `rsec_…`) | [Your Rotur App](../build-an-app/set-up-your-app.md) | The [apps API](../build-an-app/apps-api.md), with HTTP Basic |

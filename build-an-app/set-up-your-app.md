@@ -8,7 +8,7 @@ A Rotur App is how your website, game or program connects to Rotur. It gives you
 
 * A **client ID** (`app_` and 16 characters), which is also your app's ID.
 * **Secrets** (`rsec_…`) for your server.
-* **Redirect URIs**, the addresses Rotur may send people back to after they sign in.
+* **Redirect URIs**, the pages people sign in from.
 * A dashboard for your app's users, bans, reports, badges, webhooks and safety settings.
 
 Anyone with a Rotur account can create apps. You can own up to 10.
@@ -44,12 +44,13 @@ A redirect URI is where Rotur sends people back to after they approve or deny yo
 * It must use `https://`. The only exception is `http://localhost` and `http://127.0.0.1`, for testing.
 * It can't contain a fragment (`#…`) or a username and password.
 * The `redirect_uri` you send when signing someone in must match one of them **exactly**. `https://example.com/callback` and `https://example.com/callback/` are different.
+* With the [JavaScript SDK](sign-people-in.md), add the address of each page people sign in from. The sign-in window only needs the page's origin to match, but if the browser blocks the window, the page itself goes to Rotur and comes back, and then its address must match exactly.
 
 Add one for each place your app runs, for example your live site and `http://localhost:3000/callback` for development.
 
 ## Choose public or confidential
 
-If your app can't keep a secret, because it runs entirely in a browser or on someone's computer, tick **This app can't keep a secret**. It then signs people in with PKCE alone and never sends a secret. See [Public and confidential clients](client-types.md).
+Apps that sign people in with the [JavaScript SDK](sign-people-in.md), or that run entirely on someone's computer, tick **This app can't keep a secret**. Sign-in then finishes without a secret. Your server can still use a secret for the [apps API](app-secret.md). See [Public and confidential clients](../advanced-oauth/client-types.md).
 
 ## Manage secrets
 

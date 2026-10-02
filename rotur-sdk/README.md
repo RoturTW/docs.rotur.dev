@@ -3,7 +3,7 @@
 `rotur-sdk` is the official TypeScript client for the Rotur API. Use it to log users in and call Rotur from a browser app, a desktop app, or a server.
 
 {% hint style="info" %}
-The SDK gets your app a token to act on someone's Rotur account. If you only need people to sign in to your website or app with Rotur, use Sign in with Rotur (OAuth) instead. See the [quickstart](../build-an-app/quickstart.md).
+Apps sign people in with `new Rotur({ app })` and `rotur.signIn()`, from version 3.1. See [Build an app](../build-an-app/README.md). Once someone is signed in, the methods in this section work as them. `rotur.login()` and passing a token to the constructor are for Rotur's own clients and for tools on your own account.
 {% endhint %}
 
 > **Base URL:** `https://api.rotur.dev/v2` (the SDK sends every request there)

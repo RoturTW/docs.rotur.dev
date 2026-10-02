@@ -1,10 +1,10 @@
 ---
-description: Add a Sign in with Rotur button, and the browser's own "Continue as" prompt, to any website with one script tag.
+description: Add a Sign in with Rotur button, and the browser's own "Continue as" prompt, to a website with one script tag and no SDK.
 ---
 
-# Add Sign in with Rotur in two lines
+# Sign-in button with signin.js
 
-This is the quickest way to let people sign in to your website with Rotur. You don't need the SDK, a callback page or a server.
+`signin.js` adds a Sign in with Rotur button, and the browser's "Continue as" prompt, to a website with one script tag. It gives your page an access token for the profile, and doesn't need the SDK, a callback page or a server. To also call your own server, or to act on people's accounts, use the [JavaScript SDK](../build-an-app/sign-people-in.md) instead.
 
 ## 1. Set up your app
 
@@ -109,7 +109,7 @@ const user = await fetch("https://api.rotur.dev/oauth/userinfo", { headers: { Au
 
 Everything `signin.js` does is standard, so you can do it yourself in any language or framework.
 
-**The popup.** Open `https://api.rotur.dev/oauth/authorize` in a window, with the usual [PKCE parameters](quickstart.md), plus:
+**The popup.** Open `https://api.rotur.dev/oauth/authorize` in a window, with the usual [PKCE parameters](authorize.md#1-send-the-person-to-rotur), plus:
 
 * `response_mode=web_message`
 * `redirect_uri` set to your page's origin, such as `https://yoursite.com` (no path). It must be the origin of one of your app's redirect URIs.
@@ -152,6 +152,6 @@ const credential = await navigator.credentials.get({
 
 ## Next steps
 
-* [Scopes and the consent screen](scopes.md): what people agree to.
-* [Handle errors and denials](errors.md): bans, parents' choices and adults-only apps.
-* [Meet the Developer Terms](developer-terms.md): what every app must do, such as deleting data when asked.
+* [Scopes and the consent screen](scopes.md): what people agree to, and why some are refused.
+* [Authorise, swap and refresh](authorize.md): every error the token endpoint can give.
+* [Meet the Developer Terms](../build-an-app/developer-terms.md): what every app must do, such as deleting data when asked.

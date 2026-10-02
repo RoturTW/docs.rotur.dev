@@ -15,7 +15,7 @@ The short version: Rotur looks after accounts, age checks, parental controls, pr
 - [ ] **Set a webhook** if you store anything about the people who use your app. See [Receive webhooks](webhooks.md).
 - [ ] **Declare truthfully** whether people can talk, whether there's mature content and whether people can spend. See [Declarations and safety signals](safety.md).
 - [ ] **Ask signals** before messages and purchases if you declared them, and don't offer a way round a "no".
-- [ ] **Keep secrets on your server.** No client secret or webhook signing secret in web pages, downloadable apps or public repositories. If your app can't keep a secret, make it a [public client](client-types.md).
+- [ ] **Keep secrets on your server.** No client secret or webhook signing secret in web pages, downloadable apps or public repositories. If your app can't keep a secret, make it a [public client](../advanced-oauth/client-types.md).
 - [ ] **Sign people in with Sign in with Rotur**, not by asking for a Rotur token. Rotur's age, ban and parental checks only cover Sign in with Rotur.
 
 ## While your app is running

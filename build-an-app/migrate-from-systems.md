@@ -44,7 +44,7 @@ Migrated apps start without a secret. As the owner, choose **New secret** in the
 {% step %}
 ### Move sign-in to Sign in with Rotur
 
-Add a redirect URI and follow the [Quickstart](quickstart.md). Sign in with Rotur records which app people joined through, and Rotur's ban, age and parental checks apply to it.
+Add a redirect URI and follow [Build an app](README.md). Sign in with Rotur records which app people joined through, and Rotur's ban, age and parental checks apply to it.
 {% endstep %}
 
 {% step %}

@@ -20,14 +20,8 @@ Checks a validator against the key it was generated for. It needs no token, so y
 
 **Auth:** None.
 
-{% hint style="warning" %}
-The API reads the validator from a query parameter called `v`, but `validate()` sends it as `validator`. It currently fails with `ApiError` `400` ("Validator is required"). Until the SDK is fixed, call the endpoint yourself:
-
-```ts
-const params = new URLSearchParams({ v: validator, key: "my-app-key" });
-const result = await fetch(`https://api.rotur.dev/v2/validators/verify?${params}`)
-  .then((res) => res.json());
-```
+{% hint style="info" %}
+Before version 3.0, `validate()` sent the validator in the wrong parameter and always failed with `ApiError` `400`. Update the SDK, or call the endpoint yourself. On a server, `verifyValidator` from `rotur-sdk/server` checks a validator for your app: see [Check who's calling](../../build-an-app/check-whos-calling.md).
 {% endhint %}
 
 ```ts
