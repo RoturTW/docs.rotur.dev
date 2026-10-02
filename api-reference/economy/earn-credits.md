@@ -4,7 +4,7 @@ Rotur credits are the currency used across Rotur for purchases, apps and service
 
 ## Sell keys
 
-A key is something users buy from you with credits: an app feature, a server plan, a membership, or anything else your service provides. The [Keys API](../assorted-apis/keys.md) has the full endpoint reference.
+A key is something users buy from you with credits: an app feature, a server plan, a membership, or anything else your service provides. The [Keys API](keys.md) has the full endpoint reference.
 
 When a user buys one of your keys:
 
@@ -31,7 +31,7 @@ The user is charged again at the end of each billing period. A period is a numbe
 
 ### Key limits
 
-The number of keys you can create depends on your [subscription tier](subscriptions.md):
+The number of keys you can create depends on your [subscription tier](../account/subscriptions.md):
 
 | Tier | Keys |
 | --- | --- |
@@ -72,7 +72,7 @@ Refunds are not automatic. If a user was scammed or a purchase went wrong, they 
 
 ## How users earn credits
 
-* **Daily claim.** Every user can claim credits once every 24 hours with [`/claim_daily`](../claw/api-endpoints/claim_daily.md), or from the Wallet app on originOS. Free accounts get 1 credit and Pro accounts get 3; see [Daily credit claims](subscriptions.md#daily-credit-claims).
+* **Daily claim.** Every user can claim credits once every 24 hours with [`/claim_daily`](../../claw/api-endpoints/claim_daily.md), or from the Wallet app on originOS. Free accounts get 1 credit and Pro accounts get 3; see [Daily credit claims](../account/subscriptions.md#daily-credit-claims).
 * **Transfers and sales.** Users receive credits from other users, and from selling items and cosmetics.
 * **Apps and systems.** Some Rotur-connected apps, operating systems and games have their own ways to earn credits.
 

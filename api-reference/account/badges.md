@@ -2,7 +2,7 @@
 
 Badges are small icons shown on your profile. The server works them out from your account each time they are requested, so they are always current.
 
-To read badges, call [`GET /badges`](../claw/api-endpoints/badges.md) for your own account or read the `badges` field of a profile. You can hide and reorder your badges with `/badges/preferences` (see below).
+To read badges, call [`GET /badges`](../../claw/api-endpoints/badges.md) for your own account or read the `badges` field of a profile. You can hide and reorder your badges with `/badges/preferences` (see below).
 
 ## Badge object
 

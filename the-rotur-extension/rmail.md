@@ -3,7 +3,7 @@
 The rMail blocks send short messages with a subject between logged-in users, and keep the ones you receive in a mailbox in your project.
 
 {% hint style="warning" %}
-In the current extension, mail is delivered over the socket on your designation and kept only in memory. The recipient has to be connected on the same designation when you send it, and their mailbox is empty again after the project reloads. It doesn't read or write the server-side mailbox from the [Rmail API](../assorted-apis/rmail.md).
+In the current extension, mail is delivered over the socket on your designation and kept only in memory. The recipient has to be connected on the same designation when you send it, and their mailbox is empty again after the project reloads. It doesn't read or write the server-side mailbox from the [Rmail API](../api-reference/rmail.md).
 {% endhint %}
 
 ## Send mail

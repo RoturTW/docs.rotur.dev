@@ -29,7 +29,7 @@ Templates with an unknown type, or a `user` key that doesn't exist, render as an
 
 ## `user`
 
-Shows a top-level key from your [account object](rotur-account-objects/README.md). Besides account keys, `followers` and `following` show your follower counts.
+Shows a top-level key from your [account object](account-objects/README.md). Besides account keys, `followers` and `following` show your follower counts.
 
 * Only strings, numbers and booleans are shown. Arrays and objects, such as `sys.friends` or `theme`, render as an empty string.
 * You cannot read nested values. `theme.text` does not work. Keys like `sys.currency` work because they are top-level keys whose names contain a dot.
@@ -66,4 +66,4 @@ There is no limit on the number of templates. Your bio, including the templates,
 | Plus | 500 characters |
 | Pro | 1,000 characters |
 
-Templates are rendered by the server when your profile is fetched with [`GET /profile`](../claw/api-endpoints/profile.md). Anyone who can see your profile sees the rendered values. Your own `bio` key, as returned by `GET /me`, keeps the raw template text.
+Templates are rendered by the server when your profile is fetched with [`GET /profile`](../../claw/api-endpoints/profile.md). Anyone who can see your profile sees the rendered values. Your own `bio` key, as returned by `GET /me`, keeps the raw template text.

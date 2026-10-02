@@ -13,18 +13,18 @@ There are four tiers. Each tier includes everything in the tiers below it.
 
 Plus and Pro can also be paid yearly, for the price of 8 months. **Drive** is an older name for Pro; Drive accounts get exactly the Pro benefits. The API also defines a **Max** tier above Pro (500 keys, 10 GB of storage, 50 MB notification log, 1,000-character posts), which is not sold through checkout.
 
-To check your own tier and limits, call `GET /me/benefits`. Your tier is also in `sys.subscription` on your [account object](rotur-account-objects/README.md).
+To check your own tier and limits, call `GET /me/benefits`. Your tier is also in `sys.subscription` on your [account object](account-objects/README.md).
 
 ## Rotur account
 
 | Benefit | Free | Lite | Plus | Pro |
 | --- | --- | --- | --- | --- |
-| [Keys](earn-credits.md) you can create | 5 | 10 | 20 | 50 |
+| [Keys](../economy/earn-credits.md) you can create | 5 | 10 | 20 | 50 |
 | File storage | 5 MB | 25 MB | 100 MB | 1 GB |
 | Bio length | 200 characters | 300 characters | 500 characters | 1,000 characters |
 | [Credits per daily claim](#daily-credit-claims) | 1 | 1 | 2 | 3 |
 | Login history entries | 10 | 25 | 100 | 100 |
-| [Credit history](transactions-and-taxes.md#transaction-history) kept | 1 month | 6 months | 12 months | Unlimited |
+| [Credit history](../economy/transactions-and-taxes.md#transaction-history) kept | 1 month | 6 months | 12 months | Unlimited |
 | Notification log | 256 KB | 1 MB | 2 MB | 10 MB |
 | [Bio templates](bio-templates.md) | — | Yes | Yes | Yes |
 | [Friend notes](friend-notes.md) | — | — | Yes | Yes |
@@ -33,7 +33,7 @@ To check your own tier and limits, call `GET /me/benefits`. Your tier is also in
 | Custom emojis for originChats and across Rotur | — | — | 50 | 500 |
 | Banners without the 30-credit unlock | — | — | — | Yes |
 | Custom profile backgrounds, including video | — | — | — | Yes |
-| `pro` [badge](rotur-badges.md) | — | — | — | Yes |
+| `pro` [badge](badges.md) | — | — | — | Yes |
 
 ## Claw and Pounce
 
@@ -62,7 +62,7 @@ To check your own tier and limits, call `GET /me/benefits`. Your tier is also in
 
 ## Daily credit claims
 
-Every user can claim credits once every 24 hours with [`/claim_daily`](../claw/api-endpoints/claim_daily.md). The amount depends on your tier:
+Every user can claim credits once every 24 hours with [`/claim_daily`](../../claw/api-endpoints/claim_daily.md). The amount depends on your tier:
 
 | Tier | Credits per claim |
 | --- | --- |

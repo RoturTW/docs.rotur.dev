@@ -1,6 +1,6 @@
 # Tokens
 
-`rotur.tokens` manages sub-tokens: tokens with a limited set of permissions that you give to third-party apps. Creating and changing sub-tokens needs your main token. For the HTTP endpoints, see [Tokens](../../assorted-apis/tokens/README.md).
+`rotur.tokens` manages sub-tokens: tokens with a limited set of permissions that you give to third-party apps. Creating and changing sub-tokens needs your main token. For the HTTP endpoints, see [Tokens](../../accounts-and-tokens/tokens/README.md).
 
 Sub-tokens are returned as `SubTokenPublic`: `{ id, name, permissions, created_at, revoked, last_used_at?, expires_at?, revoked_at?, origin?, description?, websites?, token? }`.
 

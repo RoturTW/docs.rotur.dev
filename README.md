@@ -1,36 +1,51 @@
+---
+description: Build on Rotur. Start here to pick the right path for your app.
+---
+
 ![](https://github.com/user-attachments/assets/59384c74-a8c4-4707-9931-f6a3364395dc)
 
-# Getting started
+# Start here
 
-Rotur provides accounts, authentication and social features that your app can use instead of building its own. Every Rotur user can sign in to your app with their existing account.
+Rotur is an account system and social platform you can build on. Instead of running your own sign-up, passwords, age checks and moderation, you let people use the Rotur account they already have.
 
-Rotur covers:
+When people sign in with Rotur, Rotur handles:
 
-* Accounts and authentication, including sub-tokens with scoped permissions
-* Friends, following and posts
-* Profile avatars and banners, served from one place
-* Live account updates over the status websocket
-* An economy of credits, items, keys and cosmetics
-* Groups, and a way to run Discord-style rich presence and activities from the web
+* **Accounts and sign-in**: passwords, passkeys, Google, GitHub and Discord sign-in, and email checks.
+* **Age**: Rotur asks for a date of birth and applies each country's minimum age. Your app never sees a date of birth or an age.
+* **Parental controls and teen defaults**: parents choose which apps their teen uses, who they can message and what they can spend.
+* **Account safety**: people banned or suspended on Rotur can't sign in to any app.
+* **Privacy requests and deletion**: Rotur tells your app when to delete someone's data.
 
-## Where to start
+You build your app and moderate your own content.
 
-| You are building | Start here |
-| --- | --- |
-| A web or JavaScript app | The [Rotur SDK](rotur-sdk/README.md): `npm install rotur-sdk` |
-| Anything that calls HTTP directly | The REST API at `https://api.rotur.dev`. Endpoint docs are in the sidebar, starting with [APIs](assorted-apis/keys.md) and [Claw](claw/what-is-claw.md). |
-| A TurboWarp or MistWarp project | [The Rotur Extension](the-rotur-extension/connecting-to-rotur.md) |
+## Choose your path
 
-{% hint style="info" %}
-The old websocket docs are in the [Deprecated](deprecated/what-is-a-websocket.md) section. Use the REST API or the SDK for new projects.
+{% hint style="success" %}
+**Most apps want Sign in with Rotur.** If you're not sure, start there.
 {% endhint %}
 
-## Background
+| You want to | Use | Start with |
+| --- | --- | --- |
+| Let people sign in to your website, game or app with their Rotur account | **Sign in with Rotur** (OAuth 2.0) | [Quickstart](build-an-app/quickstart.md) |
+| Act on someone's account: post for them, read their friends, spend credits | A **Rotur account token** | [Act on a user's account](accounts-and-tokens/README.md) |
+| Build for originOS, or in TurboWarp or MistWarp | **The Rotur Extension** | [Connect to Rotur](the-rotur-extension/connecting-to-rotur.md) |
+| Write JavaScript against the whole API | **The Rotur SDK** (`npm install rotur-sdk`) | [Rotur SDK](rotur-sdk/README.md) |
+| Look up an endpoint | **The API reference** | [How the API works](api-reference/README.md) |
+| Move a system over to Rotur Apps | **Rotur Apps** | [Migrate from systems](build-an-app/migrate-from-systems.md) |
 
-Rotur started on June 29, 2024, to connect TurboWarp and MistWarp based operating systems. It now also runs services such as originChats and the Rotur suite.
+## Sign in with Rotur in four steps
 
-## Links
+1. Create an app at [rotur.dev/me/developer](https://rotur.dev/me/developer) and add a redirect URI. You get a client ID (`app_…`) and a secret (`rsec_…`).
+2. Send people to `https://api.rotur.dev/oauth/authorize` with PKCE.
+3. Swap the code they come back with for a token at `https://api.rotur.dev/oauth/token`.
+4. Read who they are from `https://api.rotur.dev/oauth/userinfo`, and key them by `sub`.
+
+The [Quickstart](build-an-app/quickstart.md) has complete code for a browser-only app, a Node.js server and curl.
+
+## Get help
 
 * Website: [rotur.dev](https://rotur.dev)
-* Docs: [docs.rotur.dev](https://docs.rotur.dev)
 * Chat with us in the official originChats server: [originchats.mistium.com](https://originchats.mistium.com?server=chats.mistium.com)
+* Security problems: security@rotur.dev
+
+Rotur started on 29 June 2024 to connect TurboWarp and MistWarp based operating systems. It now also runs services such as originChats and the Rotur suite.

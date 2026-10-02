@@ -37,7 +37,7 @@ fetch(`https://api.rotur.dev/get_user?username=${username}&password=${password}`
 
 ***
 
-The response (`data`) is a full **Rotur account object**. Details on what's inside: [rotur-account-objects](../../my-account/rotur-account-objects/)
+The response (`data`) is a full **Rotur account object**. Details on what's inside: [rotur-account-objects](../../api-reference/account/account-objects/README.md)
 
 ***
 

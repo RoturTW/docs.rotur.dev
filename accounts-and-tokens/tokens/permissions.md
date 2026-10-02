@@ -161,7 +161,7 @@ A group is a convenience for building a permission list. When you create or upda
 
 | Permission | Description |
 |---|---|
-| `validators:generate` | Generate [validators](../validators/README.md) |
+| `validators:generate` | Generate [validators](../validators.md) |
 | `signing:private` | Read the account's private signing key (`GET /v2/me/signing-key`) |
 | `blocked:view` | View blocked users list |
 | `blocked:manage` | Block and unblock users |

@@ -1,6 +1,6 @@
 # .overlay
 
-Get the avatar overlay a user has equipped from the [cosmetics shop](../cosmetics/README.md), to draw on top of their avatar.
+Get the avatar overlay a user has equipped from the [cosmetics shop](../economy/cosmetics/README.md), to draw on top of their avatar.
 
 > **Base URL:** `https://avatars.rotur.dev`
 >

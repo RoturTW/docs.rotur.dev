@@ -12,7 +12,7 @@ This page covers the essentials. The full reference for every endpoint is in the
 
 ### Authentication
 
-rMail uses [validators](validators/README.md) instead of your Rotur token.
+rMail uses [validators](../accounts-and-tokens/validators.md) instead of your Rotur token.
 
 1. Generate a validator for the `rotur-mail` key with your Rotur token: `GET https://api.rotur.dev/generate_validator?key=rotur-mail`.
 2. Send the returned `validator` string as `Authorization: Bearer <validator>` on every rMail request.

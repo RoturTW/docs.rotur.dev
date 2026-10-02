@@ -1,6 +1,6 @@
 # Accessing OFSF Storage
 
-OFSF (originFS File System) is the cloud file storage used by originOS. This page shows how to download everything you have stored in one request. To read or write single files, use the [`/files` endpoints](../claw/api-endpoints/files.md).
+OFSF (originFS File System) is the cloud file storage used by originOS. This page shows how to download everything you have stored in one request. To read or write single files, use the [`/files` endpoints](../../claw/api-endpoints/files.md).
 
 > **Base URL:** `https://api.rotur.dev`
 > **Auth:** `Authorization: Bearer <token>` with your account token (`key` on your account object). The legacy `auth` query parameter is also accepted. Sub-tokens need `files:view`.
@@ -46,7 +46,7 @@ If you don't need everything at once, these endpoints return less. They use the 
 | `GET /files/by-path/{path}` | One file by its originFS path |
 | `GET /files/by-uuid?uuid=...` | One file by UUID |
 
-See [/files](../claw/api-endpoints/files.md) for details.
+See [/files](../../claw/api-endpoints/files.md) for details.
 
 ## Storage limits
 

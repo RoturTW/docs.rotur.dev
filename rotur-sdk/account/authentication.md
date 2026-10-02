@@ -31,7 +31,7 @@ await rotur.login({ requires: "full" });
 
 Browsers only allow the popup when `login()` runs from a click or key press. Call it from a "Sign in" button rather than on page load or from a socket event, or your users always get the iframe.
 
-Inside the iframe, Google, GitHub and Discord sign-in are unavailable because those providers refuse to be framed, so users sign in with their username and password. See [rotur.dev/auth](../../assorted-apis/rotur.dev-auth.md) for details.
+Inside the iframe, Google, GitHub and Discord sign-in are unavailable because those providers refuse to be framed, so users sign in with their username and password. See [rotur.dev/auth](../../accounts-and-tokens/rotur-dev-auth.md) for details.
 
 On failure the promise rejects with an `AuthError` whose `code` is one of `"timeout"`, `"aborted"`, `"popup_blocked"`, or `"no_token"`:
 

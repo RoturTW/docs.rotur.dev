@@ -1,6 +1,6 @@
 # Notifications
 
-Your in-app notification feed. Rotur adds a notification when someone follows you, replies to, likes, mentions or reposts you, buys your item and so on. Notifications that apps send you with [send notification](../../assorted-apis/notifications/send-notification.md) are added here too, with `type` `notification`.
+Your in-app notification feed. Rotur adds a notification when someone follows you, replies to, likes, mentions or reposts you, buys your item and so on. Notifications that apps send you with [send notification](../../api-reference/notifications/send-notification.md) are added here too, with `type` `notification`.
 
 > **Auth:** Every endpoint requires a token. Sub-tokens need `notifications:view`, including for marking notifications read and deleting them.
 

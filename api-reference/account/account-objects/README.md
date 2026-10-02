@@ -1,6 +1,6 @@
 # Rotur Account Objects
 
-Your Rotur account is a JSON object of keys and values. The server manages some keys; you can set the rest yourself. Read the whole object with [`GET /me`](../../claw/api-endpoints/me.md).
+Your Rotur account is a JSON object of keys and values. The server manages some keys; you can set the rest yourself. Read the whole object with [`GET /me`](../../../claw/api-endpoints/me.md).
 
 > **Base URL:** `https://api.rotur.dev`
 > **Auth:** `Authorization: Bearer <token>`. Sub-tokens need `account:profile` to update keys. The update endpoint also accepts the token as an `auth` field in the JSON body, but not as a query parameter.
@@ -55,13 +55,13 @@ You cannot write keys that start with `sys.`; the server manages them. These key
 | `sys.purchases` | IDs of items you own. Example: `["c4068074d5ed5bfcae9a91874383dab9"]`. |
 | `sys.total_logins` | How many times you have signed in with your password. Example: `106`. |
 | `sys.last_login` | When you last signed in with your password, in milliseconds. |
-| `sys.transactions` | Your credit history. Each entry has `type`, `user`, `amount`, `note`, `time` and `new_total`. How far back it goes depends on your tier; see [Transactions and Taxes](../transactions-and-taxes.md). |
+| `sys.transactions` | Your credit history. Each entry has `type`, `user`, `amount`, `note`, `time` and `new_total`. How far back it goes depends on your tier; see [Transactions and Taxes](../../economy/transactions-and-taxes.md). |
 | `sys.notes` | Your private notes about other users, keyed by username. See [Friend Notes](../friend-notes.md). |
 | `sys.subscription` | Your subscription: `tier`, `active`, `next_billing` and billing details. |
 | `sys.social_links` | Up to 3 social links shown on your profile. |
 | `sys.email_verified` | Whether your email address is verified. |
 
-Badges are not read from the account object. Get them from [`GET /badges`](../../claw/api-endpoints/badges.md) or the `badges` field of a profile. See [Rotur Badges](../rotur-badges.md).
+Badges are not read from the account object. Get them from [`GET /badges`](../../../claw/api-endpoints/badges.md) or the `badges` field of a profile. See [Rotur Badges](../badges.md).
 
 ## Writable keys
 

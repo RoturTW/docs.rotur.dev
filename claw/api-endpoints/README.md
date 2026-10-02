@@ -24,7 +24,7 @@ Endpoints that require a token return `403` with an `error` field when:
 
 ### Token permissions
 
-Your main account token can call every endpoint. A sub-token can only call an endpoint if it holds that endpoint's permission (for example `posts:create` for [`/post`](post.md)); otherwise you get `403` with `Token lacks permission: <permission>`. See [permissions](../../assorted-apis/tokens/permissions.md) for the full list.
+Your main account token can call every endpoint. A sub-token can only call an endpoint if it holds that endpoint's permission (for example `posts:create` for [`/post`](post.md)); otherwise you get `403` with `Token lacks permission: <permission>`. See [permissions](../../accounts-and-tokens/tokens/permissions.md) for the full list.
 
 ### Account standing and restrictions
 

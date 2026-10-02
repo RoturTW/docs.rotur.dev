@@ -1,6 +1,6 @@
 # Badges
 
-Badges are awarded to accounts for reaching goals or meeting requirements, and show on the user's profile. These blocks read the badges on the logged-in account. For the list of badges and how to get them, see [Rotur badges](../my-account/rotur-badges.md).
+Badges are awarded to accounts for reaching goals or meeting requirements, and show on the user's profile. These blocks read the badges on the logged-in account. For the list of badges and how to get them, see [Rotur badges](../api-reference/account/badges.md).
 
 The extension loads the badges with the account when the user logs in.
 

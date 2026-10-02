@@ -1,6 +1,6 @@
 # Validators
 
-`rotur.validators` creates and checks validators: strings that let another service confirm which Rotur user generated them, without seeing the user's token. A validator is bound to a key string your app chooses. For how validators work, see [Validators](../../assorted-apis/validators/README.md).
+`rotur.validators` creates and checks validators: strings that let another service confirm which Rotur user generated them, without seeing the user's token. A validator is bound to a key string your app chooses. For how validators work, see [Validators](../../accounts-and-tokens/validators.md).
 
 ## rotur.validators.generate(key)
 

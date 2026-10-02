@@ -22,7 +22,7 @@ Files are served as static files, so any file type works, including HTML pages. 
 
 ## Set up
 
-1. Subscribe to Pro or higher. See [Subscriptions](../my-account/subscriptions.md).
+1. Subscribe to Pro or higher. See [Subscriptions](account/subscriptions.md).
 2. In originOS, open Settings and check that your account shows the tier.
 3. Open Files. If there is no `share` folder in your user folder, create one.
 4. Drag files into `~/share`.

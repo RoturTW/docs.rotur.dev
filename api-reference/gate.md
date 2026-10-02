@@ -21,7 +21,7 @@ Browsers do not send Gate's cookie to other origins, so apps on other sites must
 
 To get a session:
 
-1. Get a Rotur token through [rotur.dev/auth](rotur.dev-auth.md).
+1. Get a Rotur token through [rotur.dev/auth](../accounts-and-tokens/rotur-dev-auth.md).
 2. Exchange it with `GET /api/auth` and store the returned `session_id`.
 3. Send the `session_id` on every authenticated request.
 

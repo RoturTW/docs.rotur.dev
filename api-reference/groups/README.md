@@ -18,7 +18,7 @@ Each group has a unique tag of up to 10 letters and digits (`A-Z`, `a-z`, `0-9`)
 
 Two separate permission checks apply:
 
-- **Token permissions** (such as `groups:view` or `groups:manage`) only restrict [sub-tokens](../tokens/permissions.md). A main account token passes every token permission check.
+- **Token permissions** (such as `groups:view` or `groups:manage`) only restrict [sub-tokens](../../accounts-and-tokens/tokens/permissions.md). A main account token passes every token permission check.
 - **Group permissions** (such as `groups.roles.manage`) come from the roles you hold in the group. They apply to everyone, whatever token you use.
 
 Each endpoint's **Auth** line lists both.

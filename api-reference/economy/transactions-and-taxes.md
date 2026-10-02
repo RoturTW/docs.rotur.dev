@@ -88,7 +88,7 @@ Every credit operation is logged in `sys.transactions` on your account, newest f
 | `key_id`, `key_name` | The key involved, for key transactions |
 | `provider`, `external_id` | The payment provider and its reference, for purchases |
 
-How far back your history goes depends on your [subscription tier](subscriptions.md):
+How far back your history goes depends on your [subscription tier](../account/subscriptions.md):
 
 | Tier | History kept |
 | --- | --- |
