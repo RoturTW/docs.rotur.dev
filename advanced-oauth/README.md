@@ -60,4 +60,4 @@ curl -s -X POST "https://api.rotur.dev/v2/validators?key=app_0123456789abcdef" \
 { "validator": "7ebdf483-5b9f-4b70-9edc-a1f2827391f9,9c1f…" }
 ```
 
-A token can always make validators for its own app. Validators for one 5-minute window are the same, so make one per window and reuse it. Your server checks it as in [Check who's calling](../build-an-app/check-whos-calling.md).
+A token can always make validators for its own app. Validators for one 5-minute window are the same, so make one per window and reuse it. While the person can't use your app, for example because you banned them, this answers `403` with `error`, `code`, and for a ban `reason` and `until`: show them `error`. Your server checks it as in [Check who's calling](../build-an-app/check-whos-calling.md).

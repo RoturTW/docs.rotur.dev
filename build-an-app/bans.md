@@ -106,6 +106,6 @@ Lists bans that are still in force, most recently changed first. Bans that have 
 
 ## Check whether someone is banned
 
-There's no endpoint to look up one person's ban, and you don't need one. Once you ban someone, their sign-in to your app stops working, so they can't make new validators. A validator they made before the ban gets `app_banned` when your server [checks it](check-whos-calling.md), at the latest when your server's cached answer runs out, within 5 minutes.
+There's no endpoint to look up one person's ban, and you don't need one. While a ban lasts, Rotur refuses the person's sign-in to your app with `app_banned`, the `reason` you gave and `until`. The SDK [tells your page](call-your-server.md#when-rotur-refuses-someone), and a validator they made before the ban gets the same answer when your server [checks it](check-whos-calling.md), at the latest once your server's kept answer expires, within 5 minutes. Their sign-in isn't ended: it works again when the ban ends or you lift it.
 
 If you keep your own sessions, end theirs when you ban them. The `user.banned` [webhook](webhooks.md) is for bans *from Rotur*, not from your app.
