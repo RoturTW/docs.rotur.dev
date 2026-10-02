@@ -3,7 +3,7 @@
 Sub-tokens give an app limited access to your Rotur account. Instead of sharing your main account token, which can do everything, you create a sub-token that holds only the permissions the app needs.
 
 {% hint style="info" %}
-These are Rotur account tokens, for acting on a user's account. If you only want people to sign in to your app with their Rotur account, use [Sign in with Rotur](../../build-an-app/quickstart.md) instead.
+These are Rotur account tokens, for acting on a user's account. If you're building an app for other people, use [Sign in with Rotur](../../build-an-app/sign-people-in.md) instead.
 {% endhint %}
 
 > **Base URL:** `https://api.rotur.dev`
@@ -28,7 +28,7 @@ Each sub-token also has an ID of the form `st_…`. You use the ID, not the toke
 
 ### OAuth access tokens
 
-When someone signs in to an app with [Sign in with Rotur](../../build-an-app/quickstart.md), the access token the app gets is stored as a sub-token on their account. It shows up in [List tokens](list-tokens.md) like any other, with these values:
+When someone signs in to an app with [Sign in with Rotur](../../build-an-app/sign-people-in.md), the access token the app gets is stored as a sub-token on their account. It shows up in [List tokens](list-tokens.md) like any other, with these values:
 
 | Field | Value |
 | --- | --- |

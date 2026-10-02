@@ -7,7 +7,7 @@ description: Ask someone for a Rotur account token from your website, through ro
 [rotur.dev/auth](https://rotur.dev/auth) signs someone in on Rotur and hands your page a Rotur account token with the permissions they choose. It works as a redirect, a popup or an iframe.
 
 {% hint style="warning" %}
-This gives your app a token to **act on the account**. If you only need to know who someone is, use [Sign in with Rotur](../build-an-app/quickstart.md) instead. Only Sign in with Rotur applies your app's bans and Rotur's age and parental checks for apps.
+This gives your app a token to **act on the account**. If you're building an app for other people, use [Sign in with Rotur](../build-an-app/sign-people-in.md) instead. Only Sign in with Rotur applies your app's bans and Rotur's age and parental checks for apps.
 {% endhint %}
 
 If you write JavaScript, the [Rotur SDK](../rotur-sdk/account/authentication.md)'s `rotur.login()` builds the URL, opens a popup (or an iframe when popups are blocked) and waits for the token for you. The rest of this page is for apps that can't use the SDK.

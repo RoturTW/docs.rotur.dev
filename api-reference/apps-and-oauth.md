@@ -4,16 +4,16 @@ description: Every Sign in with Rotur and Rotur Apps endpoint, with links to the
 
 # Apps and OAuth endpoints
 
-An index of the endpoints for [building an app](../build-an-app/quickstart.md). Each row links to the page that documents it.
+An index of the endpoints for [building an app](../build-an-app/README.md). Each row links to the page that documents it.
 
 ## Sign in with Rotur
 
 | Method | Path | Auth | Docs |
 | --- | --- | --- | --- |
-| GET | `/oauth/authorize` | None (a browser redirect) | [Send the person to Rotur](../build-an-app/sign-users-in.md#1-send-the-person-to-rotur) |
-| POST | `/oauth/token` | Client credentials, or `client_id` for public clients | [Swap the code for a token](../build-an-app/sign-users-in.md#3-swap-the-code-for-a-token) |
-| GET | `/oauth/userinfo` | Access token | [Find out who signed in](../build-an-app/sign-users-in.md#4-find-out-who-signed-in) |
-| GET | `/.well-known/oauth-authorization-server` | None | [Endpoints](../build-an-app/sign-users-in.md#endpoints) |
+| GET | `/oauth/authorize` | None (a browser redirect) | [Send the person to Rotur](../advanced-oauth/authorize.md#1-send-the-person-to-rotur) |
+| POST | `/oauth/token` | Client credentials, or `client_id` for public clients | [Swap the code for tokens](../advanced-oauth/authorize.md#3-swap-the-code-for-tokens), [Refresh](../advanced-oauth/authorize.md#4-refresh) |
+| GET | `/oauth/userinfo` | Access token | [Find out who signed in](../advanced-oauth/authorize.md#5-find-out-who-signed-in) |
+| GET | `/.well-known/oauth-authorization-server` | None | [Endpoints](../advanced-oauth/README.md#endpoints) |
 
 `/oauth/request`, `/oauth/approve` and `/oauth/deny` are used by Rotur's own consent screen. Don't call them from your app.
 
@@ -40,6 +40,9 @@ All under `https://api.rotur.dev`. "App" means HTTP Basic with your client ID an
 | POST | `/v2/apps/<app>/reports/<id>/escalate` | App | [Send a report to Rotur](../build-an-app/handle-reports.md#send-a-report-to-rotur) |
 | POST | `/v2/apps/<app>/signals/message` | App only | [May they message?](../build-an-app/safety.md#may-they-message) |
 | POST | `/v2/apps/<app>/signals/purchase` | App only | [May they spend?](../build-an-app/safety.md#may-they-spend) |
+| POST | `/v2/apps/<app>/payment-requests` | App, or the payer's Sign in with Rotur token | [Take payments](../build-an-app/payments.md) |
+| GET | `/v2/apps/<app>/payment-requests/<id>` | App, or the payer's token | [Take payments](../build-an-app/payments.md) |
+| POST | `/v2/apps/<app>/payment-requests/<id>/cancel` | App, or the payer's token | [Take payments](../build-an-app/payments.md) |
 
 The endpoints for editing your app, its secrets, managers, declarations and webhook are only for its owner and managers signed in on rotur.dev. See [Call the apps API](../build-an-app/apps-api.md#endpoints).
 

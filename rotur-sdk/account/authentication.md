@@ -1,7 +1,7 @@
 # Authentication
 
 {% hint style="info" %}
-`rotur.login()` gives your app a Rotur token so it can act on the person's account: post, send credits, read their files and so on. If you only want people to sign in to your website or app with their Rotur account, use Sign in with Rotur (OAuth) instead. See the [quickstart](../../build-an-app/quickstart.md).
+Apps sign people in with `new Rotur({ app })` and `rotur.signIn()`, from version 3.1. See [Sign people in](../../build-an-app/sign-people-in.md). The ways below are for Rotur's own clients and for tools on your own account.
 {% endhint %}
 
 The SDK gives you a few ways to get a token for the Rotur API.

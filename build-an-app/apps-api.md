@@ -25,7 +25,7 @@ const app = await fetch(`https://api.rotur.dev/v2/apps/${CLIENT_ID}`, {
 Your credentials only work on your own app, and only about your own users. Call the apps API from your server: it needs a secret, so it can't run in a browser.
 
 {% hint style="info" %}
-The apps API is separate from Sign in with Rotur. You don't need a signed-in user to call it, and an access token from Sign in with Rotur won't work here.
+The apps API is separate from Sign in with Rotur. You don't need a signed-in user to call it, and an access token from Sign in with Rotur won't work here, except to make and check payment requests for the person it belongs to. [Use your app secret on the server](app-secret.md) has examples in several languages.
 {% endhint %}
 
 ## Endpoints
@@ -52,6 +52,9 @@ The apps API is separate from Sign in with Rotur. You don't need a signed-in use
 | POST | `/v2/apps/<app>/reports/<id>/escalate` | App | [Send a report to Rotur](handle-reports.md#send-a-report-to-rotur) |
 | POST | `/v2/apps/<app>/signals/message` | App only | [May they message?](safety.md#may-they-message) |
 | POST | `/v2/apps/<app>/signals/purchase` | App only | [May they spend?](safety.md#may-they-spend) |
+| POST | `/v2/apps/<app>/payment-requests` | App, or the payer's Sign in with Rotur token | [Take payments](payments.md) |
+| GET | `/v2/apps/<app>/payment-requests/<id>` | App, or the payer's token | [Take payments](payments.md) |
+| POST | `/v2/apps/<app>/payment-requests/<id>/cancel` | App, or the payer's token | [Take payments](payments.md) |
 | PATCH | `/v2/apps/<app>` | Dashboard | Edit details and redirect URIs |
 | POST, DELETE | `/v2/apps/<app>/secrets` | Dashboard, owner | Make and revoke secrets |
 | PUT, DELETE | `/v2/apps/<app>/managers/<username>` | Dashboard | Add and remove managers |

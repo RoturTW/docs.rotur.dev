@@ -86,3 +86,20 @@ redirects:
   apis/groups/member-roles: api-reference/groups/member-roles.md
   apis/groups/transfer: api-reference/groups/transfer.md
   apis/status-websocket: api-reference/status-websocket/README.md
+
+  # Moved on 2 October 2026, when Build an app became the SDK path and raw
+  # OAuth moved to its own section.
+  build-an-app/quickstart: advanced-oauth/examples.md
+  build-an-app/sign-users-in: advanced-oauth/authorize.md
+  build-an-app/sign-users-in/scopes: advanced-oauth/scopes.md
+  build-an-app/sign-users-in/client-types: advanced-oauth/client-types.md
+  build-an-app/sign-users-in/errors: advanced-oauth/authorize.md
+  build-an-app/scopes: advanced-oauth/scopes.md
+  build-an-app/client-types: advanced-oauth/client-types.md
+  build-an-app/errors: advanced-oauth/authorize.md
+  build-an-app/sign-in-button: advanced-oauth/signin-js.md
+  build-an-app/users: build-an-app/users.md
+  build-an-app/badges: build-an-app/badges.md
+  build-an-app/bans: build-an-app/bans.md
+  build-an-app/handle-reports: build-an-app/handle-reports.md
+  build-an-app/safety: build-an-app/safety.md

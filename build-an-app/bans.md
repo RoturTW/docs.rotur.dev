@@ -106,4 +106,6 @@ Lists bans that are still in force, most recently changed first. Bans that have 
 
 ## Check whether someone is banned
 
-There's no endpoint to look up one person's ban, and you don't need one. A banned person's token stops working, so `/oauth/userinfo` answers `401` and they can't sign in again. If you keep your own sessions, the `user.banned` [webhook](webhooks.md) is for bans *from Rotur*, not from your app, so end your own session for someone when you ban them.
+There's no endpoint to look up one person's ban, and you don't need one. Once you ban someone, their sign-in to your app stops working, so they can't make new validators. A validator they made before the ban gets `app_banned` when your server [checks it](check-whos-calling.md), at the latest when your server's cached answer runs out, within 5 minutes.
+
+If you keep your own sessions, end theirs when you ban them. The `user.banned` [webhook](webhooks.md) is for bans *from Rotur*, not from your app.

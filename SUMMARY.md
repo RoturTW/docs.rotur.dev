@@ -4,22 +4,31 @@
 
 ## Build an app
 
-* [Add Sign in with Rotur in two lines](build-an-app/sign-in-button.md)
-* [Quickstart: Sign in with Rotur](build-an-app/quickstart.md)
-* [Set up your app](build-an-app/set-up-your-app.md)
-* [Sign users in](build-an-app/sign-users-in.md)
-  * [Scopes and the consent screen](build-an-app/scopes.md)
-  * [Public and confidential clients](build-an-app/client-types.md)
-  * [Handle errors and denials](build-an-app/errors.md)
-* [Call the apps API](build-an-app/apps-api.md)
-* [See who uses your app](build-an-app/users.md)
-* [Give badges](build-an-app/badges.md)
-* [Ban people from your app](build-an-app/bans.md)
-* [Handle reports](build-an-app/handle-reports.md)
-* [Declarations and safety signals](build-an-app/safety.md)
+* [How an app fits together](build-an-app/README.md)
+* [Sign people in](build-an-app/sign-people-in.md)
+* [Call your server](build-an-app/call-your-server.md)
+* [Check who's calling (Go, Python, PHP, JS…)](build-an-app/check-whos-calling.md)
+* [Use your app secret on the server](build-an-app/app-secret.md)
 * [Receive webhooks](build-an-app/webhooks.md)
+* [Take payments](build-an-app/payments.md)
+* [Set up your app](build-an-app/set-up-your-app.md)
+* [The apps API](build-an-app/apps-api.md)
+  * [See who uses your app](build-an-app/users.md)
+  * [Give badges](build-an-app/badges.md)
+  * [Ban people from your app](build-an-app/bans.md)
+  * [Handle reports](build-an-app/handle-reports.md)
+  * [Declarations and safety signals](build-an-app/safety.md)
 * [Meet the Developer Terms](build-an-app/developer-terms.md)
 * [Migrate from systems](build-an-app/migrate-from-systems.md)
+
+## Advanced: OAuth without the SDK
+
+* [OAuth without the SDK](advanced-oauth/README.md)
+* [Authorise, swap and refresh](advanced-oauth/authorize.md)
+* [Scopes and the consent screen](advanced-oauth/scopes.md)
+* [Public and confidential clients](advanced-oauth/client-types.md)
+* [Complete examples](advanced-oauth/examples.md)
+* [Sign-in button with signin.js](advanced-oauth/signin-js.md)
 
 ## Accounts and tokens
 

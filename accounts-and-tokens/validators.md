@@ -1,155 +1,112 @@
+---
+description: Short-lived proofs that someone owns a Rotur account, which a server checks without ever seeing their token.
+---
+
 # Validators
 
-A validator is a short-lived string that proves a user owns a Rotur account, without your service ever seeing their token or password. The user generates a validator for your app's key and hands it to your service, which checks it and gets back the user's username and ID.
+A validator is a short string that proves who made it, without the server that checks it seeing their token or password. Someone signed in to Rotur makes one for a **key**, and gives it to a service that knows the key. The service asks Rotur who made it.
 
-> **Base URL:** `https://api.rotur.dev`
->
-> **Auth:** Generating a validator needs the user's token in the `Authorization: Bearer <token>` header (the legacy `auth` query parameter is also accepted). Sub-tokens need `validators:generate`. Validating is public.
+Apps use their app ID as the key. The JavaScript SDK's `rotur.fetch` sends one to your server with each request, and [Check who's calling](../build-an-app/check-whos-calling.md) shows your server checking it in several languages. This page is the reference for both endpoints.
 
-The v2 paths are `POST /v2/validators` (generate) and `GET /v2/validators/verify` (validate). They take the same query parameters.
+* **Base URL:** `https://api.rotur.dev`
+* **Make one:** `POST /v2/validators?key=<key>`, with the person's token. The older `GET /generate_validator` does the same.
+* **Check one:** `GET /v2/validators/verify?v=<validator>&key=<key>`, with no auth. The older `GET /validate` does the same.
 
-## GET `/generate_validator`
+## Make a validator
 
-Generates a validator for the signed-in user, bound to `key`. It is valid for 5 minutes.
+`POST /v2/validators?key=<key>`
 
-**Auth:** Required. Sub-tokens need `validators:generate`.
+**Auth:** The person's token, as `Authorization: Bearer <token>`. A Sign in with Rotur token can always make validators for its own app's ID. For any other key, a token from Token Manager or an app needs the `validators:generate` permission.
 
-If you authenticate with a sub-token, the server still uses the main account token to compute the hash, so validation works the same either way.
+| Name | In | Required | Description |
+| --- | --- | --- | --- |
+| `key` | query | Yes | The key the validator is for: your app's ID, or any string your service and its users agree on |
 
-### Parameters
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `key` | query | string | Yes | Your application's key, bound into the validator hash |
-
-### Example
-
-```http
-GET /generate_validator?key=myAppKey
-Authorization: Bearer <token>
+```sh
+curl -s -X POST "https://api.rotur.dev/v2/validators?key=app_0123456789abcdef" \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
 **Response `200`:**
 
 ```json
-{
-  "validator": "<userId>,<hash>"
-}
+{ "validator": "7ebdf483-5b9f-4b70-9edc-a1f2827391f9,9c1f0e…" }
 ```
 
-`validator` is the user's ID and a SHA-256 hash, separated by a comma.
-
-### Errors
+`validator` is the person's Rotur ID and a SHA-256 hash, separated by a comma.
 
 | Status | When |
 | --- | --- |
 | `400` | `key` is missing (`key is required`) |
-| `403` | The token is missing or invalid, or a sub-token lacks `validators:generate` |
-| `403` | The account is restricted or banned. The body has `code: "account_blocked"`, `standing`, `recover_at`, `reason` and `redirect_url`. |
-| `403` | `key` is for an OriginChats server that a parent or carer has blocked. The body has `code: "parental_block"` and `server`. |
+| `403` | The token is missing or invalid, or a token without the permission asked for a key that isn't its own app (`code: "permission_missing"`) |
+| `403` | The account is restricted or banned. The body has `code: "account_blocked"`, `standing`, `recover_at`, `reason` and `redirect_url` |
+| `403` | The key is for an originChats server that a parent or carer has blocked. The body has `code: "parental_block"` and `server` |
 
-## GET `/validate`
+## Check a validator
 
-Checks a validator against a key. Your service calls this; no authentication is needed.
+`GET /v2/validators/verify?v=<validator>&key=<key>`
 
 **Auth:** None.
 
-### Parameters
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `v` | query | string | Yes | The full validator string, `userId,hash` |
-| `key` | query | string | Yes | The key the validator was generated for |
-
-### Example
-
-```http
-GET /validate?v=abc123def456,a1b2c3d4e5f6...&key=myAppKey
-```
+| Name | In | Required | Description |
+| --- | --- | --- | --- |
+| `v` | query | Yes | The whole validator, URL-encoded |
+| `key` | query | Yes | The key it was made for |
 
 **Response `200` (valid):**
 
 ```json
-{
-  "valid": true,
-  "username": "example_user",
-  "id": "abc123def456",
-  "minor": false
-}
+{ "valid": true, "id": "7ebdf483-5b9f-4b70-9edc-a1f2827391f9", "username": "kit", "minor": false }
 ```
 
 | Field | Description |
 | --- | --- |
-| `minor` | `true` if the account is under 18, or has no date of birth |
+| `minor` | `true` if the account isn't known to be 18 or over |
 | `account_type` | Only for sub-accounts: `bot` or `org` |
 | `owner` | Only for sub-accounts whose owner is discoverable: the owner's username |
-| `restrictions` | Only for OriginChats keys when parental controls limit direct messages. Holds `direct_messages` and the user's `friends`, so a DM server can enforce the rule. |
+| `restrictions` | Only for originChats keys when parental controls limit direct messages. Holds `direct_messages` and the person's `friends`, so a DM server can enforce the rule |
 
-**Response `200` (not valid):**
-
-An expired, unknown or wrong-key validator still returns `200`, with `valid: false`. Always check `valid`.
+**Not valid:** an expired, unknown or wrong-key validator still gets `200`, with `valid: false` and an `error`. Always check `valid`.
 
 ```json
-{
-  "valid": false,
-  "error": "Validator expired or not found"
-}
+{ "valid": false, "error": "Validator expired or not found" }
 ```
 
-```json
-{
-  "valid": false,
-  "error": "Invalid validator"
-}
-```
+When the key is an app ID, Rotur also checks the person may use that app, and refuses with a `code` if not: `app_banned`, `app_suspended`, `app_adults_only`, `parent_blocked_apps`, `parent_approval_needed` or `account_unavailable`. [Check who's calling](../build-an-app/check-whos-calling.md#the-call) says what each means. A successful check also counts as the person using the app, for your [users list](../build-an-app/users.md).
 
-For an OriginChats key, a validator for a server that a parent or carer has blocked also returns `valid: false`, with `code: "parental_block"`.
-
-### Errors
+For an originChats key, a server that a parent or carer has blocked gets `valid: false` with `code: "parental_block"`.
 
 | Status | When |
 | --- | --- |
-| `400` | `v` or `key` is missing (`Validator is required`, `Key is required`) |
-| `400` | `v` has no comma (`Invalid validator format`) |
-| `400` | The user has no token set (`User has no token`) |
-| `403` | The account is restricted or banned. The body has `valid: false`, `code: "account_blocked"`, `standing`, `recover_at`, `reason`, `redirect_url`, `username` and `id`. |
-| `404` | No user has the ID in the validator (`User not found`) |
+| `400` | `v` or `key` is missing (`Validator is required`, `Key is required`), or `v` has no comma (`Invalid validator format`). No `valid` field |
+| `403` | The account is restricted or banned. The body has `valid: false`, `code: "account_blocked"`, `standing`, `recover_at`, `reason`, `redirect_url`, `username` and `id` |
+| `404` | No account has the ID in the validator (`User not found`). No `valid` field |
 
 ## How it works
 
 ### Hash
 
 ```
-SHA-256(key + authKey + windowStart)
+SHA-256(key + accountToken + windowStart)
 ```
 
-- `key`: your application's key.
-- `authKey`: the user's main account token. It never leaves the server.
-- `windowStart`: the generation time in Unix seconds rounded down to a multiple of 300, as a decimal string.
+* `key`: the key it was made for.
+* `accountToken`: the account's main token. It never leaves Rotur.
+* `windowStart`: when it was made, in Unix seconds, rounded down to a multiple of 300, as a decimal string.
 
-The result is a 64-character lowercase hex string.
+The result is a 64-character lowercase hex string. Every validator one account makes for one key in the same 5-minute window is the same string.
 
 ### Lifetime
 
-Each validator is valid for 300 seconds from the moment it was generated. The hash uses the rounded window start, but expiry counts from the exact generation time, so every validator gets the full 5 minutes.
-
-### Validation steps
-
-1. Split `v` into the user ID and the hash.
-2. Look up the user and their main account token.
-3. Find a stored validator for that user with the same hash that has not expired.
-4. Recompute the hash from `key`, the user's token and that validator's window.
-5. If it matches, the validator is valid.
-
-A validator can be checked more than once until it expires.
+Each validator works for 300 seconds from when it was last made. It can be checked any number of times until then. A service can keep the answer for a validator until the end of its 5-minute window.
 
 ### Storage
 
-Validators are held in memory only. Expired ones are pruned every 300 seconds and whenever the same user generates a new one. A server restart invalidates every pending validator, and so does refreshing the user's main token.
+Rotur holds validators in memory only. A restart of Rotur ends every validator, and so does the account's main token changing.
 
 ## Security
 
-- Each validator expires 5 minutes after it is generated, which limits replay.
-- The hash includes both your key and the user's account token, so a validator cannot be reused for another key or user.
-- The account token is never returned; it is only mixed into the hash on the server.
-- Anyone can call `/validate`. Forging a validator would require the user's account token.
+* A validator expires 5 minutes after it's made, which limits replay.
+* The hash covers both the key and the account's token, so a validator can't be used for another key or account.
+* The account's token is never sent anywhere. It is only mixed into the hash, on Rotur's side.
+* Anyone can check a validator. Forging one needs the account's token.

@@ -8,7 +8,7 @@ Badges show on people's Rotur profiles. Your app has two kinds.
 
 ## The origin badge
 
-People who created their Rotur account through your app, for example by signing up in the middle of [signing in to it](sign-users-in.md#when-someone-signs-up-during-sign-in), get your app's origin badge automatically.
+People who created their Rotur account through your app, for example by signing up in the middle of [signing in to it](../advanced-oauth/authorize.md#when-someone-signs-up-during-sign-in), get your app's origin badge automatically.
 
 * Its ID is `app:<your slug>`.
 * It shows your app's name and icon, says "Joined Rotur through *your app*", and links to your website if you've set one.
