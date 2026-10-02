@@ -8,6 +8,8 @@ Groups are Rotur communities with their own roles, announcements, events, role p
 
 `{tag}` in every path is the group's tag. Every endpoint with `{tag}` in its path returns `404` with `{"error": "Group not found"}` when no group has that tag, and every endpoint that needs auth returns `403` when the token is missing or invalid. Those errors aren't repeated on each page.
 
+Access tokens from "Sign in with Rotur" can't use any endpoint that needs auth here. They get `403` with `{"error": "OAuth access tokens can only read the public profile"}`. Use a sub-token with the right permissions instead.
+
 ## Concepts
 
 ### Tags
@@ -33,7 +35,7 @@ Each endpoint's **Auth** line lists both.
 
 ### Visibility
 
-Groups are public or private. Only public groups appear in [search](search.md) and [top groups](top.md), and only public groups accept direct joins and join requests. A private group can only be joined by accepting an invite, and only its members can tip it. Anyone can [fetch a group](get.md) by tag.
+Groups are public or private. Only public groups appear in [search](search.md) and [top groups](top.md), and only public groups accept direct joins and join requests. A private group can only be joined by accepting an invite, and only its members can tip it, contribute to its campaigns, or see its activity feed and campaigns. Anyone can [fetch a group](get.md) by tag.
 
 ### Roles and group permissions
 
@@ -64,7 +66,7 @@ A group can charge an **entry fee** in credits. The fee is taken from the joinin
 
 ### Credits
 
-Creating a group costs **15 credits**. Tips, entry fees, and role product sales all go into the group's `credits_balance`. Members with `groups.tips.withdraw` can [withdraw](tips.md) from it.
+Creating a group costs **15 credits**. Tips, campaign contributions, entry fees, and role product sales all go into the group's `credits_balance`. Members with `groups.tips.withdraw` can [withdraw](tips.md) from it.
 
 ## Endpoints
 
@@ -81,11 +83,14 @@ Creating a group costs **15 credits**. Tips, entry fees, and role product sales 
 | POST | [`/v2/groups/{tag}/leave`](leave.md) | Required | Leave a group |
 | PUT, DELETE | [`/v2/groups/{tag}/represent`](represent.md) | Required | Show or hide a group on your profile |
 | POST | [`/v2/groups/{tag}/report`](report.md) | Required | Report a group |
-| POST, GET | [`/v2/groups/{tag}/icon`](icon.md) | Upload only | Upload or fetch the icon |
+| POST | [`/v2/groups/{tag}/icon`](icon.md) | Required | Upload the icon |
+| GET | [`/v2/groups/{tag}/icon.jpg`](icon.md) | None | Fetch the icon |
 | POST, GET | [`/v2/groups/{tag}/banner`](banner.md) | Upload only | Upload or fetch the banner |
 | GET, POST, DELETE | [`/v2/groups/{tag}/announcements`](announcements.md) | Except listing | Announcements |
+| GET | [`/v2/groups/{tag}/activity`](announcements.md) | Private groups only | Activity feed |
 | GET, POST, PATCH, DELETE | [`/v2/groups/{tag}/events`](events.md) | Required | Events |
 | GET, POST | [`/v2/groups/{tag}/tips`](tips.md) | Required | Tips and withdrawals |
+| GET, POST, PATCH | [`/v2/groups/{tag}/campaigns`](tips.md) | Except listing | Fundraising campaigns |
 | GET, POST, DELETE | [`/v2/groups/{tag}/products`](products.md) | Except ownership check | Role products and subscriptions |
 | GET, POST, PATCH, DELETE | [`/v2/groups/{tag}/roles`](roles.md) | Required | Roles |
 | GET, DELETE | [`/v2/groups/{tag}/members`](members.md) | Required | List, look up, and kick members |
@@ -94,8 +99,6 @@ Creating a group costs **15 credits**. Tips, entry fees, and role product sales 
 | GET, POST, DELETE | [`/v2/groups/{tag}/invites`](invites.md) | Required | Invites |
 | GET, POST | [`/v2/groups/{tag}/join-requests`](join-requests.md) | Required | Join requests |
 | POST | [`/v2/groups/{tag}/transfer/{userid}`](transfer.md) | Required | Transfer ownership |
-
-The API also serves a group activity feed (`GET /v2/groups/{tag}/activity`) and fundraising campaigns (`/v2/groups/{tag}/campaigns`). They aren't documented here yet.
 
 ## Data models
 

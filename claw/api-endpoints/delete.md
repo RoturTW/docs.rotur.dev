@@ -2,6 +2,8 @@
 
 Deletes one of your posts. Network admins can delete any post.
 
+Rotur staff can also remove posts that break the rules. The author gets a `content_removed` notification with the reason, which does not say who removed it.
+
 **Auth:** Required. Sub-tokens need `posts:delete`.
 
 {% hint style="warning" %}

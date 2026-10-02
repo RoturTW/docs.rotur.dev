@@ -4,7 +4,7 @@
 
 Register a Web Push subscription for your account under a source. If the same device (fingerprint and source) is already registered, its endpoint and keys are replaced instead of adding a duplicate.
 
-**Auth:** Required. Sub-tokens need `account:settings`.
+**Auth:** Required. Sub-tokens need `account:settings`. Send your Rotur token in the `Authorization` header (or use a rotur.dev session). The body's `auth` field is always read as the push subscription secret, never as your token, on both `/notify/register` and `/v2/notify/register`.
 
 ### Parameters
 

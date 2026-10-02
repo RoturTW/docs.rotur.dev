@@ -6,7 +6,7 @@ Create a group that you own. It costs 15 credits, and each account can own one g
 
 **Auth:** Required. Sub-tokens need `groups:manage`. Your account must be in good standing and must not have group changes blocked by moderation.
 
-All parameters go in the query string, not the body.
+Send the parameters in the query string, or as a JSON body (`Content-Type: application/json`). If a parameter is in both, the query string wins.
 
 ### Parameters
 

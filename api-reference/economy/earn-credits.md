@@ -68,13 +68,18 @@ For a subscription renewal, `content` reads `buyer_username was charged by key: 
 
 ## Refunds
 
-Refunds are not automatic. If a user was scammed or a purchase went wrong, they can contact **@mistium** on Discord, **@mist** on Rotur, or send an Rmail, and the refund is handled by hand.
+Refunds for keys are not automatic. If a user was scammed or a purchase went wrong, they can contact Rotur, and Rotur staff handle the refund by hand.
 
 ## How users earn credits
 
-* **Daily claim.** Every user can claim credits once every 24 hours with [`/claim_daily`](../../claw/api-endpoints/claim_daily.md), or from the Wallet app on originOS. Free accounts get 1 credit and Pro accounts get 3; see [Daily credit claims](../account/subscriptions.md#daily-credit-claims).
+* **Daily claim.** Every user can claim credits once every 24 hours with [`/claim_daily`](../../claw/api-endpoints/claim_daily.md), or from the Wallet app on originOS. Free accounts get 1 credit and Pro accounts get 3; see [Daily credit claims](../account/subscriptions.md#daily-credit-claims). Sub accounts can't claim.
 * **Transfers and sales.** Users receive credits from other users, and from selling items and cosmetics.
-* **Apps and systems.** Some Rotur-connected apps, operating systems and games have their own ways to earn credits.
+* **Apps.** Some Rotur Apps, operating systems and games have their own ways to earn credits.
+* **App owners.** If you own a Rotur App that used to be a system, you get 0.25 credits each time an account on that system makes a daily claim. See [Transactions and Taxes](transactions-and-taxes.md#daily-claim-tax).
+
+{% hint style="info" %}
+Rotur no longer sells credits. Credits you already hold, daily claims, transfers and the Lite subscription (paid in credits) are not affected.
+{% endhint %}
 
 ## Economy statistics
 

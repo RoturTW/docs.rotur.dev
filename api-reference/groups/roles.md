@@ -1,6 +1,6 @@
 # Roles
 
-Roles give members group permissions and benefits. Every group starts with an **Owner** role, which always has every permission and can't be deleted, and a **Member** role, which is given to new members. See [group permissions](README.md#roles-and-group-permissions) for what each permission allows.
+Roles give members group permissions and benefits. Every group starts with an **Owner** role, which always has every permission, and a **Member** role, which is given to new members. Neither can be deleted. See [group permissions](README.md#roles-and-group-permissions) for what each permission allows.
 
 ## GET `/v2/groups/{tag}/roles`
 
@@ -67,7 +67,7 @@ Create a role. New roles have no permissions or benefits; set them with the upda
 
 | Name | In | Type | Required | Description |
 | --- | --- | --- | --- | --- |
-| `name` | query | string | Yes | Up to 50 characters |
+| `name` | query | string | Yes | Up to 50 characters. Can't be `Owner` (in any case) |
 | `description` | query | string | No | Up to 200 characters |
 | `assign_on_join` | query | string | No | `true` to give the role to new members automatically. Default `false` |
 | `self_assignable` | query | string | No | `true` to let members give the role to themselves. Default `false` |
@@ -99,12 +99,13 @@ Authorization: Bearer YOUR_TOKEN
 | Status | When |
 | --- | --- |
 | `400` | `name` is missing (`Name is required`) or over 50 characters (`Name length exceeded`) |
+| `400` | `name` is `Owner` (`Role name is reserved`) |
 | `400` | `description` is over 200 characters (`Description length exceeded`) |
 | `403` | You lack `groups.roles.manage` (`You don't have permission to manage roles`) |
 
 ## PATCH `/v2/groups/{tag}/roles/{roleid}`
 
-Update a role. Only the fields you send are changed. Lists you send replace the existing lists.
+Update a role. Only the fields you send are changed. Lists you send replace the existing lists. A field with the wrong JSON type is rejected, and if any field is rejected, nothing is changed.
 
 **Auth:** Required. Sub-tokens need `groups:manage`. You need `groups.roles.manage`.
 
@@ -113,8 +114,8 @@ Update a role. Only the fields you send are changed. Lists you send replace the 
 | Name | In | Type | Required | Description |
 | --- | --- | --- | --- | --- |
 | `roleid` | path | string | Yes | The role's `id` |
-| `name` | body | string | No | New name |
-| `description` | body | string | No | New description |
+| `name` | body | string | No | New name, 1–50 characters. Only the Owner role can be named `Owner`, and it can't be renamed |
+| `description` | body | string | No | New description, up to 200 characters |
 | `assign_on_join` | body | boolean | No | Give the role to new members automatically |
 | `self_assignable` | body | boolean | No | Let members give the role to themselves |
 | `permissions` | body | string[] | No | New permission list |
@@ -143,13 +144,17 @@ Content-Type: application/json
 | Status | When |
 | --- | --- |
 | `400` | The body isn't valid JSON (`Invalid request body`) |
+| `400` | `name` isn't a string (`Invalid name`), is empty (`Name is required`), or is over 50 characters (`Name length exceeded`) |
+| `400` | `name` would make a role other than Owner be called `Owner`, or rename the Owner role (`Role name is reserved`) |
+| `400` | `description` isn't a string (`Invalid description`) or is over 200 characters (`Description length exceeded`) |
+| `400` | `assign_on_join` or `self_assignable` isn't a boolean (`Invalid assign_on_join`, `Invalid self_assignable`) |
 | `400` | `permissions` or `benefits` isn't an array of strings (`Invalid permissions`, `Invalid benefits`) |
 | `403` | You lack `groups.roles.manage` (`You don't have permission to manage roles`) |
 | `404` | No role has that ID in this group (`Role not found`) |
 
 ## DELETE `/v2/groups/{tag}/roles/{roleid}`
 
-Delete a role. The Owner role can't be deleted.
+Delete a role. The Owner and Member roles can't be deleted.
 
 **Auth:** Required. Sub-tokens need `groups:manage`. You need `groups.roles.manage`.
 
@@ -178,6 +183,6 @@ Authorization: Bearer YOUR_TOKEN
 
 | Status | When |
 | --- | --- |
-| `400` | The role is named `Owner` or `Everyone` (`Cannot delete default roles`) |
+| `400` | The role is named `Owner` or `Member` (`Cannot delete default roles`) |
 | `403` | You lack `groups.roles.manage` (`You don't have permission to manage roles`) |
 | `404` | No role has that ID in this group (`Role not found`) |

@@ -12,17 +12,19 @@ To read badges, call [`GET /badges`](../../claw/api-endpoints/badges.md) for you
 | `name` | string | Display name |
 | `icon` | string | An ICN vector drawing string, not an image URL |
 | `description` | string | What the badge is for |
-| `issuer` | string | Who issued it: `rotur`, or a system name for system badges |
+| `issuer` | string | Who issued it: `rotur`, or the app's name for [app badges](#app-badges) |
 | `evolving` | boolean | `true` if the badge levels up as you progress |
 | `level` | number | Current level, for badges with levels |
 | `progress` | number | Your current value, such as your credit balance |
 | `next_threshold` | number | The value needed for the next level, if there is one |
+| `image` | string | An `https://` image to show instead of `icon`. Only set on origin app badges whose app icon is an image. |
+| `link` | string | Where the badge leads, such as the app's website. Only set on origin app badges. |
 
 ## Automatic badges
 
 | ID | Name | How to earn it | Levels |
 | --- | --- | --- | --- |
-| `system` | Your system's name | Your account belongs to a Rotur system, such as originOS | — |
+| `app:<slug>` | The app's name | You made your account through a Rotur App, such as `app:originos`. The badge links to the app's website. | — |
 | `official` | Official | The account is an official Rotur service account | — |
 | `rich` | rich | Hold at least 200 credits | 200, 500, 1,000, 2,500, 5,000 credits |
 | `friendly` | friendly | Have at least 10 friends | 10, 25, 50, 100, 250 friends |
@@ -40,9 +42,24 @@ Some badges are granted by hand, for example to members of the Rotur dev team, a
 
 {% @github-files/github-code-block url="https://github.com/RoturTW/Badges/blob/main/badges.json" %}
 
-## System badges
+## Origin app badge
 
-Owners of a Rotur system can define their own badges with levels and award them to users through `/v2/systems/{system}/badges`. These badges show the system's name as their `issuer`.
+The `app:<slug>` badge shows which Rotur App you joined Rotur through. It replaces the old `system` badge.
+
+* Accounts made through an app record it in `sys.origin_app` on the [account object](account-objects/README.md).
+* Older accounts get the badge of the app their system became.
+* Signing in to an app later doesn't give you its badge.
+* There is no badge while the app is suspended.
+
+Unlike the old `system` badge, you can hide it.
+
+## App badges
+
+Teams that run a Rotur App can define their own badges with levels and award them to users through `/v2/apps/{app}/badges`. These badges show the app's name as their `issuer`, and their IDs start with the app's badge prefix, such as `myapp:streak`.
+
+{% hint style="info" %}
+Systems are deprecated and have been replaced by Rotur Apps. The old `/v2/systems/{system}/badges` endpoints still work for now. See [Migrate from systems](../../build-an-app/migrate-from-systems.md).
+{% endhint %}
 
 ## Hide and reorder badges
 
@@ -57,7 +74,7 @@ Owners of a Rotur system can define their own badges with levels and award them 
 | `hidden_badges` | body | string[] | No | Badge IDs to hide from your profile |
 | `badge_order` | body | string[] | No | Badge IDs in the order to show them. Badges you leave out keep their default order after these. |
 
-Each list can hold up to 500 IDs. The `official` and `system` badges always show first and cannot be hidden or moved.
+Each list can hold up to 500 IDs. The `official` badge always shows first and cannot be hidden or moved.
 
 ### Example
 

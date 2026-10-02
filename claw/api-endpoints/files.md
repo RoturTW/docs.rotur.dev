@@ -25,7 +25,7 @@ A file's path is its location, a `/`, then its name and type, all lowercase: `or
 
 ### Storage limits
 
-The total size of your files is capped by your subscription tier: 5 MB (Free), 25 MB (Lite), 100 MB (Plus), 1 GB (Pro) or 10 GB (Max).
+The total size of your files is capped by your subscription tier: 5 MB (Free), 25 MB (Lite), 100 MB (Plus), 1 GB (Pro) or 10 GB (Max). If you have sub accounts, they share your plan's allowance, so what they store counts against yours.
 
 ## POST `/files`
 

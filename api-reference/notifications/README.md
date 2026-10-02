@@ -14,7 +14,7 @@ Authenticated requests also need a verified email address and accepted Terms of 
 | `notifications:send` | Sending notifications |
 | `account:settings` | Registering endpoints, deleting devices, changing allowed and blocked senders |
 
-A token without the permission gets `403` with `{"error": "Token lacks permission: <permission>"}`.
+A token without the permission gets `403` with `{"error": "Token lacks permission: <permission>"}`. OAuth access tokens from "Sign in with Rotur" can't use the notify service at all; they get `403` with `{"error": "OAuth access tokens can only read the public profile"}`.
 
 ## Concepts
 
@@ -36,8 +36,39 @@ Push delivery needs all of the following:
 * You have not blocked the sender from notifications ([blocked senders](allowed-senders.md#blocked-senders)).
 * You have not turned push off. `push_enabled` defaults to `true` and is read and changed with `GET` and `PUT /v2/me/notifications/preferences`.
 * You have at least one device registered for the source, or for `rotur.dev`.
+* It isn't your [quiet hours](#quiet-hours).
 
-If you have blocked the sender as a user, the send request is rejected with `403`. In every other case the notification is still added to your [notification log](notification-log.md) and your [notification feed](../../claw/api-endpoints/notifications.md), even when no push is delivered.
+If you have blocked the sender as a user, or your privacy settings don't let them message you, the send request is rejected with `403`. In every other case the notification is still added to your [notification log](notification-log.md) and your [notification feed](../../claw/api-endpoints/notifications.md), even when no push is delivered.
+
+### Quiet hours
+
+Quiet hours hold back push alerts overnight. A notification sent during quiet hours is not pushed and is not delivered later; it still lands in your log and feed, silently. They are on by default for accounts under 18 (and accounts with no age), from `22:00` to `07:00`, and off by default for adults.
+
+Read them with `GET /v2/me/notifications/quiet-hours` (sub-tokens need `notifications:view`) and change them with `PUT /v2/me/notifications/quiet-hours` (sub-tokens need `account:settings`). The `PUT` body takes any of:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `enabled` | boolean | Turn quiet hours on or off |
+| `start` | string | Start time as `HH:MM` |
+| `end` | string | End time as `HH:MM`. It must differ from `start`, and can be past midnight |
+| `time_zone` | string | An IANA zone such as `Europe/London`. Without one, your profile's time zone is used, then UTC |
+
+Both return:
+
+```json
+{
+  "enabled": true,
+  "start": "22:00",
+  "end": "07:00",
+  "time_zone": "Europe/London",
+  "effective_time_zone": "Europe/London",
+  "time_zone_source": "quiet_hours",
+  "active": false,
+  "locked": false
+}
+```
+
+`time_zone_source` is `quiet_hours`, `profile` or `utc`. `active` is `true` while quiet hours are on right now. When a parent or carer has set quiet hours, `locked` is `true` and the response adds `parent_start` and `parent_end`; you can then make the window longer but not shorter or off (`403`, code `quiet_hours_locked`). Other errors are `400` with code `quiet_hours_time` (bad or equal times) or `quiet_hours_time_zone` (unknown zone). Sub accounts follow the account that owns them and get `403` from `PUT`.
 
 ### Storage
 

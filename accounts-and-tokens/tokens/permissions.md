@@ -23,6 +23,8 @@ GET /tokens/permissions
     "account:profile",
     "account:settings",
     "account:view",
+    "account:email",
+    "account:signins",
     "credits:view",
     "..."
   ],
@@ -45,9 +47,23 @@ A group is a convenience for building a permission list. When you create or upda
 | Permission | Description |
 |---|---|
 | `account:delete` | Delete the user account |
-| `account:profile` | Edit profile fields |
-| `account:settings` | Change account settings |
-| `account:view` | View profile data |
+| `account:profile` | Edit profile fields and status, and read the account's friend notes |
+| `account:settings` | Change account settings, and read the privacy settings |
+| `account:view` | View the account's profile and record. See below. |
+| `account:email` | See the account's email address. Adults only. |
+| `account:signins` | See the account's sign-in history. Adults only. |
+
+Without `account:view`, a token reading the account (for example with `GET /me`) gets the public profile, the same as anyone signed out sees, plus whatever its other permissions cover. With it, the token also sees the rest of the account record: the fields people set themselves (bio, pronouns, theme and so on) and system fields such as the account ID, badges, banner, status, subscription plan, linked sign-in providers and when the account was last seen.
+
+`account:view` does not cover:
+
+- the email address (`account:email`) or sign-in history (`account:signins`)
+- friends and friend requests (`friends:view`), or blocked users (`blocked:view`)
+- the credit balance, transactions and purchases (`credits:view`), or items (`items:view`)
+- notification settings (`notifications:view`), privacy settings (`account:settings`) or friend notes (`account:profile`)
+- date of birth, parental controls, billing, moderation records and credentials, which apps never see
+
+`account:email` and `account:signins` are only honoured for adults. If an account is under 18, or has no date of birth, they are dropped when the token is created or updated, and the data is never returned. Requests still succeed, just without that data. Some profile fields, such as when the account was last seen, are also hidden from apps for under-18s.
 
 ### Credits
 
@@ -80,6 +96,8 @@ A group is a convenience for building a permission list. When you create or upda
 | `posts:like` | Like and unlike posts |
 | `posts:reply` | Reply to posts |
 | `posts:repost` | Repost posts |
+| `posts:vote` | Vote in polls |
+| `posts:bookmark` | Add and remove saved posts. Reading them needs `posts:view`. |
 
 ### Following
 
@@ -123,6 +141,8 @@ A group is a convenience for building a permission list. When you create or upda
 | `groups:members.view` | View group member lists |
 | `groups:invite` | Send and manage group invites |
 
+Banning and unbanning group members needs `groups:manage`.
+
 ### Notifications
 
 | Permission | Description |
@@ -157,6 +177,19 @@ A group is a convenience for building a permission list. When you create or upda
 | `cosmetics:equip` | Equip and unequip cosmetics |
 | `cosmetics:gift` | Gift cosmetics |
 
+### Emojis
+
+| Permission | Description |
+|---|---|
+| `emojis:view` | List the account's uploaded and saved custom emojis |
+| `emojis:manage` | Upload, save, unsave and delete custom emojis |
+
+### Reports
+
+| Permission | Description |
+|---|---|
+| `reports:create` | Report content and accounts |
+
 ### Other
 
 | Permission | Description |
@@ -166,6 +199,12 @@ A group is a convenience for building a permission list. When you create or upda
 | `blocked:view` | View blocked users list |
 | `blocked:manage` | Block and unblock users |
 | `tokens:manage` | Manage sub-tokens. Cannot be granted to a sub-token. |
+
+### Permissions that need confirmation
+
+A token holding any of these can move money or read secrets, so giving one to a token asks you to confirm it's you. See [Create a token](create-token.md).
+
+`account:settings`, `credits:manage`, `credits:transfer`, `gifts:create`, `items:buy`, `cosmetics:buy`, `cosmetics:gift`, `signing:private`
 
 ***
 
@@ -183,7 +222,7 @@ Predefined bundles of permissions for common kinds of app.
 
 **Read and interact with posts, friends, and following.**
 
-`account:view`, `credits:view`, `friends:view`, `posts:view`, `posts:create`, `posts:delete`, `posts:manage`, `posts:like`, `posts:reply`, `posts:repost`, `following:view`, `following:follow`, `following:unfollow`, `friends:manage`, `friends:request`, `friends:accept`, `friends:remove`, `friends:cancel`, `notifications:view`
+`account:view`, `credits:view`, `friends:view`, `posts:view`, `posts:create`, `posts:delete`, `posts:manage`, `posts:like`, `posts:reply`, `posts:repost`, `following:view`, `following:follow`, `following:unfollow`, `friends:manage`, `friends:request`, `friends:accept`, `friends:remove`, `friends:cancel`, `notifications:view`, `reports:create`, `posts:vote`, `posts:bookmark`
 
 ### `economy`
 
@@ -201,4 +240,4 @@ Predefined bundles of permissions for common kinds of app.
 
 **Full access to everything except account deletion and token management.**
 
-Every permission above except `account:delete` and `tokens:manage`.
+Every permission above except `account:delete` and `tokens:manage`. That includes `account:email` and `account:signins`, which are still dropped for under-18s.

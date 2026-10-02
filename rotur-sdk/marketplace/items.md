@@ -56,7 +56,7 @@ const items = await rotur.items.list("alice");
 
 ## rotur.items.selling(limit?)
 
-Lists items that are for sale. `limit` defaults to `50`.
+Lists items that are for sale. `limit` defaults to `50`, up to `100`. Private data is left out.
 
 **Auth:** None.
 
@@ -152,7 +152,7 @@ await rotur.items.delete("my-item");
 
 ## rotur.items.adminAdd(name, username)
 
-Adds an item to a user (admin action).
+Gives an item to a user. Network admins only.
 
 **Auth:** Required. Sub-tokens need `items:manage`.
 

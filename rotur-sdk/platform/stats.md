@@ -12,7 +12,7 @@ Gets credit economy statistics.
 const stats = await rotur.stats.economy();
 ```
 
-**Returns:** `{ average, total, variance, currency_comparison: { pence, cents } }`
+**Returns:** `{ average, total, variance, currency_comparison: { pence, cents } }`. `pence` and `cents` are strings, such as `"0.50p / credit"`.
 
 ## rotur.stats.users()
 
@@ -28,7 +28,7 @@ const { total_users, active_users } = await rotur.stats.users();
 
 ## rotur.stats.mostGained(max?)
 
-Lists the users who gained the most credits. `max` defaults to `10`.
+Lists the users who gained the most credits over the last month. `max` defaults to `10`, which is also the most it returns.
 
 **Auth:** None.
 
@@ -41,7 +41,7 @@ const leaderboard = await rotur.stats.mostGained(10);
 
 ## rotur.stats.followers(max?)
 
-Lists the users with the most followers. `max` defaults to `10`.
+Lists the users with the most followers. `max` defaults to `10` and is capped at `100`.
 
 **Auth:** None.
 
@@ -54,7 +54,7 @@ const top = await rotur.stats.followers(10);
 
 ## rotur.stats.systems()
 
-Counts users per system.
+Counts users per system. Banned and private accounts are left out.
 
 **Auth:** None.
 
@@ -67,7 +67,7 @@ const systems = await rotur.stats.systems();
 
 ## rotur.stats.posts(days?)
 
-Counts posts per day over the last `days` days. `days` defaults to `7`.
+Counts posts per day over the last `days` days, including today. `days` defaults to `7` and can be from `1` to `90`; other values fall back to `7`.
 
 **Auth:** None.
 

@@ -20,9 +20,9 @@ const groups = await rotur.groups.mine();
 
 ## rotur.groups.search(query)
 
-Searches groups.
+Searches public groups by tag, name, and description.
 
-**Auth:** Required. Sub-tokens need `groups:view`.
+**Auth:** Required. No specific permission.
 
 ```ts
 const groups = await rotur.groups.search("gaming");
@@ -32,7 +32,7 @@ const groups = await rotur.groups.search("gaming");
 
 ## rotur.groups.top(limit?)
 
-Lists top groups. `limit` defaults to `10`.
+Lists the public groups with the most members. The API currently ignores `limit` and always returns up to 10.
 
 **Auth:** None.
 
@@ -96,7 +96,7 @@ const group = await rotur.groups.update("mygrp", { description: "New description
 
 Uploads a group icon from a `Blob`.
 
-**Auth:** Required. Not listed in `METHOD_PERMISSIONS`.
+**Auth:** Required. Sub-tokens need `groups:manage`.
 
 ```ts
 const { icon_url } = await rotur.groups.uploadIcon("mygrp", file);
@@ -108,7 +108,7 @@ const { icon_url } = await rotur.groups.uploadIcon("mygrp", file);
 
 Uploads a group banner from a `Blob`.
 
-**Auth:** Required. Not listed in `METHOD_PERMISSIONS`.
+**Auth:** Required. Sub-tokens need `groups:manage`.
 
 ```ts
 const { banner_url } = await rotur.groups.uploadBanner("mygrp", file);
@@ -364,7 +364,7 @@ Accepts an invite sent to you.
 await rotur.groups.acceptInvite("mygrp", "invite-id");
 ```
 
-**Returns:** `{ message }`
+**Returns:** `{ message, group }`. The SDK types this as `{ message }`.
 
 ## rotur.groups.declineInvite(grouptag, inviteId)
 
@@ -400,7 +400,7 @@ Accepts a join request.
 await rotur.groups.acceptJoinRequest("mygrp", "request-id");
 ```
 
-**Returns:** `{ message }`
+**Returns:** `{ message, group }`. The SDK types this as `{ message }`.
 
 ## rotur.groups.declineJoinRequest(grouptag, requestId)
 
@@ -455,7 +455,7 @@ Changes a role.
 await rotur.groups.updateRole("mygrp", "role-id", { name: "Admin" });
 ```
 
-**Returns:** `GroupRole`
+**Returns:** `{ message }`. The SDK types this as `GroupRole`, but the API does not send the role back. Call `roles()` to read it.
 
 ## rotur.groups.deleteRole(grouptag, roleId)
 
@@ -476,10 +476,10 @@ Lists a member's roles.
 **Auth:** Required. Sub-tokens need `groups:view`.
 
 ```ts
-const roles = await rotur.groups.userRoles("mygrp", "user-id");
+const { roles } = await rotur.groups.userRoles("mygrp", "user-id");
 ```
 
-**Returns:** `GroupRole[]`
+**Returns:** `{ roles: GroupRole[] }`. The SDK types this as a bare `GroupRole[]`, but the API wraps it in an object, so cast the result until the SDK types are fixed.
 
 ## rotur.groups.userPermissions(grouptag, userId)
 
@@ -488,10 +488,10 @@ Lists a member's permissions from their roles.
 **Auth:** Required. Sub-tokens need `groups:view`.
 
 ```ts
-const permissions = await rotur.groups.userPermissions("mygrp", "user-id");
+const { permissions } = await rotur.groups.userPermissions("mygrp", "user-id");
 ```
 
-**Returns:** `string[]`
+**Returns:** `{ permissions: string[] }`. The SDK types this as a bare `string[]`, but the API wraps it in an object, so cast the result until the SDK types are fixed.
 
 ## rotur.groups.userBenefits(grouptag, userId)
 
@@ -500,10 +500,10 @@ Lists a member's benefits from their roles.
 **Auth:** Required. Sub-tokens need `groups:view`.
 
 ```ts
-const benefits = await rotur.groups.userBenefits("mygrp", "user-id");
+const { benefits } = await rotur.groups.userBenefits("mygrp", "user-id");
 ```
 
-**Returns:** `string[]`
+**Returns:** `{ benefits: string[] }`. The SDK types this as a bare `string[]`, but the API wraps it in an object, so cast the result until the SDK types are fixed.
 
 ## rotur.groups.assignRole(grouptag, userId, roleId)
 
@@ -569,7 +569,7 @@ await rotur.groups.deleteAnnouncement("mygrp", "announcement-id");
 
 ## rotur.groups.muteAnnouncements(grouptag)
 
-Mutes the group's announcements for you.
+Mutes the group's announcements for you, or unmutes them if they are already muted. You must be a member.
 
 **Auth:** Required. Sub-tokens need `groups:manage`.
 

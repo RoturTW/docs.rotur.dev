@@ -52,6 +52,8 @@ Authorization: Bearer <token>
 
 `icon` is a vector drawing string, not an image URL.
 
+To change which badges are hidden and their order, use `/badges/preferences`. See [Hide and reorder badges](../../api-reference/account/badges.md#hide-and-reorder-badges).
+
 ### Errors
 
 | Status | When |

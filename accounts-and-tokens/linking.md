@@ -6,7 +6,7 @@ Linking lets a program such as a desktop app, game or device get a Rotur token w
 >
 > **Auth:** Your app needs none. Only `POST /link/code`, which the link page calls, needs the user's token in the `Authorization: Bearer <token>` header (the legacy `auth` query parameter is also accepted).
 
-Every endpoint is also available under `/v2/link` with the same paths. The `GET` endpoints are rate limited.
+Every endpoint is also available under `/v2/link` with the same paths. The `GET` endpoints are rate limited to 100 requests a minute per IP address, or 300 a minute per account if you send a valid token. The allowance is shared with the API's other endpoints on the default limit. Going over returns `429`, so poll `/link/status` every few seconds rather than in a tight loop.
 
 {% hint style="info" %}
 Codes expire 10 minutes after they are created. If a code expires before the user finishes, request a new one.
@@ -15,11 +15,11 @@ Codes expire 10 minutes after they are created. If a code expires before the use
 ## The flow
 
 1. Your app calls `GET /link/code`, optionally with a name and the permissions it wants, and shows the code.
-2. The user opens [rotur.dev/link](https://rotur.dev/link), signs in, enters the code and picks which permissions to grant. The page creates a sub-token with those permissions and attaches it to the code with `POST /link/code`.
+2. The user opens [rotur.dev/link](https://rotur.dev/link), signs in, enters the code and picks which permissions to grant. The page creates a sub-token with those permissions and attaches it to the code with `POST /link/code`. A device never gets `tokens:manage` or `account:delete`.
 3. Your app polls `GET /link/status`, or waits for the user to confirm in your app.
 4. Your app calls `GET /link/user` once to collect the token.
 
-The token you receive is always a [sub-token](tokens/README.md), never the user's main token.
+The token you receive is always a [sub-token](tokens/README.md), never the user's main token. Like any sub-token, it counts towards the user's limit of 250, and it is deleted if it goes unused for 30 days.
 
 ## GET `/link/code`
 
@@ -32,7 +32,7 @@ Creates a new link code.
 | Name | In | Type | Required | Description |
 | --- | --- | --- | --- | --- |
 | `name` | query | string | No | Your app's name, shown to the user on the link page. Cut to 50 characters. |
-| `permissions` | query | string | No | Comma-separated [permissions](tokens/permissions.md) your app is asking for. The user chooses the final set. `tokens:manage` is not allowed. |
+| `permissions` | query | string | No | Comma-separated [permissions](tokens/permissions.md) your app is asking for. The user chooses the final set. `tokens:manage` and `account:delete` are not allowed. |
 
 ### Example
 
@@ -55,7 +55,7 @@ The code is 6 uppercase hex characters (`0`–`9`, `A`–`F`). `expires_in` is i
 
 | Status | When |
 | --- | --- |
-| `400` | `permissions` contains an unknown permission or `tokens:manage` |
+| `400` | `permissions` contains an unknown permission, `tokens:manage` or `account:delete` (`Invalid permission: <permission>`) |
 
 ## GET `/link/info`
 
@@ -102,7 +102,7 @@ Attaches one of the signed-in user's sub-tokens to a code. The link page at rotu
 | Name | In | Type | Required | Description |
 | --- | --- | --- | --- | --- |
 | `code` | query | string | Yes | The link code |
-| `token` | body | string | Yes | A sub-token value (`rotur_st_…`) that belongs to the signed-in user. The main token is rejected. |
+| `token` | body | string | Yes | An active sub-token value (`rotur_st_…`) that belongs to the signed-in user. The main token is rejected, and so is a sub-token holding `tokens:manage` or `account:delete`. |
 
 ### Example
 
@@ -131,6 +131,7 @@ Content-Type: application/json
 | --- | --- |
 | `400` | `token` is missing or is the main token (`A scoped token is required to link a device`) |
 | `400` | `token` is not an active sub-token of this account (`Token does not belong to this account`) |
+| `400` | `token` holds `tokens:manage` or `account:delete` (`A device can't be given a token that manages tokens or deletes the account`) |
 | `404` | The code is unknown or expired (`No auth code found`) |
 
 ## GET `/link/status`
@@ -200,4 +201,4 @@ GET /link/user?code=A1B2C3
 | --- | --- |
 | `404` | Not linked yet, expired or unknown. The body is `{ "linked": false, "token": "" }`. |
 
-Once you have the token, use it with other Rotur services or to [get the user's data](../deprecated/authentication/get-user-data.md).
+Once you have the token, use it with other Rotur services. To get the user's account data, call [`GET /me`](../claw/api-endpoints/me.md) with it. What you get back depends on the permissions the user granted: without `account:view` you get their public profile.

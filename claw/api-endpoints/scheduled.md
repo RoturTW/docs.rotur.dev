@@ -2,7 +2,7 @@
 
 Lists your posts that are scheduled but not yet published.
 
-**Auth:** Required.
+**Auth:** Required. Sub-tokens need `posts:view`.
 
 You schedule a post with the `scheduled_for` parameter on [`/post`](post.md), which needs a Plus subscription or higher. The server checks for due posts every 15 seconds, so a post can go out up to 15 seconds after its scheduled time. Its `timestamp` is set to the moment it is published.
 

@@ -1,6 +1,6 @@
 # .overlay
 
-Get the avatar overlay a user has equipped from the [cosmetics shop](../economy/cosmetics/README.md), to draw on top of their avatar.
+Get the avatar overlay a user has equipped, to draw on top of their avatar. This is either an overlay from the [cosmetics shop](../economy/cosmetics/README.md) or their own [uploaded overlay](upload.md).
 
 > **Base URL:** `https://avatars.rotur.dev`
 >
@@ -19,7 +19,7 @@ It works like a profile picture, with `.overlay` in front of the username:
 
 You can pass a 36-character user ID instead of a username. Responses carry an `ETag` and `Cache-Control: public, max-age=300, must-revalidate`.
 
-If the user does not exist or has no overlay equipped, you get a 1×1 transparent PNG instead. You can always layer this URL over the avatar without checking first.
+If the user does not exist or has no overlay equipped, you get a 1×1 transparent PNG instead. The same happens for an uploaded overlay once the user no longer has the subscription or pet that allows it. You can always layer this URL over the avatar without checking first.
 
 {% hint style="info" %}
 This endpoint always returns `200` (or `304` for a matching `ETag`). A missing overlay is the transparent pixel, not an error.

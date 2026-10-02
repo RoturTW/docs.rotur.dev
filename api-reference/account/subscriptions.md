@@ -26,6 +26,7 @@ To check your own tier and limits, call `GET /me/benefits`. Your tier is also in
 | Login history entries | 10 | 25 | 100 | 100 |
 | [Credit history](../economy/transactions-and-taxes.md#transaction-history) kept | 1 month | 6 months | 12 months | Unlimited |
 | Notification log | 256 KB | 1 MB | 2 MB | 10 MB |
+| Sub accounts (bots and organisations) | 2 | 2 | 10 | 50 |
 | [Bio templates](bio-templates.md) | — | Yes | Yes | Yes |
 | [Friend notes](friend-notes.md) | — | — | Yes | Yes |
 | Animated avatars and banners | — | — | Yes | Yes |
@@ -71,15 +72,21 @@ Every user can claim credits once every 24 hours with [`/claim_daily`](../../cla
 | Plus | 2 |
 | Pro | 3 |
 
+Sub accounts can't make daily claims. Sub-tokens need `credits:daily`.
+
 ## Get a subscription
 
 | Method | Tiers | How it works |
 | --- | --- | --- |
-| Stripe | Plus, Pro | Subscribe monthly or yearly from your Rotur account (`POST /me/billing/checkout`). Accounts that have never subscribed get a 7-day trial of Plus. Manage or cancel the plan with `POST /me/billing/portal`. |
+| Stripe | Plus, Pro | Subscribe monthly or yearly from your Rotur account (`POST /me/billing/checkout`). Accounts that have never subscribed get a 7-day trial of Plus. Manage or cancel the plan with `POST /me/billing/portal`. Within 14 days of starting a plan you can cancel it for a refund with `POST /v2/me/billing/cancel-refund`. |
 | Gift | Plus, Pro | Someone else buys a subscription for you as a gift. |
 | Lite subscription key | Lite | Buy the Lite key with Rotur credits. Lite stays active for as long as the key does. |
 | Ko-fi (legacy) | Any | Subscribe on [Ko-fi](https://ko-fi.com/mistium/tiers). Rotur matches the payment to your account by your linked Discord account, then by the email on the Ko-fi payment. Each payment gives 31 days. |
 | Administrator | Any | A Rotur administrator can set your tier by hand. |
+
+## Sub accounts
+
+Bot and organisation accounts that you own are sub accounts. A sub account without a plan of its own shares your limits: the keys and file storage it uses count towards your plan's totals. A sub account that has its own plan uses that plan's limits instead.
 
 ## Expiry
 

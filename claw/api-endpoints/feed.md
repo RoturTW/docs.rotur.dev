@@ -1,6 +1,6 @@
 # GET `/feed`
 
-Returns public posts, newest first. Profile-only posts are left out.
+Returns public posts, newest first. Profile-only posts are left out, and so are posts from accounts that only show their posts to friends.
 
 **Auth:** Optional. Send your main account token to get `poll.voted` on posts with polls; sub-tokens are ignored here.
 

@@ -1,6 +1,6 @@
 # List tokens
 
-List every sub-token on your account, including revoked and expired ones.
+List every sub-token on your account, including revoked and expired ones, and the access tokens of apps you've signed in to.
 
 ## GET `/tokens`
 
@@ -38,3 +38,5 @@ Authorization: Bearer <main token>
 ```
 
 `last_used_at`, `expires_at`, `revoked_at`, `origin`, `description` and `websites` are left out when they are empty.
+
+[OAuth access tokens](README.md#oauth-access-tokens) from Sign in with Rotur are listed too. You can spot them by an `origin` of `oauth:<client_id>`. Sub-tokens unused for 30 days are deleted by the hourly check, so they drop off the list.

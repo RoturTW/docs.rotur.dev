@@ -34,9 +34,11 @@ Send `auth` first. Until you do, every other command returns the `not authentica
   "cmd": "ready",
   "user_id": "abc123",
   "username": "mist",
-  "user": { "...": "your full user object, including sys.status" }
+  "user": { "...": "your user object, including sys.status" }
 }
 ```
+
+With a main token, `user` is your full account object. With a sub-token, it only has the fields that token is allowed to read, plus `sys.status`.
 
 A sub-token needs `account:profile` to use `set_status`, `add_activity`, and `remove_activity`, and `gifts:view` to use `gift_subscribe`. Everything else works with any valid token.
 
@@ -381,7 +383,7 @@ A user who shares a room with you changed their profile. `key` is `pfp`, `sys.ba
 
 ### `key_update`
 
-A key on **your own** account changed, such as `sys.friends`, `sys.requests`, `sys.blocked`, or `sys.transactions`. Sent to all your connections.
+A key on **your own** account changed, such as `sys.friends`, `sys.requests`, `sys.blocked`, or `sys.transactions`. Sent to all your connections. A connection signed in with a sub-token only gets the keys that token may read.
 
 ```json
 {
@@ -479,13 +481,13 @@ GET /v2/status/live?name=mist
 | --- | --- |
 | `400` | `name` is missing (`name parameter missing`) |
 | `404` | No account has that username (`user not found`) |
-| `404` | The user is connected with presence `invisible` (`no status`) |
+| `404` | The user is connected with presence `invisible`, or their privacy settings hide their presence from you (`no status`) |
 
 ### PUT `/v2/status/live`
 
 Set your status text, presence, or both. The legacy path is `POST /status/set`. Room members on the WebSocket receive the same `status_update`, `member_join`, or `member_leave` messages as for `set_status`.
 
-**Auth:** Required. Moderation must not have blocked custom status on your account.
+**Auth:** Required. Sub-tokens need `account:profile`. Moderation must not have blocked custom status on your account.
 
 #### Parameters
 

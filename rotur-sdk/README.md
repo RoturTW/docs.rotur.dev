@@ -2,6 +2,10 @@
 
 `rotur-sdk` is the official TypeScript client for the Rotur API. Use it to log users in and call Rotur from a browser app, a desktop app, or a server.
 
+{% hint style="info" %}
+The SDK gets your app a token to act on someone's Rotur account. If you only need people to sign in to your website or app with Rotur, use Sign in with Rotur (OAuth) instead. See the [quickstart](../build-an-app/quickstart.md).
+{% endhint %}
+
 > **Base URL:** `https://api.rotur.dev/v2` (the SDK sends every request there)
 > **Auth:** The SDK sends your token as an `Authorization: Bearer` header. Log in with `rotur.login()` or pass a token to the constructor. See [Authentication](account/authentication.md).
 
@@ -54,7 +58,7 @@ rotur.logout();     // clear the token and disconnect the WebSocket and Beam
 Sub-tokens only work for the methods their permissions allow. Each method page lists the permission it needs on its **Auth** line:
 
 - **Required. Sub-tokens need `x`.** The method sends your token, and a sub-token must include permission `x`.
-- **Required. Main token only.** The method needs your main account token (permission `full`).
+- **Required. Main token only.** The method needs your main account token (permission `full`). Apps outside Rotur's own sites get a scoped token even when they ask for `full`, so these methods won't work for them. See [Permission scopes](account/authentication.md#permission-scopes).
 - **Required. No specific permission.** The method sends your token, but no permission is mapped to it.
 - **None.** The method sends no token.
 
@@ -76,7 +80,7 @@ The same mapping is exported as `METHOD_PERMISSIONS` (`"namespace.method"` to pe
 | [`rotur.tokens`](marketplace/tokens.md) | Sub-tokens: create, manage, revoke |
 | [`rotur.cosmetics`](marketplace/cosmetics.md) | Cosmetics shop, purchase, equip, gift |
 | [`rotur.groups`](platform/groups.md) | Groups: members, roles, events, tips, products |
-| [`rotur.systems`](platform/systems.md) | Registered systems and system badges |
+| [`rotur.systems`](platform/systems.md) | Registered systems and system badges. Deprecated: systems are now Rotur Apps |
 | [`rotur.stats`](platform/stats.md) | Economy, user, post, and follower statistics |
 | [`rotur.standing`](platform/standing.md) | Account standing lookups |
 | [`rotur.devfund`](platform/devfund.md) | Dev fund escrow transfers |
@@ -88,15 +92,15 @@ The same mapping is exported as `METHOD_PERMISSIONS` (`"namespace.method"` to pe
 | [`rotur.link`](utilities/linking.md) | Link-code login for non-browser apps |
 | [`rotur.files`](utilities/files.md) | The user's file system |
 | [`rotur.storage`](utilities/storage.md) | App-scoped key/value storage on the user's account |
-| `rotur.signing` | Sign, verify, encrypt, and decrypt with the account's signing key |
+| [`rotur.signing`](account/README.md) | Sign, verify, encrypt, and decrypt with the account's signing key |
 | `rotur.avatars` | Avatar, banner, background, and overlay URLs and uploads |
-| `rotur.emojis` | Custom emojis: upload, save, delete |
-| `rotur.trust` | Trust scores and user verification |
-| `rotur.accounts` | Registration, password reset, email verification |
-| `rotur.sessions` | Cookie-based sessions |
-| `rotur.ai` | AI completions and chat |
-| `rotur.reports` | Report posts, replies, and users |
-| `rotur.pets` | Pet catalog, purchase, equip |
+| [`rotur.emojis`](social/posts.md) | Custom emojis: upload, save, delete |
+| `rotur.trust` | Trust scores and user verification. The API behind it has been removed, so its methods fail |
+| [`rotur.accounts`](account/README.md) | Registration, password reset, email verification |
+| [`rotur.sessions`](account/README.md) | Cookie-based sessions for Rotur's own sites |
+| `rotur.ai` | AI completions and chat. The API has removed `/ai`, so its methods fail |
+| [`rotur.reports`](social/posts.md) | Report posts, replies, and users |
+| `rotur.pets` | Pet catalogue, purchase, equip. Pets are switched off on the API for now |
 | `rotur.moderation` | Moderator tools (moderator role required) |
 | `rotur.admin` | Network admin tools |
 | `rotur.beam` | Peer-to-peer file and text transfer. Connects when you call `rotur.beam.connect()` |

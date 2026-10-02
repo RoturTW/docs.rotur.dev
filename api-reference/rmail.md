@@ -14,7 +14,7 @@ This page covers the essentials. The full reference for every endpoint is in the
 
 rMail uses [validators](../accounts-and-tokens/validators.md) instead of your Rotur token.
 
-1. Generate a validator for the `rotur-mail` key with your Rotur token: `GET https://api.rotur.dev/generate_validator?key=rotur-mail`.
+1. Generate a validator for the `rotur-mail` key with your Rotur token: `GET https://api.rotur.dev/generate_validator?key=rotur-mail`. A sub-token needs the `validators:generate` permission.
 2. Send the returned `validator` string as `Authorization: Bearer <validator>` on every rMail request.
 3. rMail checks it with Rotur on each request. There are no cookies or sessions.
 

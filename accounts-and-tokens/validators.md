@@ -43,9 +43,10 @@ Authorization: Bearer <token>
 
 | Status | When |
 | --- | --- |
-| `400` | `key` is missing |
+| `400` | `key` is missing (`key is required`) |
 | `403` | The token is missing or invalid, or a sub-token lacks `validators:generate` |
-| `403` | The account is blocked or banned. The body has `code: "account_blocked"`, `standing`, `recover_at`, `reason` and `redirect_url`. |
+| `403` | The account is restricted or banned. The body has `code: "account_blocked"`, `standing`, `recover_at`, `reason` and `redirect_url`. |
+| `403` | `key` is for an OriginChats server that a parent or carer has blocked. The body has `code: "parental_block"` and `server`. |
 
 ## GET `/validate`
 
@@ -72,9 +73,17 @@ GET /validate?v=abc123def456,a1b2c3d4e5f6...&key=myAppKey
 {
   "valid": true,
   "username": "example_user",
-  "id": "abc123def456"
+  "id": "abc123def456",
+  "minor": false
 }
 ```
+
+| Field | Description |
+| --- | --- |
+| `minor` | `true` if the account is under 18, or has no date of birth |
+| `account_type` | Only for sub-accounts: `bot` or `org` |
+| `owner` | Only for sub-accounts whose owner is discoverable: the owner's username |
+| `restrictions` | Only for OriginChats keys when parental controls limit direct messages. Holds `direct_messages` and the user's `friends`, so a DM server can enforce the rule. |
 
 **Response `200` (not valid):**
 
@@ -94,15 +103,17 @@ An expired, unknown or wrong-key validator still returns `200`, with `valid: fal
 }
 ```
 
+For an OriginChats key, a validator for a server that a parent or carer has blocked also returns `valid: false`, with `code: "parental_block"`.
+
 ### Errors
 
 | Status | When |
 | --- | --- |
-| `400` | `v` or `key` is missing |
+| `400` | `v` or `key` is missing (`Validator is required`, `Key is required`) |
 | `400` | `v` has no comma (`Invalid validator format`) |
-| `400` | The user has no token set |
-| `403` | The account is blocked or banned. The body has `valid: false`, `code: "account_blocked"`, `username` and `id`. |
-| `404` | No user has the ID in the validator |
+| `400` | The user has no token set (`User has no token`) |
+| `403` | The account is restricted or banned. The body has `valid: false`, `code: "account_blocked"`, `standing`, `recover_at`, `reason`, `redirect_url`, `username` and `id`. |
+| `404` | No user has the ID in the validator (`User not found`) |
 
 ## How it works
 

@@ -1,6 +1,6 @@
 # GET `/search_posts`
 
-Searches the text of public posts, ignoring case, and returns matches newest first. Profile-only posts are not searched.
+Searches the text of public posts, ignoring case, and returns matches newest first. Profile-only posts, and posts from accounts that only show their posts to friends, are not searched.
 
 **Auth:** None. Uses the search rate limit.
 

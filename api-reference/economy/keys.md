@@ -101,7 +101,7 @@ An array of keys.
 ]
 ```
 
-`users` maps each username to when they got access (Unix seconds) and, for buyers, the `price` they paid and billing fields. For keys you did not create, `data` and `total_income` are left out.
+`users` maps each username to when they got access (Unix seconds) and, for buyers, the `price` they paid and billing fields. For keys you did not create, `users` only lists you, and `data`, `total_income` and `webhook` are left out.
 
 ***
 
@@ -287,6 +287,7 @@ Authorization: Bearer <token>
 | --- | --- |
 | `400` | The key is not for sale (its price is negative) |
 | `400` | You already have access to the key |
+| `400` | The account that made the key no longer exists |
 | `400` | Your balance is too low |
 | `404` | The key does not exist |
 
@@ -468,7 +469,7 @@ Authorization: Bearer <token>
 
 ## v2 equivalents
 
-The same handlers are available under `https://api.rotur.dev/v2/keys`. Parameters are still passed in the query string.
+The same handlers are available under `https://api.rotur.dev/v2/keys`. Parameters are read from the query string, and on v2 you can send them as a JSON body instead.
 
 | v1 | v2 |
 | --- | --- |

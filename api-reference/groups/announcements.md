@@ -139,3 +139,47 @@ Authorization: Bearer YOUR_TOKEN
 | Status | When |
 | --- | --- |
 | `400` | You aren't a member (`You are not a member of this group`) |
+
+## GET `/v2/groups/{tag}/activity`
+
+Get a group's activity feed: its announcements, published events, and [fundraising campaigns](tips.md#fundraising-campaigns) in one list. Pinned campaigns come first, then everything else newest first. You get at most 50 items.
+
+Unpublished events are never included, and `MEMBERS` events only appear for members. An event is dated by its `start_time`.
+
+**Auth:** None for public groups. For a private group, send a token for an account that's a member.
+
+### Example
+
+```http
+GET /v2/groups/mygroup/activity
+```
+
+**Response `200`:** an array of activity items, or `[]` if there are none. `type` is `announcement`, `event`, or `campaign`, and the matching field holds the full [announcement](README.md#announcement), [event](README.md#event), or campaign object. `body`, `author`, and `pinned` are left out when empty.
+
+```json
+[
+  {
+    "id": "ann-1",
+    "type": "announcement",
+    "title": "Welcome",
+    "body": "Glad to have you here.",
+    "created_at": 1717000000,
+    "author": "alice",
+    "announcement": {
+      "id": "ann-1",
+      "group_tag": "mygroup",
+      "title": "Welcome",
+      "body": "Glad to have you here.",
+      "author_username": "alice",
+      "created_at": 1717000000,
+      "ping_members": false
+    }
+  }
+]
+```
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `403` | The group is private and you aren't a member (`This group's activity is private`) |

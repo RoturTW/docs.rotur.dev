@@ -2,7 +2,7 @@
 
 Lists the posts you have bookmarked, most recently saved first. Bookmarks of deleted posts are skipped.
 
-**Auth:** Required.
+**Auth:** Required. Sub-tokens need `posts:view`.
 
 ### Example
 

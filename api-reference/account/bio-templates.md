@@ -25,15 +25,17 @@ Hi, I'm sophie and I have 1234 credits.
 | `{{ url address }}` | Text fetched from an external URL |
 | `{{ flex economy% }}` | Your share of all credits in the economy, as a percentage, such as `0.42%` |
 
-Templates with an unknown type, or a `user` key that doesn't exist, render as an empty string.
+Templates with an unknown type, or a `user` key that doesn't exist or can't be shown, render as an empty string.
 
 ## `user`
 
 Shows a top-level key from your [account object](account-objects/README.md). Besides account keys, `followers` and `following` show your follower counts.
 
 * Only strings, numbers and booleans are shown. Arrays and objects, such as `sys.friends` or `theme`, render as an empty string.
-* You cannot read nested values. `theme.text` does not work. Keys like `sys.currency` work because they are top-level keys whose names contain a dot.
+* You cannot read nested values. `theme.text` does not work.
+* `sys.currency` is the only `sys.` key that renders. Other `sys.` keys render as an empty string.
 * Sensitive keys never render: `key`, `password`, `email`, and any key whose name contains `token`, `password` or `secret`.
+* On accounts of people under 18, `sys.currency` and personal keys (`sexuality`, `identity`, `nationality`, `birthday`, `age`, `relationship_status`, `timezone`, `language` and `favorite_website`) render as an empty string.
 
 ## `time`
 
@@ -50,6 +52,8 @@ The format can be a [Go time layout](https://pkg.go.dev/time#pkg-constants) such
 | `a` at the end | 12-hour clock with AM/PM | `{{ time h:m a }}` → `02:05 PM` |
 
 Use each letter once. `HH:MM` does not work.
+
+On accounts of people under 18, `time` renders as an empty string.
 
 ## `url`
 

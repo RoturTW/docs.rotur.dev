@@ -37,4 +37,4 @@ Authorization: Bearer <main token>
 }
 ```
 
-Each token has the same fields as in [List tokens](list-tokens.md).
+Each token has the same fields as in [List tokens](list-tokens.md). Unexpired [OAuth access tokens](README.md#oauth-access-tokens) are included. These are the tokens that count towards the limit of 250.

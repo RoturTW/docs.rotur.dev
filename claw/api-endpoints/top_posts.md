@@ -1,6 +1,6 @@
 # GET `/top_posts`
 
-Returns recent public posts sorted by number of likes, most liked first. Profile-only posts are left out.
+Returns recent public posts sorted by number of likes, most liked first. Profile-only posts are left out, and so are posts from accounts that only show their posts to friends.
 
 **Auth:** None. Uses the search rate limit.
 

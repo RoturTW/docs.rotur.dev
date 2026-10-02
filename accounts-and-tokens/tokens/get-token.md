@@ -4,9 +4,9 @@ Get one sub-token by its ID.
 
 ## GET `/tokens/:id`
 
-Returns the sub-token, including its value. A sub-token can call this with its own ID to read its own name and permissions.
+Returns the sub-token, including its value. A sub-token can call this with its own ID to read its own name and permissions. This includes [OAuth access tokens](README.md#oauth-access-tokens), which can't call any other token endpoint.
 
-**Auth:** Required. The main token can get any of its sub-tokens. A sub-token can only get itself.
+**Auth:** Required. The main token can get any of its sub-tokens. A sub-token, including an OAuth access token, can only get itself.
 
 ### Parameters
 
@@ -38,11 +38,11 @@ Authorization: Bearer <token>
 }
 ```
 
-`last_used_at`, `expires_at`, `revoked_at`, `origin`, `description` and `websites` are left out when they are empty.
+`last_used_at`, `expires_at`, `revoked_at`, `origin`, `description` and `websites` are left out when they are empty. When an OAuth access token asks about itself, `permissions` is what its scopes give: `[]`, or `["account:email"]`.
 
 ### Errors
 
 | Status | When |
 | --- | --- |
-| `403` | A sub-token asked for a different sub-token |
+| `403` | A sub-token asked for a different sub-token (`Sub-tokens can only view their own token info`) |
 | `404` | No sub-token with this ID exists on the account |

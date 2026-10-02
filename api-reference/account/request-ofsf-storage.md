@@ -59,6 +59,8 @@ Your storage limit depends on your [subscription tier](subscriptions.md) and is 
 | Plus | 100 MB |
 | Pro | 1 GB |
 
+A sub account without a plan of its own shares its owner's storage, so its files count towards the owner's limit.
+
 {% hint style="warning" %}
 Your token gives full access to your account. Don't embed it in code that other people can read.
 {% endhint %}

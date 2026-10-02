@@ -4,7 +4,7 @@ Custom emojis for Plus and Pro subscribers. You can upload emoji images, keep th
 
 > **Base URL:** `https://api.rotur.dev`
 >
-> **Auth:** Send your token in the `Authorization: Bearer <token>` header (the legacy `auth` query parameter is also accepted). Any sub-token works; these endpoints need no specific permission. `GET /emojis/:emojiId` is public.
+> **Auth:** Send your token in the `Authorization: Bearer <token>` header (the legacy `auth` query parameter is also accepted). Sub-tokens need `emojis:view` to list your emojis and `emojis:manage` to upload, add, unsave or delete them. `GET /emojis/:emojiId` is public.
 
 Every endpoint is also available under `/v2/emojis` with the same paths.
 
@@ -56,7 +56,7 @@ GET /emojis/12345
 
 Lists your saved emojis.
 
-**Auth:** Required.
+**Auth:** Required. Sub-tokens need `emojis:view`.
 
 ### Example
 
@@ -90,7 +90,7 @@ Authorization: Bearer <token>
 
 Uploads an emoji and adds it to your uploaded list. Uploading an image you already have updates its name. If the image was in your added list, it moves to your uploaded list.
 
-**Auth:** Required.
+**Auth:** Required. Sub-tokens need `emojis:manage`.
 
 ### Parameters
 
@@ -139,7 +139,7 @@ Content-Type: application/json
 
 Adds another user's uploaded emoji to your added list, optionally under a different name.
 
-**Auth:** Required.
+**Auth:** Required. Sub-tokens need `emojis:manage`.
 
 ### Parameters
 
@@ -186,7 +186,7 @@ Content-Type: application/json
 
 Removes an emoji from your added list. You cannot unsave an emoji you uploaded; delete it instead.
 
-**Auth:** Required.
+**Auth:** Required. Sub-tokens need `emojis:manage`.
 
 ### Parameters
 
@@ -223,7 +223,7 @@ Authorization: Bearer <token>
 
 Deletes an emoji you uploaded.
 
-**Auth:** Required. Only the uploader can delete an emoji.
+**Auth:** Required. Sub-tokens need `emojis:manage`. Only the uploader can delete an emoji.
 
 {% hint style="warning" %}
 Deleting an emoji also removes it from every user who added it, and deletes the image file. It cannot be undone.
@@ -268,7 +268,7 @@ Authorization: Bearer <token>
 
 Removes an emoji from every account and deletes its image. Also available at `DELETE /v2/admin/emojis/:id`.
 
-**Auth:** Required. Network admins only.
+**Auth:** Required. Network admins only, signed in with their main account token; sub-tokens get `403`.
 
 ### Parameters
 

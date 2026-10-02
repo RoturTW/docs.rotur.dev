@@ -8,6 +8,8 @@ Cosmetics are visual items for a Rotur profile: avatar overlays and profile back
 
 {% hint style="info" %}
 Authenticated endpoints also require a verified email address and accepted Terms of Service. If either is missing you get a `403` with `"error": "Email address not verified"` or `"error": "Terms-Of-Service are not accepted or outdated"`.
+
+OAuth access tokens from "Sign in with Rotur" can't call these endpoints. They get `403` with `"error": "OAuth access tokens can only read the public profile"`.
 {% endhint %}
 
 ## Concepts
@@ -73,7 +75,7 @@ If you have any active subscription, you pay 20% less for paid cosmetics. The wh
 
 ### Admin endpoints
 
-These manage the catalog. They take the server's admin token in the `Authorization` header, not a user token, and return `403` with `"error": "Invalid admin authentication"` otherwise.
+These manage the catalog. They take the server's admin token in the `Authorization` header, not a user token, and return `403` with `"error": "Invalid admin authentication"` otherwise. The request must also name a Rotur admin account (user ID or username) in the `X-Admin-ID` header; without it you get `400`, and a name that isn't an admin gets `403`.
 
 | Endpoint | Description |
 | --- | --- |

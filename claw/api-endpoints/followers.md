@@ -2,7 +2,7 @@
 
 Lists the usernames that follow a user.
 
-**Auth:** None. Uses the profile rate limit.
+**Auth:** Optional. Send a token to see lists that are only shown to the user's friends. Uses the profile rate limit.
 
 ### Parameters
 
@@ -23,6 +23,19 @@ GET /followers?name=mist
   "followers": ["rm", "temp"]
 }
 ```
+
+If the user only shows their follow lists to friends (or to nobody) and you cannot see them, you get an empty list and `hidden: true`:
+
+**Response `200`:**
+
+```json
+{
+  "followers": [],
+  "hidden": true
+}
+```
+
+Accounts that are not discoverable, and whose profile you cannot see, are left out of the list.
 
 ### Errors
 

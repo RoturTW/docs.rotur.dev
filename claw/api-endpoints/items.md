@@ -18,7 +18,7 @@ Item names are unique, ASCII only, and case-insensitive in paths. Prices are who
   "owner": "mist",
   "created": 1715054321,
   "transfer_history": [
-    { "from": null, "to": "", "timestamp": 0, "type": "" }
+    { "from": null, "to": "mist", "timestamp": 1715054321, "type": "creation" }
   ],
   "total_income": 0
 }
@@ -34,12 +34,8 @@ Item names are unique, ASCII only, and case-insensitive in paths. Prices are who
 | `owner` | Username of the current owner |
 | `private_data` | Private data. `/items/get` returns it only to the owner, and `/items/list` and `/items/selling` never return it |
 | `created` | Creation time, in Unix seconds |
-| `transfer_history` | Ownership changes, each with `from`, `to`, `timestamp` (Unix seconds), `type` (`transfer` or `purchase`) and, for purchases, `price` |
+| `transfer_history` | Ownership changes, oldest first, each with `from`, `to` (usernames), `timestamp` (Unix seconds), `type` (`creation`, `transfer` or `purchase`) and, for purchases, `price`. The `creation` entry has `from: null` |
 | `total_income` | Total credits earned from sales of this item |
-
-{% hint style="warning" %}
-The first `transfer_history` entry (the item's creation) currently comes back empty, as shown above.
-{% endhint %}
 
 ## GET `/items/create`
 
@@ -181,6 +177,7 @@ Authorization: Bearer <token>
 | `400` | `You cannot buy your own item` |
 | `403` | `Insufficient currency` |
 | `404` | `Item not found` |
+| `409` | `The seller of this item no longer has an account, so it can't be bought` (`code: seller_gone`). The item is taken off sale |
 
 ## GET `/items/transfer/:name`
 
@@ -397,7 +394,7 @@ Authorization: Bearer <token>
 
 Sets an item's owner. Network admins only.
 
-**Auth:** Required. Sub-tokens need `items:manage`. Network admin accounts only.
+**Auth:** Required. Network admin accounts only, using the main account token. Sub-tokens are always refused.
 
 ### Parameters
 

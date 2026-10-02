@@ -2,7 +2,7 @@
 
 Votes in a post's poll. Voting again replaces your earlier vote.
 
-**Auth:** Required.
+**Auth:** Required. Sub-tokens need `posts:vote`.
 
 ### Parameters
 

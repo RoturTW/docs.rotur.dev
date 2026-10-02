@@ -6,7 +6,7 @@ These keys live on your account object but only originOS uses them. All of them 
 | --- | --- |
 | `onboot` | App paths that originOS loads on boot. New accounts get the default list shown below. |
 | `hostOS` | The operating system the user last signed in from. Example: `"macOS"`. |
-| `timezone` | The user's timezone as a whole-hour UTC offset, from `UTC-14` to `UTC+14`. Example: `"UTC+0"`. The `{{ time }}` [bio template](../bio-templates.md) also uses it. |
+| `timezone` | The user's timezone as a whole-hour UTC offset, from `UTC-14` to `UTC+14`. Example: `"UTC+0"`. The `{{ time }}` [bio template](../bio-templates.md) also uses it. On accounts of people under 18, apps and bio templates can't read it. |
 | `proxy` | A CORS proxy the user has chosen. Apps can send requests through it. Example: `"https://apps.mistium.com/cors?url="`. |
 | `wallpaper_mode` | How to draw the wallpaper: `"Fill"`, `"Center"`, `"Fit"` or `"Stretch"`. |
 | `scroll_speed` | Mouse scroll speed. Example: `-1.2`. |

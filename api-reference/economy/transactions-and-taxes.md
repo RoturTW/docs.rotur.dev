@@ -26,7 +26,7 @@ POST /me/transfer
 Authorization: Bearer YOUR_TOKEN
 Content-Type: application/json
 
-{ "to": "mist", "amount": 5, "note": "Thanks for the help" }
+{ "to": "alice", "amount": 5, "note": "Thanks for the help" }
 ```
 
 **Response `200`:**
@@ -35,7 +35,7 @@ Content-Type: application/json
 {
   "message": "Transfer successful",
   "from": "your_username",
-  "to": "mist",
+  "to": "alice",
   "amount": 5,
   "debited": 5
 }
@@ -71,7 +71,20 @@ Transfers between users are free. Some other operations charge a fee:
 | Creating a credit gift | 1% on top of the gift amount |
 | Creating a group | 15 credits |
 | Unlocking banners | 30 credits, once. Free with Pro or higher. |
-| Daily claim | Free. The owner of your account's system also receives 0.25 credits, recorded as `tax`. |
+| Daily claim | Free. Rotur also pays 0.25 credits to the owner of the Rotur App your account's system became, recorded as `tax` (see below). |
+
+### Daily claim tax
+
+Each time you make a daily claim, Rotur pays an extra 0.25 credits on top of your claim. This doesn't come out of your claim. It goes to:
+
+* the owner of the Rotur App that your account's `system` became, if there is one
+* Rotur, if your system has no app or the app has no owner
+
+Nothing is paid if you own that app yourself. The owner sees it in their history as a `tax` entry with the note `Daily credit`.
+
+{% hint style="info" %}
+Systems are deprecated and have been replaced by Rotur Apps. Each old system became an app, and its owner now receives the tax. See [Migrate from systems](../../build-an-app/migrate-from-systems.md).
+{% endhint %}
 
 ## Transaction history
 
@@ -104,8 +117,9 @@ How far back your history goes depends on your [subscription tier](../account/su
 | `in` | Credits received from another user, including daily claims |
 | `out` | Credits sent to another user |
 | `transfer_reversal` | A failed transfer refunded to you |
-| `tax` | Your share of a daily claim made by a user on your system |
-| `credit_purchase` | Credits bought through Stripe or Ko-fi |
+| `tax` | Your share of a daily claim made by a user whose system became your app |
+| `credit_purchase` | Credits bought through Stripe or Ko-fi. Rotur no longer sells credits, so these are older entries. |
+| `sable_credit_purchase` | Sable credits bought through Stripe. These don't change your Rotur credit balance. |
 | `key_buy` | Credits spent on a key, including recurring subscription charges |
 | `key_sale` | Credits earned when someone buys your key (90% after the fee) |
 | `item_buy` | Credits spent buying an item |
@@ -125,6 +139,7 @@ How far back your history goes depends on your [subscription tier](../account/su
 | `group_entry_fee` | A group entry fee, paid or received |
 | `group_tip` | Credits tipped to a group |
 | `group_tip_withdrawal` | Credits withdrawn from a group's tips |
+| `group_tip_refund` | Your tips refunded when a group closed because its owner deleted their account |
 | `group_role_purchase` | Credits spent on a group role |
 | `group_role_subscription` | A recurring charge for a group role |
 | `cosmetic_purchase` | Credits spent on a cosmetic |

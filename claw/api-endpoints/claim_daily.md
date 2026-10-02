@@ -25,6 +25,7 @@ Authorization: Bearer <token>
 
 | Status | When |
 | --- | --- |
+| `403` | `Sub accounts can't claim the daily credit` (with `code` set) |
 | `429` | `Daily claim already made`. The body also has `wait_time` (seconds until you can claim) and `wait_hours` (the same in hours, as a string) |
 | `500` | `Could not record daily claim` |
 

@@ -4,7 +4,7 @@
 
 > **Base URL:** `https://avatars.rotur.dev`
 >
-> **Auth:** None for reading images. [Uploading](upload.md) takes your main account token in the request body.
+> **Auth:** None for reading images. [Uploading and removing](upload.md) takes your main account token.
 
 ## Endpoints
 
@@ -13,10 +13,17 @@
 | GET | `/:username` | The user's profile picture (this page) |
 | GET | [`/.banners/:username`](.banners.md) | The user's profile banner |
 | GET | [`/.overlay/:username`](overlay.md) | The avatar overlay the user has equipped |
+| GET | `/.backgrounds/:username` (below) | The profile background the user has equipped |
+| GET | `/.videos/:username` (below) | The user's own uploaded background video |
 | POST | [`/rotur-upload-pfp`](upload.md) | Upload a profile picture |
 | POST | [`/rotur-upload-banner`](upload.md) | Upload a banner |
+| POST | [`/rotur-upload-overlay`](upload.md) | Upload a custom overlay |
+| POST | [`/rotur-upload-background`](upload.md) | Upload a background video. `/rotur-upload-profile-video` is the same |
+| DELETE | [`/rotur-remove-banner`](upload.md) | Remove your banner |
+| DELETE | [`/rotur-remove-overlay`](upload.md) | Remove your custom overlay |
+| DELETE | [`/rotur-remove-background`](upload.md) | Remove your background video. `/rotur-remove-profile-video` is the same |
 
-The same routes are also available with v2 paths: `/v2/avatars/:username`, `/v2/avatars/:username/banner`, `/v2/avatars/:username/overlay`, `/v2/avatars/upload/pfp` and `/v2/avatars/upload/banner`.
+The same routes are also available with v2 paths: `/v2/avatars/:username`, `/v2/avatars/:username/banner`, `/v2/avatars/:username/overlay`, `/v2/avatars/:username/background`, `/v2/avatars/:username/profile-video`, `/v2/avatars/upload/pfp`, `/v2/avatars/upload/banner`, `/v2/avatars/upload/overlay`, `/v2/avatars/upload/background` (or `/upload/profile-video`), and `DELETE` on `/v2/avatars/banner`, `/v2/avatars/overlay` and `/v2/avatars/background` (or `/profile-video`). The `/v2/avatars` upload and remove routes also work on `https://api.rotur.dev`, where a rotur.dev browser session counts as your token.
 
 ## GET `/:username`
 
@@ -57,3 +64,25 @@ GET /mist?s=64&radius=32
 | Status | When |
 | --- | --- |
 | `400` | A 36-character ID was given and no user has it (`User not found`) |
+
+## GET `/.backgrounds/:username`
+
+Returns the profile background the user has equipped. Also accepts `HEAD`.
+
+**Auth:** None.
+
+If the user has equipped their own uploaded video, you get the MP4 directly. If they have equipped a background from the [cosmetics shop](../economy/cosmetics/README.md), you get a `307` redirect to its file on `https://api.rotur.dev/cosmetics/backgrounds/`. Videos are served as `video/mp4` with `Cache-Control: private, no-store`, and range requests work, so you can use the URL in a `<video>` element.
+
+`GET /.videos/:username` returns only the user's own uploaded video, whatever they have equipped.
+
+### Parameters
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `username` | path | string | Yes | The username (case-insensitive) |
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `404` | No such user, or nothing to serve: no background equipped, or for `/.videos`, no uploaded video or no longer the perk that allows one. The body is empty |
