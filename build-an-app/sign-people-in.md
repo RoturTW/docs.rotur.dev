@@ -25,10 +25,12 @@ import { Rotur } from "rotur-sdk";
 
 const rotur = new Rotur({ app: "app_0123456789abcdef" });
 
-rotur.onChange((user) => {
+rotur.onChange((user, denied) => {
   // Runs now, and whenever someone signs in or out, in this tab or another.
   if (user) showUser(user.username, user.avatar);
   else showSignInButton();
+  // Set when Rotur signed them out because they can't use your app.
+  if (denied) showMessage(denied.message);
 });
 
 signInButton.onclick = () => rotur.signIn();
@@ -37,7 +39,7 @@ signOutButton.onclick = () => rotur.signOut();
 
 `signIn()` opens Rotur's sign-in window and resolves to the person once they've signed in. Call it from a click, or the browser may block the window. If it's blocked anyway, the page goes to Rotur and comes back signed in, and the SDK finishes the sign-in when the page loads.
 
-People stay signed in on that browser until they sign out. `rotur.user` is who is signed in now, or `null`:
+People stay signed in on that browser until they sign out, or until Rotur stops them using your app: see [When Rotur refuses someone](call-your-server.md#when-rotur-refuses-someone). `rotur.user` is who is signed in now, or `null`:
 
 | Field | What it is |
 | --- | --- |

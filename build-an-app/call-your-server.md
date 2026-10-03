@@ -20,7 +20,7 @@ When nobody is signed in, `rotur.fetch` sends the request without the header.
 
 ## When your server says no
 
-Your server answers `401` when it can't tell who is calling. The examples in [Check who's calling](check-whos-calling.md) send Rotur's `error` and `code` with it:
+Your server answers `401` when it can't tell who is calling. The examples in [Check who's calling](check-whos-calling.md) send Rotur's `error` and `code` with it. `error` is written for the person:
 
 ```js
 if (res.status === 401) {
@@ -29,9 +29,24 @@ if (res.status === 401) {
 }
 ```
 
-`error` is written for the person, for example "You've been banned from Sketchpad."
+## When Rotur refuses someone
 
-Once someone can't use your app, Rotur also stops renewing their sign-in. `rotur.fetch` then throws an `ApiError` and signs them out on that browser, and `rotur.onChange` tells your page. If they sign in again, Rotur's window tells them why they can't.
+If Rotur stops someone using your app, for example because you banned them, the SDK signs them out on that browser. The call that found out, often `rotur.fetch`, throws a `RoturDeniedError`, and `onChange` gets the same error:
+
+```js
+import { RoturDeniedError } from "rotur-sdk";
+
+rotur.onChange((user, denied) => {
+  if (denied) showMessage(denied.message); // "You've been banned from Sketchpad."
+});
+```
+
+| Property | What it is |
+| --- | --- |
+| `message` | Why, written for the person |
+| `code` | The same codes your server sees, such as `app_banned`. See [Check who's calling](check-whos-calling.md#the-call) |
+| `reason` | For a ban, the reason your team gave |
+| `until` | For a ban, when it ends, in Unix milliseconds. Missing if it doesn't end |
 
 ## A server on another origin
 
