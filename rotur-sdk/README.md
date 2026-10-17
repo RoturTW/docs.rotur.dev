@@ -3,7 +3,7 @@
 `rotur-sdk` is the official TypeScript client for the Rotur API. Use it to log users in and call Rotur from a browser app, a desktop app, or a server.
 
 {% hint style="info" %}
-Apps sign people in with `new Rotur({ app })` and `rotur.signIn()`, from version 3.1. See [Build an app](../build-an-app/README.md). Once someone is signed in, the methods in this section work as them. `rotur.login()` and passing a token to the constructor are for Rotur's own clients and for tools on your own account.
+Apps sign people in with `rotur.login()` and a token from [rotur.dev/auth](../accounts-and-tokens/rotur-dev-auth.md), or with Sign in with Rotur (`new Rotur({ app })` and `rotur.signIn()`, see [Build an app](../build-an-app/README.md)). Once someone is signed in, the methods in this section work as them.
 {% endhint %}
 
 > **Base URL:** `https://api.rotur.dev/v2` (the SDK sends every request there)
@@ -22,8 +22,8 @@ import { Rotur } from "rotur-sdk";
 
 const rotur = new Rotur();
 
-// Opens the rotur.dev/auth popup
-await rotur.login();
+// From a click: a rotur.dev/auth popup, or the whole tab if the popup is blocked
+await rotur.login({ requires: ["account:view"] });
 
 const { username } = await rotur.me.checkAuth();
 console.log("Logged in as", username);
@@ -58,7 +58,7 @@ rotur.logout();     // clear the token and disconnect the WebSocket and Beam
 Sub-tokens only work for the methods their permissions allow. Each method page lists the permission it needs on its **Auth** line:
 
 - **Required. Sub-tokens need `x`.** The method sends your token, and a sub-token must include permission `x`.
-- **Required. Main token only.** The method needs your main account token (permission `full`). Apps outside Rotur's own sites get a scoped token even when they ask for `full`, so these methods won't work for them. See [Permission scopes](account/authentication.md#permission-scopes).
+- **Required. Main token only.** The method needs your main account token. No app is given that token, even when it asks for `full`, so these methods only work with a token you pass in yourself. See [Permission scopes](account/authentication.md#permission-scopes).
 - **Required. No specific permission.** The method sends your token, but no permission is mapped to it.
 - **None.** The method sends no token.
 

@@ -27,7 +27,7 @@ Rotur's ban, age and parental checks for apps, and your app's users, bans and re
 | Your app | Use |
 | --- | --- |
 | A website | [Get a token with rotur.dev/auth](rotur-dev-auth.md). The person signs in on rotur.dev, picks permissions, and the token comes back to your page |
-| A JavaScript app | The [Rotur SDK](../rotur-sdk/account/authentication.md)'s `rotur.login()`, which wraps rotur.dev/auth |
+| A JavaScript app | The [Rotur SDK](../rotur-sdk/account/authentication.md)'s `rotur.login()`, which wraps rotur.dev/auth: a popup, a full-page redirect or a sign-in box on your page |
 | A desktop app, game or device | [Link with a code](linking.md). Your app shows a code, and the person enters it at rotur.dev/link |
 | A TurboWarp or MistWarp project | [The Rotur Extension](../the-rotur-extension/connecting-to-rotur.md) |
 
