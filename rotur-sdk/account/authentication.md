@@ -6,77 +6,119 @@ Apps sign people in with `new Rotur({ app })` and `rotur.signIn()`, from version
 
 The SDK gives you a few ways to get a token for the Rotur API.
 
-## Popup Login (Browser)
+## Sign in with rotur.dev/auth
 
-`rotur.login()` opens `rotur.dev/auth` in a popup. The person signs in and picks what your app may do, and the token comes back to your app through `postMessage`.
+`rotur.login()` signs the person in on [rotur.dev/auth](../../accounts-and-tokens/rotur-dev-auth.md) and gives your app a token with the permissions they choose. Since 3.2 it can use a popup, a full-page redirect or a sign-in box on your page.
 
 ```ts
 const rotur = new Rotur();
-await rotur.login();
 
-// With options:
-await rotur.login({
-  system: "originOS",        // system for new sign-ups (deprecated)
-  timeout: 60_000,           // 60 second timeout (default: 120s)
-  signal: abortCtrl.signal,  // AbortController signal
-  requires: ["posts:create"], // permission scopes to request
-});
-
-// Ask for full account access:
-await rotur.login({ requires: "full" });
+signInButton.onclick = async () => {
+  await rotur.login({ requires: ["validators:generate"] });
+  rotur.token;   // the app's token
+  rotur.granted; // the permissions the person gave it
+};
 ```
 
-### How it works
+Options:
 
-1. Opens `https://rotur.dev/auth?return_to=<current page>&requires=<scopes>` in a popup
-2. If the popup is blocked, falls back to a fullscreen iframe
-3. Listens for a `postMessage` from `https://rotur.dev` or your own origin with `{ type: "rotur-auth-token", token: "..." }`
-4. Sets the token, opens the WebSocket, and resolves with the client
+| Option | Description |
+| --- | --- |
+| `requires` | The [permissions](#permission-scopes) your app needs: an array, or a comma-separated string. `"full"` asks for every permission an app can have |
+| `mode` | `"auto"` (default), `"popup"`, `"redirect"` or `"embed"`. See below |
+| `container` | For `mode: "embed"`: the element (or a selector for it) to put the sign-in box in. Giving one makes `"auto"` use the box |
+| `theme` | The box's colours: `"dark"` (default) or `"light"` |
+| `prompt` | `"select_account"`: the box lets the person choose the account instead of reusing the one it knows |
+| `returnTo` | The page rotur.dev hands the token to. Default: this page's origin and path, without its query or fragment |
+| `timeout` | Milliseconds to wait. Default: 15 minutes for a popup, no limit for the box |
+| `signal` | An `AbortSignal` to stop waiting |
+| `system` | The system an account made during sign-in joins. Deprecated: new apps leave it out |
 
-Browsers only allow the popup when `login()` runs from a click or key press. Call it from a "Sign in" button rather than on page load or from a socket event, or your users always get the iframe.
+### Modes
 
-Inside the iframe, Google, GitHub and Discord sign-in are unavailable because those providers refuse to be framed, so users sign in with their username and password. See [rotur.dev/auth](../../accounts-and-tokens/rotur-dev-auth.md) for details.
+- **`"auto"`**: a popup when called from a click. If the browser blocks it, the tab goes to rotur.dev and comes back. Installed web apps and in-app browsers (Instagram, TikTok…) go to rotur.dev in the tab straight away, as a popup can't hand its answer back there. With a `container`, the sign-in box.
+- **`"popup"`**: only a popup. Rejects with `popup_blocked` if the browser blocks it. Call it from a click or key press.
+- **`"redirect"`**: the tab goes to rotur.dev and comes back with the token in the address's fragment (`#rotur_token=…`), never the query. The SDK sends a random `state` and only takes an answer that carries it, so a link with someone else's token in it can't sign anyone in.
+- **`"embed"`**: rotur.dev's sign-in box in `container`. Someone who already let your site in through the box, with the same or more permissions, gets in without a click. Anything new opens rotur.dev in a popup from the box's button. The box removes itself when sign-in finishes; if the person closes the popup it stays, so they can try again.
 
-On failure the promise rejects with an `AuthError` whose `code` is one of `"timeout"`, `"aborted"`, `"popup_blocked"`, or `"no_token"`:
+```ts
+await rotur.login({ mode: "embed", container: "#signin", requires: ["files:view", "files:manage"], theme: "light" });
+```
+
+A page inside another site's frame can't go to rotur.dev in the tab (rotur.dev won't load in a frame), so there a blocked popup rejects with `popup_blocked` instead. Sign in from a click there, or use the box.
+
+### Coming back from a redirect
+
+`new Rotur()` finishes a redirect as the page loads. It checks the `state` it saved before leaving, takes the answer out of the address, and puts back the address the page had, query and fragment included. Then:
+
+- the first `rotur.login()` resolves with that sign-in, or rejects with `"cancelled"`, instead of leaving again. A page that signs in as it loads doesn't loop;
+- `rotur.finishLogin()` resolves to `{ token, permissions, id }` (or null), for apps that keep the token themselves:
+
+```ts
+const back = await rotur.finishLogin().catch(() => null);
+if (back) localStorage.setItem("rotur_token", back.token);
+```
+
+### Errors
+
+`login()` rejects with an `AuthError`:
+
+| `code` | Why |
+| --- | --- |
+| `cancelled` | They pressed Cancel on rotur.dev |
+| `popup_closed` | They closed the rotur.dev window |
+| `popup_blocked` | The browser blocked the popup, with `mode: "popup"` or in a page inside another site's frame |
+| `state_mismatch` | The page came back with a sign-in this browser didn't start. Nothing was signed in |
+| `timeout`, `aborted` | `timeout` passed, or your `signal` aborted |
 
 ```ts
 import { AuthError } from "rotur-sdk";
 
 try {
-  await rotur.login();
+  await rotur.login({ requires: ["validators:generate"] });
 } catch (err) {
-  if (err instanceof AuthError && err.code === "timeout") {
-    console.log("User never finished logging in");
-  }
+  if (err instanceof AuthError && (err.code === "cancelled" || err.code === "popup_closed")) {
+    showSignedOut();
+  } else throw err;
 }
 ```
 
+Before 3.2 the SDK showed rotur.dev in a full-window frame when the popup was blocked. rotur.dev no longer allows that, so those versions show a blank overlay for two minutes. They also wait for the timeout after Cancel. Upgrade to 3.2: see [the migration guide](https://git.rotur.dev/rotur/sdk/src/branch/main/MIGRATING.md).
+
 ### performAuth
 
-`rotur.login()` wraps the standalone `performAuth` function and accepts `system`, `timeout`, `signal` and `requires`. Call `performAuth` directly when you need `returnTo` or `popupOnly`:
+`rotur.login()` wraps the standalone `performAuth()`, which takes the same options and resolves to `{ token, permissions, id }` without a client. `handleAuthRedirect()` finishes a redirect without a client. With the `<script>` build they're `Rotur.performAuth` and `Rotur.handleAuthRedirect`.
 
 ```ts
-import { performAuth } from "rotur-sdk";
+import { handleAuthRedirect, performAuth } from "rotur-sdk";
 
-const { token } = await performAuth({
-  system: "originOS",
-  returnTo: "https://myapp.com/after-login", // default: current page URL
-  popupOnly: true, // throw AuthError("popup_blocked") instead of iframe fallback
-});
-rotur.setToken(token);
+const back = await handleAuthRedirect(); // on load
+const { token, permissions } = await performAuth({ mode: "popup", requires: ["posts:view"] });
 ```
-
-`system` is the system an account made during sign-in joins. Systems are deprecated and have been replaced by Rotur Apps, so new apps can leave it out.
 
 ### Permission scopes
 
-The `requires` option lists the permission scopes your app needs. Pass either a comma-separated string (`"posts:view,posts:create"`) or an array with one scope per entry (`["posts:view", "posts:create"]`). Use `"full"` to ask for full account access.
+`requires` lists the permissions your app needs. Pass an array (`["posts:view", "posts:create"]`) or a comma-separated string (`"posts:view,posts:create"`).
 
-`"full"` only gives you the account's own token on Rotur's own sites (`rotur.dev` and its subdomains, and `originchats.com`, over HTTPS). Anywhere else the person is offered a scoped token with every permission an app can have. They can see that token and remove it at any time, and methods marked **Main token only** do not work with it.
+| Your app… | `requires` |
+| --- | --- |
+| Shows who's signed in | `account:view` |
+| Proves who's calling to your own server ([validators](../utilities/validators.md)) | `validators:generate` |
+| Reads the person's files | `files:view` |
+| Saves files | `files:view`, `files:manage` (and `files:delete`) |
+| Shows their balance | `credits:view` |
+| Charges or sends credits | `credits:view`, `credits:transfer` |
+| Posts as them | `posts:view`, `posts:create` |
+
+Rotur asks for the password before an app gets `credits:transfer`, `credits:manage`, `account:settings`, `gifts:create`, `items:buy`, `cosmetics:buy`, `cosmetics:gift` or `signing:private`. Name them in `requires` when your app needs them: the consent card then shows them on and waits for the password. The person can still turn them off, so check `rotur.granted`.
+
+Without `requires`, apps on *.rotur.dev are offered every permission an app can have (the password ones off), and any other site gets only `account:view`.
+
+`"full"` offers every permission an app can have, as a token the person can see and remove. No app gets the account's own token, so methods marked **Main token only** don't work with any app's token.
 
 Older versions of rotur-sdk only accept an array, so pass `["full"]` there.
 
-If you use the Vite plugin from `rotur-sdk/vite`, it scans your code for SDK calls and injects the matching scopes automatically, so you rarely need to pass `requires` by hand. The `METHOD_PERMISSIONS` and `resolvePermissions` exports expose the same mapping if you want to compute scopes yourself.
+If you use the Vite plugin from `rotur-sdk/vite`, it scans your code for SDK calls and adds the matching permissions to `requires`. The `METHOD_PERMISSIONS` and `resolvePermissions` exports expose the same mapping if you want to compute them yourself.
 
 ## Manual Token
 
@@ -159,8 +201,10 @@ const abilities = await rotur.me.abilities();
 
 Any valid token can call this.
 
-## Logout
+## Sign out
 
 ```ts
-rotur.logout(); // clears the token and disconnects the WebSocket and Beam
+await rotur.signOut(); // clears the token, disconnects the WebSocket and Beam, and makes the sign-in box ask who's signing in next time
 ```
+
+`rotur.logout()` does the same.
