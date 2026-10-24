@@ -220,7 +220,7 @@ console.log(benefits.max_keys, benefits.file_system_size);
 
 **Returns:** `{ benefits, subscription, perk_restrictions }`.
 
-- `benefits` has `max_keys`, `max_login_history`, `max_transaction_history` (deprecated), `transaction_history_months`, `max_rmails`, `notification_log_size`, `file_system_size`, `bio_length`, `animated_pfp`, `animated_banner`, `free_banner_uploads`, `custom_overlay_uploads`, `custom_background_uploads`, `external_url_bio_templates`, `bio_templating`, `profile_notes`, `daily_credit_multiplier`, and `max_sub_accounts`.
+- `benefits` has `max_keys`, `max_login_history`, `max_transaction_history` (deprecated), `transaction_history_months`, `max_rmails`, `file_system_size`, `bio_length`, `animated_pfp`, `animated_banner`, `free_banner_uploads`, `custom_overlay_uploads`, `custom_background_uploads`, `external_url_bio_templates`, `bio_templating`, `profile_notes`, `daily_credit_multiplier`, and `max_sub_accounts`.
 - `subscription` has `active`, `tier`, `next_billing`, `provider`, `external_id`, `status`, `cancel_at_period_end`, and `tenure_months`.
 - `perk_restrictions` lists any cosmetic perks that have been turned off for your account.
 
